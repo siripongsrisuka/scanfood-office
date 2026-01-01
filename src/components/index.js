@@ -1,24 +1,11 @@
 import FloatingText from "./FloatingText";
-import Panda404 from "./Panda404";
-import NavBar from "./NavBar";
-import Commission from "./Commission";
-import Customer from "./Customer";
-import ShareLink from "./ShareLink";
-import Media from "./Media";
 import TripleChart from "./TripleChart";
 import InputText from "./InputText";
 import InputEmail from "./InputEmail";
 import InputPassword from "./InputPassword";
-import NewShop from "./NewShop";
 import Modal_Promptpay from "../modal/Modal_Promptpay";
-import ManageImport from "./ManageImport";
-import ImageEditor from "./ImageEditor";
 import CropImage from "./CropImage";
-import SoftwareCheck from "./SoftwareCheck";
-import CreatePDF from "./CreatePDF";
-import HardwareCheck from "./HardwareCheck";
 
-import MorrisTest from "./MorrisTest";
 import SearchControl from "./SearchControl";
 import OneButton from "./OneButton";
 import DeleteButton from "./DeleteButton";
@@ -59,26 +46,13 @@ export {
     RootImage,
     ImageSize,
     FloatingText, 
-    Panda404,
-    NavBar,
-    Commission,
-    Customer,
-    ShareLink,
-    Media,
     TripleChart,
     InputText,
     InputEmail,
     InputPassword,
-    NewShop,
     Modal_Promptpay,
-    ManageImport,
-    ImageEditor,
     CropImage,
-    SoftwareCheck,
-    CreatePDF,
-    HardwareCheck,
 
-    MorrisTest,
     SearchControl,
     OneButton,
     DeleteButton,

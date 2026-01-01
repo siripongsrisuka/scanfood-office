@@ -50,7 +50,7 @@ export default [
       id:'128'
     },
     {
-      label: '3. จัดการสาขา',
+      label: '3. ทีม Tech ขั้นเทพ',
     },
     
     {

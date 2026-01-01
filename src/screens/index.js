@@ -1,5 +1,4 @@
 import HomeScreen from "./HomeScreen";
-import ReportScreen from "./ReportScreen";
 import SbsScreen from "./SbsScreen";
 import DemoScreen from "./DemoScreen";
 import AdminDashboard from "./AdminDashboard";
@@ -7,7 +6,6 @@ import StorePort from "./StorePort";
 import NewShopScreen from "./NewShopScreen";
 import CloneScreen from "./CloneScreen";
 import LaosScreen from "./LaosScreen";
-import EquipmentScreen from "./EquipmentScreen";
 import BranchScreen from "./BranchScreen";
 import ApproveScreen from "./ApproveScreen";
 import ImportItemStoreScreen from "./ImportItemStoreScreen";
@@ -47,7 +45,6 @@ export {
     ImportItemFranchiseScreen,
     ImportItemStoreScreen,
     HomeScreen,
-    ReportScreen,
     SbsScreen,
     DemoScreen,
     AdminDashboard,
@@ -55,7 +52,6 @@ export {
     NewShopScreen,
     CloneScreen,
     LaosScreen,
-    EquipmentScreen,
     BranchScreen,
     ApproveScreen
 };

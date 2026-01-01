@@ -21,7 +21,6 @@ import Modal_Login from "./Modal_Login";
 import Modal_Profile from "./Modal_Profile";
 import Modal_SoftwareDetail from "./Modal_SoftwareDetail";
 import Modal_HardwareDetail from "./Modal_HardwareDetail";
-import Modal_Sticker from "./Modal_Sticker";
 import Modal_Delivery from "./Modal_Delivery";
 import Modal_FlatlistSearchFranchise from "./Modal_FlatlistSearchFranchise";
 import Modal_Equipment from "./Modal_Equipment";
@@ -68,7 +67,6 @@ export {
     Modal_Profile,
     Modal_SoftwareDetail,
     Modal_HardwareDetail,
-    Modal_Sticker,
     Modal_Delivery,
     Modal_FindHuman
 };

@@ -9,7 +9,6 @@ import {
   NewShopScreen,
   CloneScreen,
   LaosScreen,
-  EquipmentScreen,
   BranchScreen,
   ApproveScreen,
   ImportItemStoreScreen,
@@ -33,7 +32,6 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
 import { firebaseAuth } from './db/firestore'
-import { Panda404 } from "./components";
 import 'rsuite/dist/rsuite.min.css';
 import EquipmentSetting from "./screens/EquipmentSetting";
 import { ToastContainer } from 'react-toastify';
@@ -81,14 +79,12 @@ function App() {
           </Route>
           <Route path='/admin' element={<AdminDashboard/>} />
   
-          <Route path='/404' element={<Panda404/>} />
           <Route path='store' element={<StorePort/>}/>
           <Route path='store/demo' element={<DemoScreen/>} />
           <Route path='sbs' element={<SbsScreen/>} />
           <Route path='shop' element={<NewShopScreen/>} />
           <Route path='clone' element={<CloneScreen/>} />
           <Route path='laos' element={<LaosScreen/>} />
-          <Route path='equipment' element={<EquipmentScreen/>} />
           <Route path='branch/:id' element={<BranchScreen/>} />
           <Route path='approve' element={<ApproveScreen/>} />
           <Route path='importItem' element={<ImportItemStoreScreen/>} />
