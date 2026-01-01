@@ -1,0 +1,1 @@
+export default { status:false, content:'', onClick:()=>{}, variant:'success' }

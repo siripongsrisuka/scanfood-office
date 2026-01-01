@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "shopchamp-restaurant"
+  },
+  "targets": {
+    "shopchamp-restaurant": {
+      "hosting": {
+        "ScanfoodOffice": [
+          "scanfoodOffice"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

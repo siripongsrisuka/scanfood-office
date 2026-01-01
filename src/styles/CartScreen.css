@@ -1,0 +1,174 @@
+.category {
+    padding: 5px;
+    border-radius: 20px;
+    margin: 5px;
+    cursor: pointer;
+    background-color: #DCDDDE;
+    display: inline-block;
+}
+
+.category:hover {
+    background-color: #E9245F;
+    color: #FFFFFF;
+  }
+
+  /* .category:active,
+  .category:focus {
+    background-color: #9A6DF8;
+  } */
+
+  /* .table {
+    padding: 5px 20px;
+    border-radius: 20px;
+    margin: 5px;
+    background-color: #f44336ff;
+    color: #FFFFFF;
+    display: inline;
+} */
+
+.cart {
+    background-color: #000000;
+    border-radius: 100%;
+    position: fixed;
+    bottom: 15px;
+    right: 15px;
+    color: #FFFFFF;
+    font-size: 25px;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 999;
+}
+
+.cart2 {
+  border-radius: 100%;
+  position: fixed;
+  bottom: 40px;
+  right: 15px;
+  color: #FFFFFF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.cart3 {
+  /* border-radius: 100%; */
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  left: 0px;
+  /* color: #FFFFFF; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background-color: #FFFFFF;
+  padding: 0px 30px 10px 30px;
+}
+
+.qty {
+  position: absolute;
+  background-color: #E9245F;
+  border-radius: 100%;
+  font-size: 16px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fixed-div {
+    position: fixed;
+    width: 100%;
+    background-color: #FFFFFF;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+    /* top: 20px; 
+    right: 20px;
+    width: 200px;
+    height: 100px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 10px; */
+    z-index: 999;
+  }
+
+  .content-below {
+    margin-top: 140px; /* Adjust the margin value to create enough space for the fixed div */
+    /* Other styles for the content below if needed */
+  }
+
+  .scrollable-content {
+    overflow: auto; /* This enables scrolling for the content */
+    scrollbar-width: none; /* Firefox uses a different property, but it's hidden by default */
+    -ms-overflow-style: none; /* Hide scrollbar in IE and Edge */
+  }
+  
+  /* WebKit-based browsers (Chrome, Safari) */
+  .scrollable-content::-webkit-scrollbar {
+    width: 0.5em; /* Adjust the width of the invisible scrollbar */
+  }
+  
+  .scrollable-content::-webkit-scrollbar-track {
+    background: transparent; /* Transparent track */
+  }
+  
+  .scrollable-content::-webkit-scrollbar-thumb {
+    background: transparent; /* Transparent thumb (handle) */
+  }
+
+  .slide-modal .modal-dialog {
+    margin-top: 100%;
+    transition: margin-top 0.3s;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 10px;
+  }
+  
+  .slide-modal .show .modal-dialog {
+    margin-top: 5%; /* Adjust this value to control how much of the modal is visible initially */
+  }
+
+
+  .custom-scrollbar {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: thin; /* for Firefox */
+    scrollbar-color: #888 #f5f5f5; /* for Firefox */
+  
+    /* Hide the default scrollbar for Webkit browsers (Chrome, Safari) */
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+  
+    &::-webkit-scrollbar-thumb {
+      background-color: #888;
+      border-radius: 3px;
+    }
+  
+    &::-webkit-scrollbar-track {
+      background-color: #f5f5f5;
+    }
+  
+    /* Add any additional styling you want for other browsers here */
+  }
+
+
+  
+  
+  

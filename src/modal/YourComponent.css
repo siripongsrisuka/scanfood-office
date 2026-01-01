@@ -1,0 +1,61 @@
+/* YourComponent.css */
+
+/* Define the sliding animation */
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Apply the animation to the modal */
+.modal-slide-from-bottom .modal-dialog {
+  animation: slideInFromBottom 0.4s;
+  width: 100vw; /* Set the width of the modal to 100vw */
+  max-height: 100vh; /* Set the maximum height of the modal to 90vh */
+  overflow-y: hidden; /* Enable scrolling for the modal */
+  margin: 0; /* Remove any margins */
+  position: absolute; /* Position the modal absolutely */
+  bottom: 0; /* Place the modal at the bottom of the viewport */
+  left: 0; /* Set the left position to 0 to make it full-width */
+  right: 0; /* Set the right position to 0 to make it full-width */
+}
+
+/* Add border radius only to top-left and top-right corners of modal content */
+.modal-slide-from-bottom .modal-content {
+  border-radius: 20px 20px 0 0;
+  height: 100vh; /* Subtract header height to limit modal body height */
+  overflow-y: scroll; /* Enable scrolling for the modal content */
+}
+
+/* Fix the position of the modal header */
+.modal-slide-from-bottom .modal-header {
+  position: sticky;
+  top: 0;
+  background-color: #f8f9fa; /* Set the background color of the header area */
+  padding: 10px; /* Set padding for the header */
+  border-radius: 20px 20px 0 0; /* Apply the border radius to top-left and top-right of the header */
+  z-index: 1; /* Ensure the header stays above the modal body */
+}
+
+/* Fix the position of the modal footer */
+.modal-slide-from-bottom .modal-footer {
+  position: sticky;
+  bottom: 0;
+  background-color: #ffffff; /* Set the background color of the footer area */
+  padding: 10px; /* Set padding for the footer */
+  border-radius: 0 0 0 0; /* Apply the border radius to bottom-left and bottom-right of the footer */
+  z-index: 1; /* Ensure the footer stays above the modal body */
+}
+
+/* Add a background element to ensure sticky header remains fixed */
+.modal-slide-from-bottom .modal-background {
+  position: sticky;
+  top: 0;
+  z-index: -1;
+  background-color: #f8f9fa; /* Set the same background color as the header */
+  padding: 10px; /* Set padding for the background element */
+  border-radius: 20px 20px 0 0; /* Apply the border radius to top-left and top-right of the background element */
+}

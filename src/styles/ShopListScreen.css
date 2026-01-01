@@ -1,0 +1,19 @@
+.left-border {
+    border-left: 3px solid #EDF1F5;
+    /* padding: 1px 1px; */
+}
+.right-border {
+    border-left: 3px solid #EDF1F5;
+}
+
+.loading-screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99;
+  }
+  

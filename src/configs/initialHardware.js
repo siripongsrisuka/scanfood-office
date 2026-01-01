@@ -1,0 +1,20 @@
+export default {
+    address:'',
+    shopId:'',
+    shopName:'',
+    profileId:'',
+    profileName:'',
+    timestamp:'',
+    imageId:'',
+    net:'',
+    status:'order',//
+    tel:'',
+    product:[],
+    deliveryFee:0,
+    vat:false,
+    vatDetail:'',
+    vatAmount:0,
+    totalPrice:'',
+    nameSername:'',
+    orderNumber:'',
+  };

@@ -1,0 +1,20 @@
+export default {
+    id:'',
+    name:'',
+    detail:'',
+    sku:'',
+    barcode:'',
+    imageId:'',
+    unit:'',
+    stock:'',
+    category:[],
+    weight:'',
+    price:'',
+    discount:'',
+    point:'',
+    minimum:1,
+    maximum:999,
+    saleStatus:'notSale',
+    BOM:[],
+    priceTypes:[]
+  }
