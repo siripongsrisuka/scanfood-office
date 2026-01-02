@@ -341,7 +341,7 @@ export function findDay(packageId){
   const member = new Set(['34', '35', '36', '37','38','39'])
   
   if(months.has(packageId)){
-    day = 30
+    day = 31
   } else { // years
     day = 365
   }
@@ -362,17 +362,7 @@ export function findDay(packageId){
   return { day, packageId, packageType }
 }
 
-export function useToDate(date) {
-  if (date instanceof Date) {
-      return date;
-  }
 
-  try {
-      return date.toDate();
-  } catch (err) {
-      return new Date();
-  }
-};
 
 export function manageBill(arr1,arr2){
   let bills = mergeArrays(arr1,arr2)

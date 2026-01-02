@@ -32,9 +32,11 @@ import Modal_Card from "./Modal_Card";
 import Modal_Splash from "./Modal_Splash";
 import Modal_Human from "./Modal_Human";
 import Modal_FindHuman from "./Modal_FindHuman";
+import Modal_ApproveSoftware from "./Modal_ApproveSoftware";
 
 
 export { 
+    Modal_ApproveSoftware,
     Modal_Human,
     Modal_Splash,
     Modal_Card,

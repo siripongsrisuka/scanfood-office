@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { NumberYMD, minusDays, stringYMDHMS3 } from '../Utility/dateTime';
-import { endCutoff, manageBill, startCutoff, useToDate } from '../Utility/function';
+import { endCutoff, formatTime, manageBill, startCutoff } from '../Utility/function';
 import { db } from '../db/firestore';
 import { initialCheckOut } from '../configs';
 
@@ -39,7 +39,7 @@ export const fetchBill = createAsyncThunk(
               ...initialCheckOut,
               id:doc.id, 
               ...doc.data(), 
-              timestamp: useToDate(doc.data().timestamp)
+              timestamp: formatTime(doc.data().timestamp)
             });
           });
         } else {

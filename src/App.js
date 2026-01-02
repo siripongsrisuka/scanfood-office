@@ -34,6 +34,7 @@ import { firebaseAuth } from './db/firestore'
 import 'rsuite/dist/rsuite.min.css';
 import EquipmentSetting from "./screens/EquipmentSetting";
 import { ToastContainer } from 'react-toastify';
+import ApproveSoftwareScreen from "./screens/ApproveSoftwareScreen";
 
 
 function App() {
@@ -80,6 +81,7 @@ function App() {
             <Route path='kbankReport' element={<KbankReportScreen/>} />
             <Route path='equipmentSetting' element={<EquipmentSetting/>} />
             <Route path='warehouse' element={<WarehouseScreen/>} />
+            <Route path='approveSoftware' element={<ApproveSoftwareScreen/>} />
 
           </Route>
           <Route path='/admin' element={<AdminDashboard/>} />

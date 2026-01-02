@@ -32,9 +32,9 @@ export default [
       
     },
     {
-      topic: '2.1 license',
+      topic: '2.1 อนุมัคิ Software',
       icon: 'bi-speedometer',
-      to: 'equipmentSetting',
+      to: 'approveSoftware',
       id:'128'
     },
     {
