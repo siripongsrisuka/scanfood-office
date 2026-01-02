@@ -27,26 +27,54 @@ export default [
       to: 'report',
       id:'107'
     },
-  {
-      label: '2. คลังสินค้า',
+      {
+      label: '2. คำสั่งซื้อ',
       
     },
     {
-      topic: '2.1 หมวดหมู่สินค้า',
+      topic: '2.1 license',
       icon: 'bi-speedometer',
-      to: 'warehouseCategory',
+      to: 'equipmentSetting',
       id:'128'
     },
     {
-      topic: '2.2 คลังสินค้า',
+      topic: '2.1 อุปกรณ์',
       icon: 'bi-speedometer',
       to: 'warehouse',
       id:'128'
     },
     {
-      topic: '2.3 ผูกรายการสินค้า',
+      topic: '2.1 ประวัติ License',
       icon: 'bi-speedometer',
-      to: 'stockLink',
+      to: 'softwareHistory',
+      id:'128'
+    },
+      {
+      topic: '2.1 ประวัติ อุปกรณ์',
+      icon: 'bi-speedometer',
+      to: 'hardwareHistory',
+      id:'128'
+    },
+  {
+      label: '2. คลังสินค้า',
+      
+    },
+    {
+      topic: '2.1 ตั้งค่าอุปกรณ์',
+      icon: 'bi-speedometer',
+      to: 'equipmentSetting',
+      id:'128'
+    },
+    {
+      topic: '2.1 สต๊อกคงเหลือ',
+      icon: 'bi-speedometer',
+      to: 'warehouse',
+      id:'128'
+    },
+    {
+      topic: '2.1 งาน',
+      icon: 'bi-speedometer',
+      to: 'equipmentSetting',
       id:'128'
     },
     {
@@ -54,11 +82,32 @@ export default [
     },
     
     {
-      topic: '3.1 สาขาทั้งหมด',
+      topic: '3.1 คัดลอกร้าน',
       icon: 'bi-speedometer',
-      to: 'branch',
+      to: 'clone',
       id:'128'
     },
+    {
+      topic: '3.1 อัปโหลดสินค้าร้านเดี่ยว',
+      icon: 'bi-speedometer',
+      to: 'importItem',
+      id:'128'
+    },
+    {
+      topic: '3.1 อัปโหลดวัตถุดิบร้านเดี่ยว',
+      icon: 'bi-speedometer',
+      to: 'importBomShop',
+      id:'128'
+    },
+    {
+      topic: '3.1 kbankReport',
+      icon: 'bi-speedometer',
+      to: 'kbankReport',
+      id:'128'
+    },
+    
+
+    
    
     {
         label: '4. พนักงาน',

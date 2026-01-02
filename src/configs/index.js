@@ -10,7 +10,6 @@ import onesignalDefalut from "./onesignalDefalut";
 import initialCheckOut from "./initialCheckOut";
 import initialAlert from "./initialAlert";
 import admin from "./admin";
-import card from "./card";
 import colorIndex from "./colorIndex";
 import initialStore from "./initialStore";
 import initialPackage from "./initialPackage";
@@ -35,7 +34,6 @@ export {
     initialCheckOut,
     initialAlert,
     admin,
-    card,
     colorIndex,
     initialStore,
     initialPackage,

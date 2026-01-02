@@ -1,4 +1,5 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import { db } from '../db/firestore';
 
 const initialState = {
     office:{
@@ -7,6 +8,13 @@ const initialState = {
     }, // 
     modal_Office:false,
 };
+
+export const fetchOffice = createAsyncThunk(
+  'office/fetchOffice', async () => {
+    const officeDoc = await db.collection('admin').doc('office').get();
+ 
+    return officeDoc.data();
+});
 
 export const officeSlice = createSlice({
   name: 'office',
@@ -20,7 +28,16 @@ export const officeSlice = createSlice({
     },
   },
   extraReducers: builder => {
- 
+      builder.addCase(fetchOffice.pending, state => {
+        state.modal_Office = true
+      })
+      builder.addCase(fetchOffice.fulfilled, (state, action) => {
+          state.office = action.payload
+          state.modal_Office = false
+      })
+      builder.addCase(fetchOffice.rejected, state => {
+          state.modal_Office = false
+      })
   }
 })
 

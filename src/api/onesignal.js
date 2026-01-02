@@ -310,35 +310,6 @@ export async function onesignalWebGetPlayerId(){
 }
 
 
-export async function cloneShop(pushParam) {  // update tag to all same external_user_id in all player of onesignal
-
-
-
-  try{
-    // return await shopchampRestaurantAPI.put("/updateTagsByExternalUserId/"+external_user_id,{uid:objRes.user.uid,appName:'merchant'});
-    const response = await shopchampRestaurantAPI.post(
-      "/shop/cloneShop/",
-      {...pushParam},
-      { }
-    );
-
-    return response
-  }catch(error){
-    console.log('cloneShop_error')
-    // console.log(error)
-
-    if (error.response) {   // // not make error on calling layer, cause it reject by axios and has go to this scope (catch), reject or error can only go to catch scpoe one time if want more than one must thow error to make error again on outside layer
-      console.log('Error data:', error.response.data); // The data returned by the server
-      console.log('Error status:', error.response.status); // The HTTP status code
-      console.log('Error headers:', error.response.headers); // The response headers
-      // console.log('Error message:', error.message); // The error message 
-    }
-
-  }
-
-
-
-}
 
 
 export async function onesignalWebGetFullPlayerData(_player_id='') {   // use to get "external_user_id" of user in onesignal

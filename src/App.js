@@ -8,7 +8,6 @@ import {
   StorePort,
   NewShopScreen,
   CloneScreen,
-  LaosScreen,
   BranchScreen,
   ApproveScreen,
   ImportItemStoreScreen,
@@ -21,13 +20,13 @@ import {
   HardwareHistory,
   TransformTable,
   TransferExpireScreen,
-  TeamAScreen,
   QuestionSettingScreen,
   MasterScreen,
   DiagnosisScreen,
   KbankReportScreen,
   OfficeScreen,
   StaffScreen,
+  WarehouseScreen,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -75,6 +74,12 @@ function App() {
           <Route path='/master' element={<MasterScreen/>} />
           <Route path='/office' element={<OfficeScreen/>} >
             <Route path='staff' element={<StaffScreen/>} />
+            <Route path='clone' element={<CloneScreen/>} />
+            <Route path='importItem' element={<ImportItemStoreScreen/>} />
+            <Route path='importBomShop' element={<ImportBomShopScreen/>} />
+            <Route path='kbankReport' element={<KbankReportScreen/>} />
+            <Route path='equipmentSetting' element={<EquipmentSetting/>} />
+            <Route path='warehouse' element={<WarehouseScreen/>} />
 
           </Route>
           <Route path='/admin' element={<AdminDashboard/>} />
@@ -84,24 +89,18 @@ function App() {
           <Route path='sbs' element={<SbsScreen/>} />
           <Route path='shop' element={<NewShopScreen/>} />
           <Route path='clone' element={<CloneScreen/>} />
-          <Route path='laos' element={<LaosScreen/>} />
           <Route path='branch/:id' element={<BranchScreen/>} />
           <Route path='approve' element={<ApproveScreen/>} />
-          <Route path='importItem' element={<ImportItemStoreScreen/>} />
           <Route path='importItemFranchise' element={<ImportItemFranchiseScreen/>} />
           <Route path='importBomFranchise' element={<ImportBomFranchiseScreen/>} />
-          <Route path='importBomShop' element={<ImportBomShopScreen/>} />
           <Route path='importMarketPlaceFranchise' element={<ImportMarketPlaceFranchise/>} />
           <Route path='customerCare' element={<CustomerCareScreen/>} />
-          <Route path='equipmentSetting' element={<EquipmentSetting/>} />
           <Route path='softwareHistory' element={<SoftwareHistory/>} />
           <Route path='hardwareHistory' element={<HardwareHistory/>} />
           <Route path='transform' element={<TransformTable/>} />
           <Route path='transferExpire' element={<TransferExpireScreen/>} />
-          <Route path='teamA' element={<TeamAScreen/>} />
           <Route path='questionSetting' element={<QuestionSettingScreen/>} />
           <Route path='diagnosis' element={<DiagnosisScreen/>} />
-          <Route path='kbankReport' element={<KbankReportScreen/>} />
 
           
 

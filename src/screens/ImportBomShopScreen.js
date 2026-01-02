@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import ExcelJS from "exceljs";
 import { db } from "../db/firestore";
-import { Table } from "react-bootstrap";
+import { Table, Row, Col } from "react-bootstrap";
 import { colors } from "../configs";
-import { Modal_FlatlistSearchShop, Modal_Loading, Modal_Success } from "../modal";
-import { Button } from "rsuite";
+import { Modal_FlatlistSearchShop, Modal_Loading } from "../modal";
 import { v4 as uuidv4 } from 'uuid';
-import { findInArray } from "../Utility/function";
+import { findInArray, toastSuccess } from "../Utility/function";
 import firebase from 'firebase/app';
+import { Card, OneButton } from "../components";
+import { stringFullDate } from "../Utility/dateTime";
 
 const { theme3 } = colors;
-const initialShop = { id:'', name:'', BOMCategory:[] };
+const initialShop = { id:'', name:'', BOMCategory:[], createdDate:new Date() };
 const initialBOM = {
     shopId:'',
     name:'',
@@ -27,10 +28,10 @@ const ImportBomShopScreen = () => {
   const [products, setProducts] = useState([]);
   const [search_Modal, setSearch_Modal] = useState(false);
   const [shop, setShop] = useState(initialShop)
-  const { id:shopId, name, BOMCategory:smartCategory } = shop;
+  const { id:shopId, name, BOMCategory:smartCategory, createdDate } = shop;
   const [category, setCategory] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [success_Modal, setSuccess_Modal] = useState(false);
+  const fileInputRef = useRef(null);
 
     const handleFileUpload = async (event) => {
         const file = event.target.files[0];
@@ -48,12 +49,12 @@ const ImportBomShopScreen = () => {
             worksheet.eachRow((row, rowNumber) => {
             if (rowNumber > 1) { // Skip header
                 extractedProducts.push({
-                name: row.getCell(1).value||'', // Assuming name in column A
-                smallestUnit: row.getCell(2).value||'', // Assuming name in column A
-                category: row.getCell(3).value||'', // Assuming name in column A
-                safetyStock: row.getCell(4).value||'', // Assuming name in column A
-                stock: row.getCell(5).value||'', // Assuming name in column A
-                cost: row.getCell(6).value||'', // Assuming name in column A
+                    name: row.getCell(1).value||'', // Assuming name in column A
+                    smallestUnit: row.getCell(2).value||'', // Assuming name in column A
+                    category: row.getCell(3).value||'', // Assuming name in column A
+                    safetyStock: row.getCell(4).value||'', // Assuming name in column A
+                    stock: row.getCell(5).value||'', // Assuming name in column A
+                    cost: row.getCell(6).value||'', // Assuming name in column A
                 });
             }
             });
@@ -86,7 +87,9 @@ const ImportBomShopScreen = () => {
   
         if (products.length === 0) {
             return alert('กรุณาใส่ไฟล์ excel');
-        }
+        };
+
+        if(!shopId) return alert('กรุณาเลือกร้าน')
     
         try {
             setLoading(true);
@@ -148,10 +151,9 @@ const ImportBomShopScreen = () => {
     
             setProducts([]);
             setShop(initialShop)
-            setSuccess_Modal(true);
-            setTimeout(() => setSuccess_Modal(false), 900);
+            toastSuccess()
         } catch (error) {
-            console.error('Error adding products:', error);
+            alert('Error adding products:', error);
         } finally {
             setLoading(false);
         }
@@ -160,57 +162,70 @@ const ImportBomShopScreen = () => {
 
 
   return (
-    <div style={{padding:10}} >
+    <div  >
+        <h1>อัปโหลดวัตถุดิบร้านเดี่ยว</h1>
         <Modal_Loading show={loading} />
-        <Modal_Success show={success_Modal} />
         <Modal_FlatlistSearchShop
             show={search_Modal}
             onHide={()=>{setSearch_Modal(false)}}
             onClick={handleShop}
         />
-        <div>
-            <Button color="red" appearance="primary" onClick={()=>{setSearch_Modal(true)}}>1. เลือกร้านค้า</Button>
-            {name
-                ?<p><h2>ร้าน : {name}</h2></p>
-                :null
-            }
-        </div>
-       {name
+        <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleFileUpload}
+            style={{ display: "none" }}
+        />
+        <Row>
+            <Col md='4' sm='6' >
+                <OneButton {...{ text:'1. เลือกร้านค้า', submit:()=>{setSearch_Modal(true)}, variant:'success' }} />
+            </Col>
+            <Col md='4' sm='6' >
+                <OneButton {...{ text:'2. เลือกไฟล์', submit:() => fileInputRef.current.click(), variant:shopId?'success':'secondary' }} />
+            </Col>
+            <Col md='4' sm='6' >
+                <OneButton {...{ text:'3. Upload', submit:()=>{addProductsToDatabase()}, variant:shopId&&products.length>0?'success':'secondary'  }} />
+            </Col>
+        </Row>
+        {shopId
             ?<React.Fragment>
-                <h2>2.Upload Excel File with Images</h2>
-                <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
-                <Button color="orange" appearance="primary" onClick={addProductsToDatabase}>3. Upload</Button>
+            <Card title="ข้อมูลร้าน">
+                <h5>ร้าน : {name}</h5>
+                <h6>วันที่สมัคร : {stringFullDate(createdDate)}</h6>
+            </Card>
+            <Card title="ข้อมูลวัตถุดิบ" maxWidth={'none'} >
                 <Table striped bordered hover responsive  variant="light"   >
                     <thead  >
-                    <tr>
-                    <th style={styles.text2}>No.</th>
-                    <th style={styles.text}>name</th>
-                    <th style={styles.text}>smallestUnit</th>
-                    <th style={styles.text4}>category</th>
-                    <th style={styles.text}>safetyStock</th>
-                    <th style={styles.text}>stock</th>
-                    <th style={styles.text}>cost</th>
-                    </tr>
-                </thead>
-                <tbody  >
-                    {products.map((item, index) => {
-                        const { name, category, smallestUnit, cost, safetyStock, stock } = item;
-                        return <tr  key={index} >
-                                    <td style={styles.text3}>{index+1}.</td>
-                                    <td style={styles.text3} >{name}</td>
-                                    <td style={styles.text3} >{smallestUnit}</td>
-                                    <td style={styles.text3}>{category}</td>
-                                    <td style={styles.text3}>{safetyStock}</td>
-                                    <td style={styles.text3}>{stock}</td>
-                                    <td style={styles.text3}>{cost}</td>
-                                </tr>
-                    })}
-                </tbody>
+                        <tr>
+                        <th style={styles.text2}>No.</th>
+                        <th style={styles.text}>name</th>
+                        <th style={styles.text}>smallestUnit</th>
+                        <th style={styles.text4}>category</th>
+                        <th style={styles.text}>safetyStock</th>
+                        <th style={styles.text}>stock</th>
+                        <th style={styles.text}>cost</th>
+                        </tr>
+                    </thead>
+                    <tbody  >
+                        {products.map((item, index) => {
+                            const { name, category, smallestUnit, cost, safetyStock, stock } = item;
+                            return <tr  key={index} >
+                                        <td style={styles.text3}>{index+1}.</td>
+                                        <td style={styles.text3} >{name}</td>
+                                        <td style={styles.text3} >{smallestUnit}</td>
+                                        <td style={styles.text3}>{category}</td>
+                                        <td style={styles.text3}>{safetyStock}</td>
+                                        <td style={styles.text3}>{stock}</td>
+                                        <td style={styles.text3}>{cost}</td>
+                                    </tr>
+                        })}
+                    </tbody>
                 </Table>
+            </Card>
             </React.Fragment>
             :null
         }
-      
     </div>
   );
 };

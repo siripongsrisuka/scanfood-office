@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "react-bootstrap";
 
-function OneButton({ text, submit, variant='dark' }) {
+function OneButton({ text, submit, variant='warning' }) {
 
     function handle(){
         submit()
@@ -14,7 +14,8 @@ function OneButton({ text, submit, variant='dark' }) {
 
 const styles = {
     container : {
-        minWidth:"150px"
+        minWidth:"150px",
+        margin:'1rem'
     }
 }
 

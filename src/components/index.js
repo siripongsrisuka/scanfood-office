@@ -35,9 +35,11 @@ import Download from "./Download";
 import CategoryControl from "./CategoryControl";
 import SearchAndBottom from "./SearchAndBottom";
 import CategoryRender from "./CategoryRender";
+import Card from "./Card";
 
 
 export {
+    Card,
     CategoryRender,
     SearchAndBottom,
     CategoryControl,

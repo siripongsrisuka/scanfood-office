@@ -18,7 +18,6 @@ import {
 
 import { db, prepareFirebaseImage } from "../db/firestore";
 import { Modal_FlatlistSearchShop, Modal_Loading, Modal_Success } from "../modal";
-import { cloneShop } from "../api/onesignal";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate , Outlet, NavLink } from 'react-router-dom';
 import { daysBetween, findInArray, formatTime } from "../Utility/function";
 import { NumberYMD, plusDays } from "../Utility/dateTime";

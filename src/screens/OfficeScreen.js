@@ -19,6 +19,7 @@ import { logout } from "../redux/authSlice";
 import { Modal_Alert } from "../modal";
 import { Dropdown, Accordion } from 'rsuite';
 import { transformData } from "../Utility/function";
+import { fetchOffice } from "../redux/officeSlice";
 
 const { white, softWhite, backgroundColor, dark } = colors;
 
@@ -35,7 +36,7 @@ function OfficeScreen() {
   const { office : {  humanRight }  } = useSelector((state)=> state.office);
   useEffect(() => {  // เอาไว้กำหนด display ของ sidebar
     // Function to update the window width state
-
+    dispatch(fetchOffice());
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
     };

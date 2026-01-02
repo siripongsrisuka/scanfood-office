@@ -3,6 +3,8 @@ import { Row, Col, Button, Modal, Form } from "react-bootstrap";
 import '../App.css'
 import _ from "lodash"; // For debounce function
 import { db } from "../db/firestore";
+import { OneButton } from "../components";
+import { formatTime } from "../Utility/function";
 
 function Modal_FlatlistSearchShop({
   backdrop=true, // true/false/static
@@ -18,20 +20,26 @@ function Modal_FlatlistSearchShop({
   const [isLoading, setIsLoading] = useState(false);
 
   async function fetchByTel(){
-    let queryResults = []
-    await db.collection('shop').where('tel','==',searchTerm).get().then((docs)=>{
-      docs.forEach((doc)=>{
-        queryResults.push({...doc.data(),id:doc.id})
+    setIsLoading(true);
+    try {
+      const query = await db.collection('shop').where('tel','==',searchTerm).get();
+      const results = query.docs.map(doc=>{
+        const { createdDate = new Date(), ...rest } = doc.data();
+        return {
+          ...rest,
+          id:doc.id,
+          createdDate:formatTime(createdDate)
+        }
       })
-    })
-    setResults(queryResults);
+      setResults(results);
 
-  }
+    } catch (error) {
+      alert(error)
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  // // Debounce the search function
-  // const debouncedSearch = _.debounce((search) => {
-  //   fetchResults(search);
-  // }, 300);
 
   // Handle search input change
   const handleInputChange = (e) => {
@@ -68,7 +76,7 @@ function Modal_FlatlistSearchShop({
               value={searchTerm}
               name='ค้นหา'
           />&emsp;
-          <Button onClick={fetchByTel} >ค้นหา</Button>&emsp;
+          <OneButton {...{ text:'ค้นหา', submit:fetchByTel }} />
         </div>
         
         <br/>

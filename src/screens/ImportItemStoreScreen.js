@@ -1,22 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import ExcelJS from "exceljs";
 import { db, prepareFirebaseImage } from "../db/firestore";
 import { Row, Col, Table } from "react-bootstrap";
 import { colors, initialProduct } from "../configs";
 import { Modal_FlatlistSearchShop, Modal_Loading, Modal_Success } from "../modal";
-import { Button } from "rsuite";
 import { v4 as uuidv4 } from 'uuid';
-import { minusMinutes, plusSecond } from "../Utility/dateTime";
-import { findInArray } from "../Utility/function";
+import { minusMinutes, plusSecond, stringFullDate } from "../Utility/dateTime";
+import { findInArray, toastSuccess } from "../Utility/function";
+import { Card, OneButton } from "../components";
 
 const { theme3 } = colors;
-const initialShop = { id:'', name:'', smartCategory:[] }
+const initialShop = { id:'', name:'', smartCategory:[], createdDate:new Date() }
 
 const ImportItemStoreScreen = () => {
   const [products, setProducts] = useState([]);
   const [search_Modal, setSearch_Modal] = useState(false);
   const [shop, setShop] = useState(initialShop)
-  const { id:shopId, name, smartCategory } = shop;
+  const { id:shopId, name, smartCategory, createdDate } = shop;
   const [category, setCategory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [success_Modal, setSuccess_Modal] = useState(false);
@@ -148,12 +148,12 @@ const ImportItemStoreScreen = () => {
         setShop(item)
     };
 
-    console.log(products)
 
     async function addProductsToDatabase() {
         if (products.length === 0) {
             return alert('กรุณาใส่ไฟล์ excel');
         }
+        if(!shopId) return alert('กรุณาใส่ร้านค้า')
     
         try {
             setLoading(true);
@@ -206,20 +206,21 @@ const ImportItemStoreScreen = () => {
             console.log('Batch write successful');
     
             setProducts([]);
-            setShop(initialShop)
-            setSuccess_Modal(true);
-            setTimeout(() => setSuccess_Modal(false), 900);
+            setShop(initialShop);
+            toastSuccess('อัปโหลดรายการสำเร็จ')
+        
         } catch (error) {
-            console.error('Error adding products:', error);
+            alert('Error adding products:', error);
         } finally {
             setLoading(false);
         }
     };
 
-
+const fileInputRef = useRef(null);
 
   return (
-    <div style={{padding:10}} >
+    <div  >
+        <h1>อัปโหลดสินค้าร้านเดี่ยว</h1>
         <Modal_Loading show={loading} />
         <Modal_Success show={success_Modal} />
         <Modal_FlatlistSearchShop
@@ -227,19 +228,32 @@ const ImportItemStoreScreen = () => {
             onHide={()=>{setSearch_Modal(false)}}
             onClick={handleShop}
         />
-        <div>
-            <Button color="red" appearance="primary" onClick={()=>{setSearch_Modal(true)}}>1. เลือกร้านค้า</Button>
-            {name
-                ?<p><h2>ร้าน : {name}</h2></p>
-                :null
-            }
-        </div>
-       {name
-            ?<React.Fragment>
-                <h2>2.Upload Excel File with Images</h2>
-                <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
-                <Button color="orange" appearance="primary" onClick={addProductsToDatabase}>3. Upload</Button>
-                <Table striped bordered hover responsive  variant="light"   >
+         <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleFileUpload}
+            style={{ display: "none" }}
+          />
+        <Row>
+          <Col md='4' sm='6' >
+              <OneButton {...{ text:'1. เลือกร้านค้า', submit:()=>{setSearch_Modal(true)}, variant:'success' }} />
+          </Col>
+          <Col md='4' sm='6' >
+              <OneButton {...{ text:'2. เลือกไฟล์', submit:() => fileInputRef.current.click(), variant:shopId?'success':'secondary' }} />
+          </Col>
+          <Col md='4' sm='6' >
+              <OneButton {...{ text:'3. Upload', submit:()=>{addProductsToDatabase()}, variant:shopId&&products.length>0?'success':'secondary'  }} />
+          </Col>
+        </Row>
+        {shopId
+          ?<React.Fragment>
+            <Card title="ข้อมูลร้าน">
+              <h5>ร้าน : {name}</h5>
+              <h6>วันที่สมัคร : {stringFullDate(createdDate)}</h6>
+            </Card>
+            <Card title="ข้อมูลสินค้า" maxWidth={'none'} >
+              <Table striped bordered hover responsive  variant="light"   >
                     <thead  >
                     <tr>
                     <th style={styles.text2}>No.</th>
@@ -266,9 +280,12 @@ const ImportItemStoreScreen = () => {
                     })}
                 </tbody>
                 </Table>
-            </React.Fragment>
-            :null
+            </Card>
+          </React.Fragment>
+          :null
         }
+
+ 
       
     </div>
   );

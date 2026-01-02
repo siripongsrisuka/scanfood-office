@@ -5,7 +5,6 @@ import AdminDashboard from "./AdminDashboard";
 import StorePort from "./StorePort";
 import NewShopScreen from "./NewShopScreen";
 import CloneScreen from "./CloneScreen";
-import LaosScreen from "./LaosScreen";
 import BranchScreen from "./BranchScreen";
 import ApproveScreen from "./ApproveScreen";
 import ImportItemStoreScreen from "./ImportItemStoreScreen";
@@ -18,22 +17,22 @@ import SoftwareHistory from "./SoftwareHistory";
 import HardwareHistory from "./HardwareHistory";
 import TransformTable from "./TransformTable";
 import TransferExpireScreen from "./TransferExpireScreen";
-import TeamAScreen from "./TeamAScreen";
 import QuestionSettingScreen from "./QuestionSettingScreen";
 import MasterScreen from "./MasterScreen";
 import DiagnosisScreen from "./DiagnosisScreen";
 import KbankReportScreen from "./KbankReportScreen";
 import OfficeScreen from "./OfficeScreen";
 import StaffScreen from "./StaffScreen";
+import WarehouseScreen from "./WarehouseScreen";
 
 export {
+    WarehouseScreen,
     StaffScreen,
     OfficeScreen,
     KbankReportScreen,
     DiagnosisScreen,
     MasterScreen,
     QuestionSettingScreen,
-    TeamAScreen,
     TransferExpireScreen,
     TransformTable,
     HardwareHistory,
@@ -51,7 +50,6 @@ export {
     StorePort,
     NewShopScreen,
     CloneScreen,
-    LaosScreen,
     BranchScreen,
     ApproveScreen
 };

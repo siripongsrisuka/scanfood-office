@@ -8,9 +8,15 @@ import { OneButton, SearchControl } from "../components";
 import { Modal_Equipment, Modal_Loading } from "../modal";
 import { searchFilterFunction, toastSuccess } from "../Utility/function";
 
-const initialEquipment = { id:'', name:'', imageId:'', detail:'', price:'' }
+const initialEquipment = { id:'', name:'', imageId:'', detail:'', price:'' };
+const initialWarehouse = {
+    id:'',
+    stock:'',
+    safety:'',
+    
+}
 
-function EquipmentSetting() {
+function WarehouseScreen() {
     const [equipments, setEquipment] = useState([]);
     const [current, setCurrent] = useState(initialEquipment);
     const [equipment_Modal, setEquipment_Modal] = useState(false);
@@ -94,7 +100,7 @@ function EquipmentSetting() {
           current={current}
           setCurrent={setCurrent}
         />
-      <h1>ตั้งค่าอุปกรณ์</h1>
+      <h1>สต๊อกคงเหลือ</h1>
       <div style={{display:'flex'}} >
         &emsp;
         <SearchControl {...{ placeholder:'ค้นหาด้วยชื่อ', search, setSearch }} />&emsp;
@@ -156,4 +162,4 @@ const styles = {
     }
 }
 
-export default EquipmentSetting;
+export default WarehouseScreen;
