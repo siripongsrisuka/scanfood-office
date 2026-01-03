@@ -32,11 +32,19 @@ export default [
       
     },
     {
-      topic: '2.1 อนุมัคิ Software',
+      topic: '2.1 อนุมัติ Software',
       icon: 'bi-speedometer',
       to: 'approveSoftware',
       id:'128'
     },
+    {
+      topic: '2.1 สร้างออเดอร์อัตโนมัติ',
+      icon: 'bi-speedometer',
+      to: 'createOrder',
+      id:'128'
+    },
+
+    
     {
       topic: '2.1 อุปกรณ์',
       icon: 'bi-speedometer',

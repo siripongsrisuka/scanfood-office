@@ -4,15 +4,16 @@ import {
   Table
 } from "react-bootstrap";
 
-import { initialAlert } from "../configs";
 import { db } from "../db/firestore";
 import { findDay, findInArray, formatCurrency, formatTime, summary, toastSuccess } from "../Utility/function";
 import { pushByIdFilter } from "../api/onesignal";
-import { Modal_Alert, Modal_ApproveSoftware, Modal_Loading } from "../modal";
+import { Modal_ApproveSoftware, Modal_Loading } from "../modal";
 import { reverseSort } from "../Utility/sort";
-import { NumberYMD, plusDays, stringDateTimeReceipt } from "../Utility/dateTime";
+import { NumberYMD, plusDays, stringDateTimeReceipt, stringFullDate } from "../Utility/dateTime";
 import { Card } from "../components";
+import { colors } from "../configs";
 
+const { five } = colors;
 
 const initialPackage = {
     orderNumber:'', 
@@ -23,14 +24,13 @@ const initialPackage = {
     net:'',  
     packageId:[], 
     tel:'', 
-    timestamp:new Date()
+    timestamp:new Date(),
+    requestApprove:''
 };
 
 function ApproveSoftwareScreen() {
     const { profile:{ id:adminId, name:adminName } } = useSelector(state=>state.profile)
     const [masterData, setMasterData] = useState([]);
-    const [alert_Modal, setAlert_Modal] = useState(initialAlert);
-    const { status, content, onClick, variant } = alert_Modal;
     const [loading, setLoading] = useState(false)
     const [masterPackage, setMasterPackage] = useState([]);
 
@@ -160,7 +160,7 @@ function ApproveSoftwareScreen() {
                     packageArray: [...newPackageArray, ...newPackages],
                 });
                 transaction.set(mailboxRef,{
-                    content: `อนุมัติ ${content} เรียบร้อย`,
+                    content: `อนุมัติแพ็กเกจเรียบร้อย`,
                     scanfood: false,
                     timestamp: new Date(),
                     shopId,
@@ -197,13 +197,6 @@ function ApproveSoftwareScreen() {
                 currentSoftware={currentSoftware}
             />
             <Modal_Loading show={loading} />
-            <Modal_Alert
-                show={status}
-                onHide={()=>{setAlert_Modal(initialAlert)}}
-                content={content}
-                onClick={onClick}
-                variant={variant}
-            />
             <div style={{ position:'sticky',top:0 }} >
                 <Card>
                     <h4>รอตรวจสอบ {length} รายการ</h4>
@@ -220,18 +213,24 @@ function ApproveSoftwareScreen() {
                 </thead>
                 <tbody  >
                 {masterData.map((item, index) => {
-                    const { orderNumber, shopName, profileName, net, tel, timestamp } = item;
+                    const { orderNumber, shopName, profileName, net, tel, timestamp, requestApprove } = item;
                         return <tr  style={{cursor: 'pointer'}} key={index} onClick={()=>{openSoftware(item)}} >
-                                <td  style={styles.text3}>
+                                <td  style={styles.text2}>
                                     <h6>{orderNumber}</h6>
                                     {stringDateTimeReceipt(timestamp)}
                                 </td>
-                                <td  style={styles.text3}>
+                                <td  style={styles.text2}>
                                     <p>ร้าน : {shopName}</p>
                                     <p>ผู้ติดต่อ : {profileName}</p>
                                     <p>เบอร์ : {tel}</p>
                                 </td>
-                                <td  style={styles.text3}>{net}</td>
+                                <td  style={styles.text2}>
+                                    {net}
+                                    {requestApprove
+                                        ?<h6>{stringFullDate(new Date())}</h6>
+                                        :<h6 style={{ color:five }} >วันนี้</h6>
+                                    }
+                                </td>
                             </tr>
                     }
                 )}
@@ -243,7 +242,8 @@ function ApproveSoftwareScreen() {
 
 const styles = {
     text2 : {
-        textAlign:'center'
+        textAlign:'center',
+        width:'200px'
     }
 }
 

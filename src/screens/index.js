@@ -24,8 +24,10 @@ import KbankReportScreen from "./KbankReportScreen";
 import OfficeScreen from "./OfficeScreen";
 import StaffScreen from "./StaffScreen";
 import WarehouseScreen from "./WarehouseScreen";
+import CreateOrder from "./CreateOrder";
 
 export {
+    CreateOrder,
     WarehouseScreen,
     StaffScreen,
     OfficeScreen,

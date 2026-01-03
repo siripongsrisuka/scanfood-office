@@ -33,9 +33,11 @@ import Modal_Splash from "./Modal_Splash";
 import Modal_Human from "./Modal_Human";
 import Modal_FindHuman from "./Modal_FindHuman";
 import Modal_ApproveSoftware from "./Modal_ApproveSoftware";
+import Modal_Payment from "./Modal_Payment";
 
 
 export { 
+    Modal_Payment,
     Modal_ApproveSoftware,
     Modal_Human,
     Modal_Splash,
