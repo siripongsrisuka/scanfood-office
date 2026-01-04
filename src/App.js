@@ -28,6 +28,9 @@ import {
   StaffScreen,
   WarehouseScreen,
   CreateOrder,
+  SaleScreen,
+  Test,
+  UpgradeStoreSizeScreen,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -84,7 +87,9 @@ function App() {
             <Route path='warehouse' element={<WarehouseScreen/>} />
             <Route path='approveSoftware' element={<ApproveSoftwareScreen/>} />
             <Route path='createOrder' element={<CreateOrder/>} />
-
+            <Route path='sale' element={<SaleScreen/>} />
+            <Route path='upgrade' element={<UpgradeStoreSizeScreen/>} />
+            
           </Route>
           <Route path='/admin' element={<AdminDashboard/>} />
   
@@ -105,6 +110,7 @@ function App() {
           <Route path='transferExpire' element={<TransferExpireScreen/>} />
           <Route path='questionSetting' element={<QuestionSettingScreen/>} />
           <Route path='diagnosis' element={<DiagnosisScreen/>} />
+          <Route path='test' element={<Test/>} />
 
           
 

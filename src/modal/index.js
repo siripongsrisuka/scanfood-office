@@ -34,9 +34,11 @@ import Modal_Human from "./Modal_Human";
 import Modal_FindHuman from "./Modal_FindHuman";
 import Modal_ApproveSoftware from "./Modal_ApproveSoftware";
 import Modal_Payment from "./Modal_Payment";
+import Modal_Package from "./Modal_Package";
 
 
 export { 
+    Modal_Package,
     Modal_Payment,
     Modal_ApproveSoftware,
     Modal_Human,

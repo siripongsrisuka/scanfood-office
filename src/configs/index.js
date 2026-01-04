@@ -18,8 +18,12 @@ import initialHardware from "./initialHardware";
 import initialWarehouseItem from "./initialWarehouseItem";
 import initialAdmin from "./initialAdmin";
 import initialOffice from "./initialOffice";
+import initialStoreSize from "./initialStoreSize";
+import initialShop from "./initialShop";
 
 export {
+  initialShop,
+  initialStoreSize,
   initialOffice,
   initialAdmin, 
     initialWarehouseItem,

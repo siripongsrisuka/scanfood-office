@@ -6,7 +6,7 @@ import {
 } from "react-bootstrap";
 
 import { Modal_FlatlistSearchShop, Modal_Loading } from "../modal";
-import { shopchampRestaurantAPI } from "../Utility/api";
+import { scanfoodAPI } from "../Utility/api";
 import { toastSuccess } from "../Utility/function";
 
 function CloneScreen() {
@@ -20,7 +20,7 @@ function CloneScreen() {
     const handleClone = async () => {
       setLoading(true)
       try {
-            const response = await shopchampRestaurantAPI.post(
+            const response = await scanfoodAPI.post(
               "/shop/cloneShop/",
               {
                 originalShop:original.id,

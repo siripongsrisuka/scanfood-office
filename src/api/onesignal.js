@@ -1,5 +1,5 @@
 // import OneSignal from 'react-native-onesignal';
-import { shopchampRestaurantAPI } from '../Utility/api';
+import { scanfoodAPI } from '../Utility/api';
 import onesignalDefalut from '../configs/onesignalDefalut';
 // import firebaseAuth from '@react-native-firebase/auth';
 // import { fbUpdateOnesignalTags } from '../db/firestore';
@@ -316,7 +316,7 @@ export async function onesignalWebGetFullPlayerData(_player_id='') {   // use to
   let player_id = _player_id;  
   if (!player_id) player_id = await onesignalWebGetPlayerId();
 
-  const fullPlayerData =  await shopchampRestaurantAPI.get("/onesignal_scanFood/getFullPlayerData/"+player_id);
+  const fullPlayerData =  await scanfoodAPI.get("/onesignal_scanFood/getFullPlayerData/"+player_id);
   return fullPlayerData.data;
 }
 
@@ -344,7 +344,7 @@ export async function onesignalWebSetExtUid(extUid = "",_player_id = '') {
 
   console.log('onesignalSetExtUid player_id:',player_id)
   
-  return shopchampRestaurantAPI.put(
+  return scanfoodAPI.put(
     "/onesignal_scanFood/setExternalUserId/"+player_id,
     {external_user_id:extUid}
   );
@@ -357,7 +357,7 @@ export async function onesignalWebClearExtUid(_player_id = '') {
 
   console.log('onesignalDelExtUid player_id:',player_id)
   
-  return shopchampRestaurantAPI.put(
+  return scanfoodAPI.put(
     "/onesignal_scanFood/setExternalUserId/"+player_id,
     {external_user_id:""}
   );
@@ -374,7 +374,7 @@ export async function onesignalWebInitUserTagsByPlayerId(objTags={},_player_id='
 
 
   // !! should tag only curent player id on this device, use other code instead below !!
-  return shopchampRestaurantAPI.put(
+  return scanfoodAPI.put(
     "/onesignal_scanFood/updateTagsByPlayerId/"+player_id,
     {tags:{...objTags}}
   );
@@ -387,7 +387,7 @@ export async function onesignalWebInitShopTagsByPlayerId(objShop={},_player_id='
 
   // console.log('initShopTagsByPlayerId objShop:',JSON.stringify(objShop,null,4))
 
-  return shopchampRestaurantAPI.put(
+  return scanfoodAPI.put(
     "/onesignal_scanFood/initShopTagsByPlayerId/"+player_id,
     {objShop:{...objShop}}
   );
@@ -399,7 +399,7 @@ export async function onesignalWebInitProfileTagsByPlayerId(objProfile={},_playe
 
   // console.log('initProfileTagsByPlayerId objProfile:',JSON.stringify(objProfile,null,4))
 
-  return shopchampRestaurantAPI.put(
+  return scanfoodAPI.put(
     "/onesignal_scanFood/initProfileTagsByPlayerId/"+player_id,
     {objProfile:{...objProfile}}
   );
@@ -414,12 +414,12 @@ export async function onesignalWebUpdateUserTagsByExtUid(objTags={},_external_us
   // await fbUpdateOnesignalTags(shopDoc, {...strObjTags}); // in future, may change random doc id to doc id from uid (equivalent external_user_uid)
 
 
-  // return shopchampRestaurantAPI.put(
+  // return scanfoodAPI.put(
   //   "/onesignal_scanFood/updateTagsByExternalUserId/"+external_user_id,
   //   {tags:{...objTags}}
   // );
 
-  const res = await shopchampRestaurantAPI.put(
+  const res = await scanfoodAPI.put(
     "/onesignal_scanFood/updateTagsByExternalUserId/"+external_user_id,
     {tags:{...objTags}}
   );
@@ -437,7 +437,7 @@ export async function onesignalWebDeleteUserTagsByExtUid(arrTagsKey=[],_external
   
   // await fbDeleteOnesignalTags(shopDoc, {...objTags}); // in future, may change random doc id to doc id from uid (equivalent external_user_uid)
   
-  return shopchampRestaurantAPI.put(   // !!! use this instead send array in axios, will change later ....
+  return scanfoodAPI.put(   // !!! use this instead send array in axios, will change later ....
     "/onesignal_scanFood/updateTagsByExternalUserId/"+external_user_id,
     {tags:{...objEmptyString}}
   );
@@ -449,7 +449,7 @@ export async function onesignalWebDeleteTagsByPlayerId(arrTagsKey=[],_player_id=
 
   const objEmptyString = keyNameToEmptyStringObj([...arrTagsKey])     // ['dateTime','name','age']
 
-  // return shopchampRestaurantAPI.delete(       // !!! have an error, cannot send array data via axios to nodejs ,must to confix if need, not occur when test with postman
+  // return scanfoodAPI.delete(       // !!! have an error, cannot send array data via axios to nodejs ,must to confix if need, not occur when test with postman
   //   "/onesignal_scanFood/deleteTagsByPlayerId/"+player_id,
   //   JSON.stringify({ arrTagsKey:["name","af_favSport"] }),
     // {
@@ -458,7 +458,7 @@ export async function onesignalWebDeleteTagsByPlayerId(arrTagsKey=[],_player_id=
     // }
   // );
 
-  return shopchampRestaurantAPI.put(   // !!! use this instead send array in axios, will change later ....
+  return scanfoodAPI.put(   // !!! use this instead send array in axios, will change later ....
     "/onesignal_scanFood/updateTagsByPlayerId/"+player_id,
     // {tags:{name:'',af_first_name:''}}
     { tags:{...objEmptyString} }
@@ -470,7 +470,7 @@ export async function onesignalWebDeleteAllTagsByPlayerId(_player_id='') {
   let player_id = _player_id;  
   if (!player_id) player_id = await onesignalWebGetPlayerId();
 
-  return shopchampRestaurantAPI.delete(
+  return scanfoodAPI.delete(
     "/onesignal_scanFood/deleteAllTagsByPlayerId/"+player_id
   );
 }
@@ -486,12 +486,12 @@ export async function onesignalUpdateUserTagsByExtUid(objTags={},_external_user_
   // await fbUpdateOnesignalTags(shopDoc, {...strObjTags}); // in future, may change random doc id to doc id from uid (equivalent external_user_uid)
 
 
-  // return shopchampRestaurantAPI.put(
+  // return scanfoodAPI.put(
   //   "/onesignal_scanFood/updateTagsByExternalUserId/"+external_user_id,
   //   {tags:{...objTags}}
   // );
 
-  const res = await shopchampRestaurantAPI.put(
+  const res = await scanfoodAPI.put(
     "/onesignal_scanFood/updateTagsByExternalUserId/"+external_user_id,
     {tags:{...objTags}}
   );
@@ -509,7 +509,7 @@ export async function onesignalDeleteUserTagsByExtUid(arrTagsKey=[],_external_us
   
   // await fbDeleteOnesignalTags(shopDoc, {...objTags}); // in future, may change random doc id to doc id from uid (equivalent external_user_uid)
   
-  return shopchampRestaurantAPI.put(   // !!! use this instead send array in axios, will change later ....
+  return scanfoodAPI.put(   // !!! use this instead send array in axios, will change later ....
     "/onesignal_scanFood/updateTagsByExternalUserId/"+external_user_id,
     {tags:{...objEmptyString}}
   );
@@ -521,7 +521,7 @@ export async function onesignalDeleteUserTagsByExtUid(arrTagsKey=[],_external_us
 
 //   const objEmptyString = keyNameToEmptyStringObj([...arrTagsKey])     // ['dateTime','name','age']
 
-//   // return shopchampRestaurantAPI.delete(       // !!! have an error, cannot send array data via axios to nodejs ,must to confix if need, not occur when test with postman
+//   // return scanfoodAPI.delete(       // !!! have an error, cannot send array data via axios to nodejs ,must to confix if need, not occur when test with postman
 //   //   "/onesignal_scanFood/deleteTagsByPlayerId/"+player_id,
 //   //   JSON.stringify({ arrTagsKey:["name","af_favSport"] }),
 //     // {
@@ -530,7 +530,7 @@ export async function onesignalDeleteUserTagsByExtUid(arrTagsKey=[],_external_us
 //     // }
 //   // );
 
-//   return shopchampRestaurantAPI.put(   // !!! use this instead send array in axios, will change later ....
+//   return scanfoodAPI.put(   // !!! use this instead send array in axios, will change later ....
 //     "/onesignal_scanFood/updateTagsByPlayerId/"+player_id,
 //     // {tags:{name:'',af_first_name:''}}
 //     { tags:{...objEmptyString} }
@@ -542,7 +542,7 @@ export async function onesignalDeleteUserTagsByExtUid(arrTagsKey=[],_external_us
 //   let player_id = _player_id;  
 //   if (!player_id) player_id = await onesignalGetPlayerId();
 
-//   return shopchampRestaurantAPI.delete(
+//   return scanfoodAPI.delete(
 //     "/onesignal_scanFood/deleteAllTagsByPlayerId/"+player_id
 //   );
 // }
@@ -552,8 +552,8 @@ export async function onesignalDeleteUserTagsByExtUid(arrTagsKey=[],_external_us
 export async function onesignalSendPush(pushParam) {  // update tag to all same external_user_id in all player of onesignal
   const authToken = await fbGetIdToken();
 
-  // return await shopchampRestaurantAPI.put("/updateTagsByExternalUserId/"+external_user_id,{uid:objRes.user.uid,appName:'merchant'});
-  return shopchampRestaurantAPI.post(
+  // return await scanfoodAPI.put("/updateTagsByExternalUserId/"+external_user_id,{uid:objRes.user.uid,appName:'merchant'});
+  return scanfoodAPI.post(
     "/onesignal_scanFood/sendPush/",
     {...pushParam},
     { authorization: `Bearer ${authToken}` }
@@ -806,7 +806,7 @@ export async function lineNotifyAPI(obj){
     // const authToken = await frbGetIdToken();
 
 
-    const { status, data } = await shopchampRestaurantAPI.post(
+    const { status, data } = await scanfoodAPI.post(
         "/onesignal_scanFood/sendMultiLineNotify/",
         {   
             // arrLineNotifyToken:["8AlwzGsVaRo7LwQUJSZj2UBkKv1vsmTsZJr1fgEeuCm",]  // ทดสอบ LINE Notify

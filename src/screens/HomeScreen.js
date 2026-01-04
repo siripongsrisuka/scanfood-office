@@ -10,7 +10,7 @@ import { resetPassword, signin } from '../redux/authSlice';
 import { Modal_OneInput, Modal_Splash } from "../modal";
 import { fetchNormalProfile } from "../redux/profileSlice";
 import { db } from "../db/firestore";
-import { shopchampRestaurantAPI } from "../Utility/api";
+import { scanfoodAPI } from "../Utility/api";
 import { toastSuccess } from "../Utility/function";
 
 
@@ -74,7 +74,7 @@ async function handleProfile(profileId){
 
 const checkRegisterUser = async() => {
   setLoading(true)
-await shopchampRestaurantAPI.get('/users/checkEmailRegister/'+formData?.email.trim()).then(objRes=>{
+await scanfoodAPI.get('/users/checkEmailRegister/'+formData?.email.trim()).then(objRes=>{
   const emailUserUid = objRes?.data?.uid;
 
   if(emailUserUid){

@@ -25,8 +25,14 @@ import OfficeScreen from "./OfficeScreen";
 import StaffScreen from "./StaffScreen";
 import WarehouseScreen from "./WarehouseScreen";
 import CreateOrder from "./CreateOrder";
+import SaleScreen from "./SaleScreen";
+import Test from "./Test";
+import UpgradeStoreSizeScreen from "./UpgradeStoreSizeScreen";
 
 export {
+    UpgradeStoreSizeScreen,
+    Test,
+    SaleScreen,
     CreateOrder,
     WarehouseScreen,
     StaffScreen,

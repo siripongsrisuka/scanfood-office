@@ -43,6 +43,19 @@ export default [
       to: 'createOrder',
       id:'128'
     },
+    {
+      topic: '2.1 เซล',
+      icon: 'bi-speedometer',
+      to: 'sale',
+      id:'128'
+    },
+    {
+      topic: '2.1 Upgrade ร้าน',
+      icon: 'bi-speedometer',
+      to: 'upgrade',
+      id:'128'
+    },
+
 
     
     {

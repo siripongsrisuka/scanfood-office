@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addNewStorePort, fetchBySale, updateDemo } from "../redux/careSlice";
 import { colors } from "../configs";
 import { searchFilterFunction } from "../Utility/function";
-import { shopchampRestaurantAPI } from "../Utility/api";
+import { scanfoodAPI } from "../Utility/api";
 
 const initialStore = { storeName:'', ownerName:'', tel:'', codeName:'',timestamp:new Date() };
 
@@ -77,7 +77,7 @@ function StorePort() {
     // async function testPack(){
     //     try {
     //         const authToken = await frbGetIdToken();
-    //         const res = await shopchampRestaurantAPI.post('/test2/test/'+"085555xx",{ phoneNumber2:'winny' },{
+    //         const res = await scanfoodAPI.post('/test2/test/'+"085555xx",{ phoneNumber2:'winny' },{
     //             headers: {
     //                 Authorization:`Bearer ${authToken}`,
     //             },
@@ -95,7 +95,7 @@ function StorePort() {
     //     try{
     //         const authToken = await frbGetIdToken();
 
-    //         const { status, data } = await shopchampRestaurantAPI.post(
+    //         const { status, data } = await scanfoodAPI.post(
     //             "/paymentGateway/payTransaction/",
     //             {   
     //                 // serverOption:serverOption,

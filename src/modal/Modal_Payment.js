@@ -9,21 +9,16 @@ import Modal_Alert from "./Modal_Alert";
 import { OneButton } from "../components";
 import QRCode, { QRCodeSVG } from 'qrcode.react';
 import html2canvas from "html2canvas";
+import { formatCurrency } from "../Utility/function";
 
 const { white, softWhite, five, one } = colors;
 
 const ThaiQrCard = ({ promptPayQrString, amount = 6000 }) => {
   return (
-    <div style={styles.wrapper}>
-      <div style={styles.header}>THAI QR PAYMENT</div>
-
-      <div style={styles.body}>
-
-        {/* === IMAGE BACKGROUND + QR OVERLAY === */}
-        <div style={styles.imageWrapper}>
+     <div style={styles.imageWrapper}>
           {/* background image */}
           <img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT96xu3mYue2a_kgRf3Z66OVHmKNaaKeG6Mjg&s"
+            src="/frame.jpg" 
             style={styles.image}
             alt="bg"
           />
@@ -32,19 +27,15 @@ const ThaiQrCard = ({ promptPayQrString, amount = 6000 }) => {
           <div style={styles.qrOverlay}>
             <QRCodeSVG
               value={promptPayQrString}
-              size={160}
+              size={140}
               level="M"
               bgColor="transparent"
             />
           </div>
+           <h6 style={styles.amount}>
+            {formatCurrency(Number(amount))}
+            </h6>
         </div>
-
-        {/* amount */}
-        <h6 style={styles.amount}>
-          {Number(amount).toLocaleString("th-TH")} บาท
-        </h6>
-      </div>
-    </div>
   );
 };
 
@@ -55,9 +46,10 @@ function Modal_Payment({
   onHide,
   centered=true,
   size='lg',
+  qrCode,
+  amount
 }) {
     const cardRef = useRef(null);
-    const promptPayQrString = '1319800140196';
 
     const captureImage = async () => {
         const canvas = await html2canvas(cardRef.current, {
@@ -90,11 +82,11 @@ function Modal_Payment({
         <h2><b>อนุมัติแพ็กเกจ</b></h2>
       </Modal.Header>
 
-      <Modal.Body >
+      <Modal.Body style={{ display:'flex', flexDirection:'column', alignItems:'center' }} >
         <div ref={cardRef}>
             <ThaiQrCard
-            promptPayQrString="000201010212..."
-            amount={6000}
+            promptPayQrString={qrCode}
+            amount={amount}
             />
         </div>
         <OneButton {...{ text:'บันทึก', submit:()=>{captureImage()} }} />
@@ -104,32 +96,12 @@ function Modal_Payment({
 };
 
 const styles = {
-  wrapper: {
-    width: 320,
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    overflow: "hidden",
-    fontFamily: "sans-serif",
-  },
-
-  header: {
-    backgroundColor: "#0B4C82",
-    color: "#fff",
-    padding: 12,
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-
-  body: {
-    padding: 16,
-    textAlign: "center",
-  },
-
   imageWrapper: {
     position: "relative",
-    width: "100%",
-    maxWidth: 300,
+    // width: "100%",
+    // maxWidth: 300,
     margin: "0 auto",
+    width:'300px'
   },
 
   image: {
@@ -141,7 +113,8 @@ const styles = {
 
   qrOverlay: {
     position: "absolute",
-    top: "32%",
+    top: "42%",
+    // top: "32%",
     left: "50%",
     transform: "translate(-50%, -50%)",
     backgroundColor: "#fff",
@@ -151,8 +124,15 @@ const styles = {
 
   amount: {
     marginTop: 16,
-    fontSize: 20,
+    fontSize: 14,
     fontWeight: "bold",
+    position: "absolute",
+    top: "59%",
+    // top: "32%",
+    right: "14%",
+    // left: "75%",
+
+    // transform: "translate(-50%, -50%)",
   },
 };
 

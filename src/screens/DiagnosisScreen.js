@@ -18,7 +18,7 @@ import { toast } from "react-toastify";
 import { normalSort } from "../Utility/sort";
 import { v4 as uuidv4 } from 'uuid';
 import Modal_FlatListTypeColumn from "../modal/Modal_FlatListTypeColumn";
-import { shopchampRestaurantAPI } from "../Utility/api";
+import { scanfoodAPI } from "../Utility/api";
 
 const { dark, softWhite, white, one, two, three, four, five, six, seven, eight } = colors;
 
