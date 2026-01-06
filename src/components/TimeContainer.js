@@ -2,11 +2,12 @@ import React, { forwardRef } from "react";
 import {
     Container,
   } from "react-bootstrap";
-  import DatePicker from "react-datepicker";
+import DatePicker from "react-datepicker";
 import { SlCalender } from "react-icons/sl";
 import { colors } from "../configs";
 import '../App.css';
 import { Button } from 'rsuite';
+import { Modal_Loading } from "../modal";
 
 const { white } = colors;
 
@@ -15,6 +16,7 @@ function TimeContainer({
     endDate,
     onChangeStart,
     onChangeEnd,
+    show,
     search
 }) {
     const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => (
@@ -28,9 +30,10 @@ function TimeContainer({
             fluid
             style={styles.container2}
             >
+            <Modal_Loading show={show} />
             <div style={styles.container3} >
                 <SlCalender />
-                <div style={styles.container4} >  เริ่่ม: </div>
+                <div style={styles.container4} >  เริ่ม: </div>
                 <DatePicker
                     dateFormat="dd/MM/yyyy"
                     selected={startDate}
@@ -57,7 +60,7 @@ function TimeContainer({
                     withPortal
                 />
             </div>&emsp;
-            <Button style={{minWidth:'100px'}} onClick={search} color="orange" appearance="primary" >ค้นหา</Button>
+            <Button onClick={search} color="orange" appearance="primary" >ค้นหา</Button>
         </Container>
   );
 };

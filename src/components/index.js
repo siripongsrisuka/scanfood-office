@@ -36,9 +36,15 @@ import CategoryControl from "./CategoryControl";
 import SearchAndBottom from "./SearchAndBottom";
 import CategoryRender from "./CategoryRender";
 import Card from "./Card";
+import TimeControlUpgrade from "./TimeControlUpgrade";
+import initialColors from "./initialColors";
+import SlideOptions from "./SlideOptions";
 
 
 export {
+    SlideOptions,
+    initialColors,
+    TimeControlUpgrade,
     Card,
     CategoryRender,
     SearchAndBottom,

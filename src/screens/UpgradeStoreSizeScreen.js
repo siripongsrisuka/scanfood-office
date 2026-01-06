@@ -1,36 +1,30 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import {
   Button,
-  Form,
-  Row,
-  Col,
-  Container,
-  Table,
-  Modal,
-  Image,
-  Collapse,
-  InputGroup,
-  OverlayTrigger,
-  Tooltip
 } from "react-bootstrap";
-import { Modal_FlatlistSearchShop, Modal_Loading } from "../modal";
+import { Modal_FlatlistSearchShop, Modal_Loading, Modal_Payment } from "../modal";
 import { colors, initialShop, initialStoreSize } from "../configs";
 import { MdRadioButtonUnchecked, MdRadioButtonChecked } from 'react-icons/md'; // replace with correct MaterialCommunityIcons mapping
 import { db } from "../db/firestore";
-import { formatCurrency, formatTime, summary } from "../Utility/function";
+import { formatCurrency, formatTime, summary, toastSuccess } from "../Utility/function";
 import { Card, OneButton } from "../components";
-import { stringFullDate } from "../Utility/dateTime";
+import { stringFullDate, stringReceiptNumber, stringYMDHMS3 } from "../Utility/dateTime";
+import { scanfoodAPI } from "../Utility/api";
+import { useSelector } from "react-redux";
 
 const { dark, theme3, white } = colors;
 
 function UpgradeStoreSizeScreen() {
     const [search_Modal, setSearch_Modal] = useState(false);
     const [current, setCurrent] = useState(initialShop);
-    const { name, vip, storeSize } = current;
+    const { name, vip, storeSize} = current;
     const [selectedSize, setSelectedSize] = useState(20);
     const [masterPackage, setMasterPackage] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [payment_Modal, setPayment_Modal] = useState(false);
+    const [qrCode, setQrcode] = useState('');
+    const [amount, setAmount] = useState('');
+    const { profile:{ id:profileId, name:profileName } } = useSelector(state=>state.profile);
 
 
     function diffDaysFloor(ts1, ts2) {
@@ -95,26 +89,23 @@ function UpgradeStoreSizeScreen() {
 
 
     useEffect(() => {
-        setLoading(true);
-        Promise.all([
-            fetchPackage()
-        ])
-        .then(()=>{
-            setLoading(false);
-        }) 
+        fetchPackage()
    
     }, []);
 
 
 
     async function fetchPackage(){
+        setLoading(true);
         try {
             const packageDoc = await db.collection('admin').doc('package').get();
             const { value } = packageDoc.data();
             setMasterPackage(value)
         } catch (error) {
             alert(error)
-        } 
+        } finally {
+            setLoading(false);
+        }
     };
 
 
@@ -129,13 +120,80 @@ function UpgradeStoreSizeScreen() {
    
     };
 
-    console.log(vipPrice)
+    async function submit(){
+        if(!current.id) return alert('เพิ่มร้านก่อน')
+        setLoading(true);
+        const amount = 1;
+        try {
+            const timestamp = new Date();
+
+            const qrCode =  await db.runTransaction( async (transaction) => {
+                let orderNumber = stringReceiptNumber(1)
+                const upgradeNumberRef = db.collection("admin").doc('upgradeNumber');
+                const upgradeNumberDoc = await transaction.get(upgradeNumberRef);
+                const { value } = upgradeNumberDoc.data();
+                orderNumber = stringReceiptNumber(value+1);
+
+                const upgradeRef = db.collection('autoUpgradeSize').doc();
+                const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,{ 
+                    channelType:'posxpay',
+                    shopId:`upgrade:${upgradeRef.id}`,
+                    amount,
+                    serial:'WQRN002405000023',
+                    token:process.env.REACT_APP_API_TOKEN,
+                    ref2:'auto'
+                });
+    
+                const { 
+                    referenceId,
+                    chargeId,
+                    qrCode,
+                } = data?.data;
+                const { id:shopId, storeSize, name } = current;
+                transaction.set(upgradeRef,{
+                    shopId,
+                    shopName:name,
+                    storeSize,
+                    nextStoreSize:selectedSize,
+                    amount,
+                    chargeId,
+                    qrCode,
+                    profileId,
+                    profileName,
+                    createdAt:timestamp,
+                    process:'request', // requst, success, cancel
+                    billDate:stringYMDHMS3(timestamp),
+                    orderNumber
+                })
+          
+                transaction.update(upgradeNumberRef, { value: value+1, timestamp });
+                return qrCode
+            })
+            
+            setQrcode(qrCode);
+            setAmount(amount);
+            setPayment_Modal(true);
+            toastSuccess('สร้างคำขอสำเร็จ');
+            setCurrent(initialShop);
+            setSelectedSize(20);
+        } catch (error) {
+            alert(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     
   return (
     <div style={styles.container} >
         <h1>ปรับขนาดร้าน</h1>
         <Modal_Loading show={loading} />
-
+        <Modal_Payment
+            show={payment_Modal}
+            onHide={()=>{setPayment_Modal(false)}}
+            qrCode={qrCode}
+            amount={amount}
+        />
         <Modal_FlatlistSearchShop
             show={search_Modal}
             onHide={()=>{setSearch_Modal(false)}}
@@ -211,7 +269,7 @@ function UpgradeStoreSizeScreen() {
                 <h4>{formatCurrency(net)}</h4>
                 <h6>net</h6>
             </Button>
-            <OneButton {...{ text:'สร้างการชำระเงิน', submit:()=>{alert('สวัสดีจ้า')} }} />
+            <OneButton {...{ text:'สร้างการชำระเงิน', submit:()=>{submit()} }} />
             
             
         </div>

@@ -79,7 +79,7 @@ function Modal_Payment({
       size={size}
     >
       <Modal.Header closeButton>
-        <h2><b>อนุมัติแพ็กเกจ</b></h2>
+        <h2><b>QRCode ชำระเงิน</b></h2>
       </Modal.Header>
 
       <Modal.Body style={{ display:'flex', flexDirection:'column', alignItems:'center' }} >

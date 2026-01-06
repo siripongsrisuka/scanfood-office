@@ -50,9 +50,15 @@ export default [
       id:'128'
     },
     {
-      topic: '2.1 Upgrade ร้าน',
+      topic: '2.1 เพิ่มโต๊ะ',
       icon: 'bi-speedometer',
       to: 'upgrade',
+      id:'128'
+    },
+    {
+      topic: '2.1 ประวัติเพิ่มโต๊ะ',
+      icon: 'bi-speedometer',
+      to: 'upgradeHistory',
       id:'128'
     },
 

@@ -14,7 +14,8 @@ import careReducer from './careSlice';
 import cardReducer from './cardSlice';
 import scenarioReducer from './scenarioSlice';
 import reportReducer from './reportSlice';
-import officeReducer from './officeSlice'
+import officeReducer from './officeSlice';
+import upgradeReducer from './upgradeSlice';
 
 
 
@@ -61,7 +62,8 @@ import officeReducer from './officeSlice'
     card:cardReducer,
     scenario:scenarioReducer,
     report:reportReducer,
-    office:officeReducer
+    office:officeReducer,
+    upgrade:upgradeReducer
     // care:careReducer,
 
   })

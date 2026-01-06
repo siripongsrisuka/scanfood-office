@@ -31,16 +31,26 @@ function CreateOrder() {
         const amount = 1;
         try {
             const payload = {
-                
+
             }
-            const { status, data } = await scanfoodAPI.post('/gateway/payment/requestQr',{ 
-                channelType:'posxpay',
-                shopId:'scanfoodOffice',
-                amount,
-                serial:'WQRN002405000023',
-                token:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjaGFudElkIjoxMDQ3M30.P42rmcK6gLFCcf6x88rgpMx4hRGPPgDh4hgbreuCTaw',
-                ref2:'checkout'
-            });
+            const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,{ 
+                    // const { status, data } = await scanfoodAPI.post('/gateway/payment/requestQr',{ 
+                        channelType:'posxpay',
+                        shopId:'scanfoodOffice',
+                        amount,
+                        serial:'WQRN002405000023',
+                        token:process.env.REACT_APP_API_TOKEN,
+                        // token:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjaGFudElkIjoxMDQ3M30.P42rmcK6gLFCcf6x88rgpMx4hRGPPgDh4hgbreuCTaw',
+                        ref2:'checkout'
+                    });
+            // const { status, data } = await scanfoodAPI.post('/gateway/payment/requestQr',{ 
+            //     channelType:'posxpay',
+            //     shopId:'scanfoodOffice',
+            //     amount,
+            //     serial:'WQRN002405000023',
+            //     token:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjaGFudElkIjoxMDQ3M30.P42rmcK6gLFCcf6x88rgpMx4hRGPPgDh4hgbreuCTaw',
+            //     ref2:'checkout'
+            // });
             const { 
                 referenceId,
                 chargeId,

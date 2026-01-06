@@ -31,6 +31,7 @@ import {
   SaleScreen,
   Test,
   UpgradeStoreSizeScreen,
+  UpgradeStoreSizeHistory,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -89,6 +90,7 @@ function App() {
             <Route path='createOrder' element={<CreateOrder/>} />
             <Route path='sale' element={<SaleScreen/>} />
             <Route path='upgrade' element={<UpgradeStoreSizeScreen/>} />
+            <Route path='upgradeHistory' element={<UpgradeStoreSizeHistory/>} />
             
           </Route>
           <Route path='/admin' element={<AdminDashboard/>} />

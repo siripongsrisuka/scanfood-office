@@ -327,7 +327,11 @@ export function transformData(input) {
   });
 
   return result;
-}
+};
+
+  export function onlyNumberValue2(value){
+    return value.replace(/[^0-9]/g, '')
+  }
 
 export function findDay(packageId){
   let day = 0;
@@ -362,21 +366,6 @@ export function findDay(packageId){
   return { day, packageId, packageType }
 }
 
-
-
-export function manageBill(arr1,arr2){
-  let bills = mergeArrays(arr1,arr2)
-  let normalBills = []
-  let voidedBills = []
-  bills.forEach(obj => {
-    if (obj.void === true) {
-      voidedBills.push(obj);
-    } else {
-      normalBills.push(obj);
-    }
-  });
-  return {bills, normalBills, voidedBills}
-};
 
 
 

@@ -26,6 +26,16 @@ export const stringYMDHMS = (day) => {
     return cDateTime;  // 20210627002526
 };
 
+export function stringReceiptNumber(receipts){
+    const date = new Date()
+    const cDateTime =
+        date.getFullYear().toString().padStart(4,"0")+"" +
+        parseInt(date.getMonth()+1).toString().padStart(2,"0") +""+
+        receipts.toString().padStart(6,"0")
+
+    return cDateTime;  // 202309000123
+};
+
 export const stringDateTime = (dateTime) => {
     const today = new Date(dateTime);
     const cDateTime =
@@ -96,15 +106,7 @@ export const setTimeEnd = (date) => {
     return result;  //for expireDate
 }
 
-export const stringReceiptNumber = (receipts) => {
-    const date = new Date()
-    const cDateTime =
-        date.getFullYear().toString().padStart(4,"0")+"" +
-        parseInt(date.getMonth()+1).toString().padStart(2,"0") +""+
-        receipts.toString().padStart(6,"0")
 
-    return cDateTime;  // 202309000123
-};
 export const stringFullDate = (day) => {
     const today = new Date(day);
     let xx = 10

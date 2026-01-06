@@ -20,8 +20,17 @@ import initialAdmin from "./initialAdmin";
 import initialOffice from "./initialOffice";
 import initialStoreSize from "./initialStoreSize";
 import initialShop from "./initialShop";
+import initialRegions from "./initialRegions";
+import initialNote from "./initialNote";
+import initialProvince from "./initialProvince";
+import initialChannel from "./initialChannel";
+
 
 export {
+  initialChannel,
+  initialProvince,
+  initialNote,
+  initialRegions,
   initialShop,
   initialStoreSize,
   initialOffice,

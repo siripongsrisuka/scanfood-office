@@ -28,8 +28,10 @@ import CreateOrder from "./CreateOrder";
 import SaleScreen from "./SaleScreen";
 import Test from "./Test";
 import UpgradeStoreSizeScreen from "./UpgradeStoreSizeScreen";
+import UpgradeStoreSizeHistory from "./UpgradeStoreSizeHistory";
 
 export {
+    UpgradeStoreSizeHistory,
     UpgradeStoreSizeScreen,
     Test,
     SaleScreen,
