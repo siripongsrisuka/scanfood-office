@@ -32,14 +32,16 @@ import { colors, initialProcess } from "../configs";
 import { diffDaysCeil, formatCurrency, formatTime, toastSuccess, wait } from "../Utility/function";
 import initialShopType from "../configs/initialShopType";
 
-const { softWhite, dark, softGray } = colors;
+const { softWhite, dark, softGray, greenSanta, white } = colors;
 
 const options = [
-        {id:'1',name:'ongoing', value:'1'},
+        {id:'1',name:'lead', value:'1'},
         {id:'2',name:'so', value:'2'},
         {id:'3',name:'success', value:'3'},
         {id:'4',name:'waste', value:'4'},
         {id:'5',name:'memo', value:'5'},
+        {id:'6',name:'SW', value:'6'},
+        {id:'7',name:'HW', value:'7'},
 ];
 
 const actionOptions = [
@@ -108,7 +110,13 @@ function SaleScreen() {
     const [connect_Modal, setConnect_Modal] = useState(false);
     const [payments, setPayments] = useState([]);
     const [paymentAction_Modal, setPaymentAction_Modal] = useState(false);
-
+    const [softwares, setSoftwares] = useState([]); // license เฉพาะที่ยังไม่ได้อนุมัติ
+    const [hardware, setHardware] = useState([]); // hardware เฉพาะที่ยังไม่จัดส่ง
+    const [option, setOption] = useState({id:'1',name:'Ongoing', value:'1' });
+    const { id:optionId, name:optinName, value } = option;
+    const [customer_Modal, setCustomer_Modal] = useState(false);
+    const [currentCustomer, setCurrentCustomer] = useState(initialCustomer);
+    const { tel, id:customerId, storeSize, shopId, shopName, name } = currentCustomer;
 
     const colorMap = useMemo(
         () => new Map(initialProcess.map(a=>[a.id,a.color]))
@@ -127,12 +135,37 @@ function SaleScreen() {
             fetchMemo(),
             fetchWaste(),
             fetchSuccessCases(),
-            fetchPayment()
+            fetchPayment(),
+            fetchSoftware()
         ]).then(()=>{
             setLoading(false)
         })
     },[]);
 
+        // 200%
+    async function fetchSoftware(){
+        try {
+            const query = await db.collection('packageOrder')
+                .where('profileId','==',profileId)
+                .where('status','==','request')
+                .get();
+            
+            const results = query.docs.map(doc=>{
+                const { timestamp, requestDate, ...rest } = doc.data();
+                return {
+                    ...rest,
+                    timestamp:formatTime(timestamp),
+                    requestDate:formatTime(requestDate),
+                    id:doc.id,
+                }
+            });
+            setSoftwares(results)
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+    // 200%
     async function fetchPayment(){
         try {
             const query = await db.collection('autoPayment')
@@ -155,9 +188,7 @@ function SaleScreen() {
         }
     };
 
-    console.log('payments')
-    console.log(payments)
-
+    // 200%
     async function fetchWaste(){
         const thisYearMonth = yearMonth(new Date());
         try {
@@ -181,6 +212,7 @@ function SaleScreen() {
         }
     };
 
+    // 200%
     async function fetchSuccessCases(){
         const thisYearMonth = yearMonth(new Date());
         try {
@@ -226,6 +258,8 @@ function SaleScreen() {
             console.log(error)
         }
     };
+
+
 
     async function fetchMemo(){
         try {
@@ -377,7 +411,8 @@ function SaleScreen() {
                     profileName,
                     process:'request', // request, cancel, success
                     team,
-                    customerId
+                    customerId,
+                    name
                     
                 })
                 return qrCode
@@ -395,17 +430,13 @@ function SaleScreen() {
         
     };
 
-    const [option, setOption] = useState({id:'1',name:'Ongoing', value:'1' });
-    const { id:optionId, name:optinName, value } = option;
 
     const handleChange = (value) => {
       const option = options.find(a=>a.value === value)
         setOption(option);
     };
 
-    const [customer_Modal, setCustomer_Modal] = useState(false);
-    const [currentCustomer, setCurrentCustomer] = useState(initialCustomer);
-    const { tel, id:customerId, storeSize, shopId, shopName } = currentCustomer;
+
     function openAction(item){
         setCurrentCustomer(item);
         if(optionId==='1') return setAction_Modal(true);
@@ -439,7 +470,6 @@ function SaleScreen() {
                 break;
         }
     };
-
 
 
     // 200%
@@ -604,7 +634,16 @@ function SaleScreen() {
 
   return (
     <div style={styles.container} >
-        <h1>Sale</h1>
+        <div style={{ display:'flex', justifyContent:'space-between', marginRight:'3rem', paddingTop:'1rem' }} >
+            <RadarChart width={105} height={100} data={data}>
+                <PolarGrid />
+                <PolarAngleAxis dataKey="subject" />
+                <PolarRadiusAxis domain={[0, 100]} />
+                <Radar dataKey="A" stroke="#d32f2f" fill="#d32f2f" fillOpacity={0.3} />
+            </RadarChart>
+            <Button style={{ backgroundColor:greenSanta, borderRadius:100, width:'40px', height:'40px', borderColor:greenSanta }} onClick={checkOpen} ><i class="bi bi-plus-circle"></i></Button>
+        </div>
+        <SlideOptions {...{ value, handleChange, options }} />
         <Modal_FlatListTwoColumn
             header={'Payment Action'}
             show={paymentAction_Modal}
@@ -667,10 +706,7 @@ function SaleScreen() {
             disabled={optionId!=='1'}
 
         />
-        <div style={{ display:'flex', alignItems:'center' }} >
-            <SlideOptions {...{ value, handleChange, options }} />&emsp;
-            <Button style={{ backgroundColor:dark, borderRadius:100, width:'40px', height:'40px', borderColor:dark, marginBottom:'12px' }} onClick={checkOpen} ><i class="bi bi-plus-circle"></i></Button>
-        </div>
+
         {optionId==='1'
         // {['1','3','4'].includes(optionId)
             ?<React.Fragment>
@@ -680,7 +716,8 @@ function SaleScreen() {
                     const color = colorMap.get(process);
                     const shopTypeName = shopTypeMap.get(shopType);
                     return <Row onClick={()=>{openAction(item)}} key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
-                                <Col xs='12' sm='4'md='3'lg='3' ><i style={{ color }} class="bi bi-circle-fill"></i>&nbsp;<span style={{ color:softGray }} >({day})</span><span  >({storeSize})</span>{name}<span><button style={{ backgroundColor:'rgba(247,199,77,0.9)'}} >ผูกบัญชีแล้ว</button></span></Col>
+
+                                <Col xs='12' sm='4'md='3'lg='3' ><i style={{ color }} class="bi bi-circle-fill"></i>&nbsp;<span style={{ color:softGray }} >({day})</span><span  >({storeSize})</span>{name}{shopId?<span><button style={{ backgroundColor:'rgba(247,199,77,0.9)'}} >ผูกบัญชีแล้ว</button></span>:null}</Col>
                                 <Col xs='6' sm='4'md='3'lg='3'  >{shopTypeName}</Col>
                                 <Col md='12' lg='6'  >Note : {note}</Col>
                             </Row>
@@ -688,7 +725,7 @@ function SaleScreen() {
             </React.Fragment>
             :optionId === '3'
             ?<React.Fragment> 
-                <h4>ทั้งหมด : {customers.length} Success</h4>
+                <h4>ทั้งหมด : {successCases.length} Success</h4>
                 {successCases.map((item)=>{
                     const { name, storeSize, shopType, note, process, day } = item;
                     const color = colorMap.get(process);
@@ -739,17 +776,25 @@ function SaleScreen() {
                     </Col>
                 })}
             </Row>
+            :optionId ==='6'
+            ?<React.Fragment> 
+                <h4>ทั้งหมด : {softwares.length} รายการ</h4>
+                {softwares.map((item)=>{
+                    const { name, shopName, net, process, requestDate } = item;
+                    const processName = processMap[process]
+                    return <Row onDoubleClick={()=>{alert('xxx')}}  key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
+                                <Col xs='12' sm='6'  >{name}[{shopName}]</Col>
+                                <Col xs='6' sm='3'  >{formatCurrency(net)}</Col>
+                                <Col xs='6' sm='3'  >{processName}</Col>
+                            </Row>
+                })}
+            </React.Fragment> // so
             :null
         }
  
         
 
-        {/* <RadarChart width={350} height={300} data={data}>
-            <PolarGrid />
-            <PolarAngleAxis dataKey="subject" />
-            <PolarRadiusAxis domain={[0, 100]} />
-            <Radar dataKey="A" stroke="#d32f2f" fill="#d32f2f" fillOpacity={0.3} />
-        </RadarChart> */}
+        
       <div>
     </div>
     </div>
@@ -759,6 +804,7 @@ function SaleScreen() {
 const styles = {
   container : {
     minHeight:'100vh',
+    position:'relative'
   }
 }
 

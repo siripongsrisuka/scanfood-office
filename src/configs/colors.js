@@ -58,7 +58,8 @@ export default {
     header:'#D00A13',
     background:'#D00A13',
     green:'#00BF63',
-    blue:'#5DC3FF'
+    blue:'#5DC3FF',
+    greenSanta:'#0D8266',
 
 };
 
