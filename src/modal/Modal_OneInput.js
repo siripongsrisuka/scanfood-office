@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Modal } from "react-bootstrap";
-import { FloatingText } from "../components";
+import { FloatingText, FooterButton } from "../components";
 
 function Modal_OneInput({
   backdrop=false, // true/false/static
@@ -39,10 +39,7 @@ function Modal_OneInput({
             value={value}
         />
       </Modal.Body>
-      <Modal.Footer>
-            <Button onClick={onHide} variant="secondary">Cancel</Button>
-            <Button onClick={onClick} variant={color}>Confirm</Button>
-      </Modal.Footer>
+      <FooterButton {...{ onHide, submit:onClick }} />
     </Modal>
   );
 }

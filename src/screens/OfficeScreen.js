@@ -169,7 +169,10 @@ function OfficeScreen() {
 
 const styles = {
   container : {
-    paddingTop:'1rem',paddingBottom:'1rem',backgroundColor:softWhite,width:'100%',display:'flex',paddingRight:'3rem',position:'fixed',top:0,backgroundColor:white,zIndex:99
+    paddingTop:'1rem',
+    paddingBottom:'1rem',
+    backgroundColor:softWhite,
+    width:'100%',display:'flex',paddingRight:'3rem',position:'fixed',top:0,backgroundColor:white,zIndex:99
   },
   container2 : {
     maxWidth:'80vw', whiteSpace: 'nowrap', scrollbarWidth:'thin',zIndex:999,marginLeft:'3rem'
@@ -181,7 +184,11 @@ const styles = {
     position:'absolute',top:10,left:10,fontSize:30,cursor:'pointer'
   },
   container5 : {
-    width:'100%',paddingTop:'5rem',backgroundColor:backgroundColor, height:'100%',marginLeft:'1rem'
+    width:'100%',
+    paddingTop:'3rem',
+    backgroundColor:backgroundColor, height:'100%',
+    marginLeft:'0.5rem',
+    maxWidth:'95vw', minWidth:'95vw'
   },
 
   container7 : {

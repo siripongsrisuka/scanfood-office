@@ -7,7 +7,7 @@ import {
   Table
 } from "react-bootstrap";
 import { DeleteButton, FloatingArea, FloatingText, FooterButton, InputArea, InputText, OneButton, RedStar } from "../components";
-import { colors, initialAlert, initialChannel, initialNote, initialProvince, initialStoreSize } from "../configs";
+import { colors, initialAlert, initialChannel, initialNote, initialProcess, initialProvince, initialStoreSize } from "../configs";
 import Modal_Alert from "./Modal_Alert";
 import { onlyNumberValue2 } from "../Utility/function";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
@@ -18,14 +18,6 @@ import initialShopType from "../configs/initialShopType";
 
 const { softWhite, darkGray, dark } = colors;
 
-const initialCoporations = [
-    {
-        id:true,name:'นิติบุคคล'
-    },
-    {
-        id:false,name:'บุคคลธรรมดา'
-    },
-]
 
 const positionOptions = ['owner','manager']
 
@@ -39,10 +31,8 @@ function Modal_Customer({
   submit,
   setCurrent,
   current,
-  deleteItem,
-  newCustomer = false
 }) {
-    const { id, name, tel, province, note = [], channel, storeSize, contactPosition, shopType } = current;
+    const { id, name, tel, province, note = [], channel, storeSize, contactPosition, shopType, process } = current;
     const [alert_Modal, setAlert_Modal] = useState(initialAlert);
     const { status, content, onClick, variant } = alert_Modal;
 
@@ -88,6 +78,26 @@ function Modal_Customer({
                 value={note}
                 onChange={(event)=>{setCurrent(prev=>({...prev,note:event.target.value}))}}
             />
+            <Form.Select 
+                aria-label="Default select example" 
+                value={process} 
+                onChange={(event)=>{
+                event.preventDefault()
+                if(event.target.value!==process){
+                    setCurrent({
+                        ...current,
+                        process:event.target.value,
+                    })
+                }
+                }}
+                style={styles.container} 
+            >
+                <option value="" disabled>ความคืบหน้า</option>
+                {initialProcess.map((item,index)=>{
+                    return <option key={index} value={item.id}>{item.name}</option>
+                })}
+            </Form.Select>
+            <br/>
             <Form.Select 
                 aria-label="Default select example" 
                 value={storeSize} 

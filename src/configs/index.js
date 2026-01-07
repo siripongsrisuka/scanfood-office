@@ -24,9 +24,11 @@ import initialRegions from "./initialRegions";
 import initialNote from "./initialNote";
 import initialProvince from "./initialProvince";
 import initialChannel from "./initialChannel";
+import initialProcess from "./initialProcess";
 
 
 export {
+  initialProcess,
   initialChannel,
   initialProvince,
   initialNote,

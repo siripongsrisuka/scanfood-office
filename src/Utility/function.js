@@ -333,6 +333,18 @@ export function transformData(input) {
     return value.replace(/[^0-9]/g, '')
   }
 
+export  function diffDaysFloor(ts1, ts2) {
+    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+    const diffMs = Math.abs(ts2 - ts1);
+    return Math.floor(diffMs / MS_PER_DAY);
+};
+
+export  function diffDaysCeil(ts1, ts2) {
+    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+    const diffMs = Math.abs(ts2 - ts1);
+    return Math.ceil(diffMs / MS_PER_DAY);
+}
+
 export function findDay(packageId){
   let day = 0;
   let packageType = 'qrcode';

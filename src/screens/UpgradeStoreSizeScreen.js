@@ -6,7 +6,7 @@ import { Modal_FlatlistSearchShop, Modal_Loading, Modal_Payment } from "../modal
 import { colors, initialShop, initialStoreSize } from "../configs";
 import { MdRadioButtonUnchecked, MdRadioButtonChecked } from 'react-icons/md'; // replace with correct MaterialCommunityIcons mapping
 import { db } from "../db/firestore";
-import { formatCurrency, formatTime, summary, toastSuccess } from "../Utility/function";
+import { diffDaysFloor, formatCurrency, formatTime, summary, toastSuccess } from "../Utility/function";
 import { Card, OneButton } from "../components";
 import { stringFullDate, stringReceiptNumber, stringYMDHMS3 } from "../Utility/dateTime";
 import { scanfoodAPI } from "../Utility/api";
@@ -26,12 +26,6 @@ function UpgradeStoreSizeScreen() {
     const [amount, setAmount] = useState('');
     const { profile:{ id:profileId, name:profileName } } = useSelector(state=>state.profile);
 
-
-    function diffDaysFloor(ts1, ts2) {
-        const MS_PER_DAY = 24 * 60 * 60 * 1000;
-        const diffMs = Math.abs(ts2 - ts1);
-        return Math.floor(diffMs / MS_PER_DAY);
-    }
 
     const { currentStore, vipPrice, net, vipCharge, extraCharge } = useMemo(()=>{
         const currentStore = initialStoreSize.filter(item=>item.value > storeSize);

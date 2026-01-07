@@ -36,9 +36,11 @@ import Modal_ApproveSoftware from "./Modal_ApproveSoftware";
 import Modal_Payment from "./Modal_Payment";
 import Modal_Package from "./Modal_Package";
 import Modal_Customer from "./Modal_Customer";
+import Modal_Cancel from "./Modal_Cancel";
 
 
 export { 
+    Modal_Cancel,
     Modal_Customer,
     Modal_Package,
     Modal_Payment,

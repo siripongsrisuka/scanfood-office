@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useRef, forwardRef } from "react";
+import React, { useMemo, forwardRef } from "react";
 import {
 //   Button,
   Modal,
@@ -8,8 +8,8 @@ import {
 } from "react-bootstrap";
 import { formatCurrency, formatCurrency2, summary } from "../Utility/function";
 import { MdRadioButtonUnchecked, MdRadioButtonChecked } from 'react-icons/md'; // replace with correct MaterialCommunityIcons mapping
-import { colors, initialStoreSize } from "../configs";
-import { Card, FloatingArea, FooterButton, InputArea } from "../components";
+import { colors } from "../configs";
+import { Card, FloatingArea, FooterButton } from "../components";
 import DatePicker from "react-datepicker";
 import { SlCalender } from "react-icons/sl";
 import { Button } from "rsuite";
@@ -28,7 +28,7 @@ function Modal_Package({
   hardwares
 }) {
     const { storeSize, software, requestDate = '', hardware, note = '', deliveryType = 'normal' } = current;
-
+    
     const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => (
         <div style={{ borderRadius:20 }} onClick={onClick} ref={ref}>
           {value}
@@ -87,10 +87,6 @@ function Modal_Package({
         }))
     };
 
-
-    function handleStoreSize(value){
-        setCurrent(prev=>({...prev, storeSize:value, software:[] }))
-    };
 
     function handleHardware({ item, type }){
         switch (type) {
@@ -154,46 +150,10 @@ function Modal_Package({
         <Card title='Software' maxWidth={'95vw'} accentColor={nine} >
             <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
                 <div style={{ marginBottom: 12, fontWeight: 'bold' }}>
-                    <h2>1. ขนาดร้าน <span style={{ color:five }}  >{extraCharge>0?`+ ${formatCurrency(extraCharge)}`:''}</span>
+                    <h2>1. ขนาดร้าน : {storeSize}โต๊ะ <span style={{ color:five }}  >{extraCharge>0?`+ ${formatCurrency(extraCharge)}`:''}</span>
                     
                     </h2>
                 </div>
-
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
-                    {initialStoreSize.map((item) => {
-                        const { id, value } = item;
-                        const status = storeSize === value
-
-                        return (
-                            <div
-                            key={id}
-                            onClick={() => handleStoreSize(value)}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 12,
-                                backgroundColor:white,
-                                padding: 12,
-                                borderRadius: 10,
-                                cursor: 'pointer',
-                                boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-                                minWidth: 250,
-                            }}
-                            >
-                            {status ? (
-                                <MdRadioButtonChecked size={30} color={dark} />
-                            ) : (
-                                <MdRadioButtonUnchecked size={30} color={theme3} />
-                            )}
-
-                            <div>
-                                <div style={{ fontSize: 18, fontWeight: 600 }}>{value} โต๊ะ</div>
-                            </div>
-                            </div>
-                        );
-                    })}
-                </div>
-                
             </div>
             <br/>
             <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
