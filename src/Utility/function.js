@@ -343,7 +343,12 @@ export  function diffDaysCeil(ts1, ts2) {
     const MS_PER_DAY = 24 * 60 * 60 * 1000;
     const diffMs = Math.abs(ts2 - ts1);
     return Math.ceil(diffMs / MS_PER_DAY);
+};
+
+export function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
+
 
 export function findDay(packageId){
   let day = 0;

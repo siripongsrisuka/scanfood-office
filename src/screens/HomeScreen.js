@@ -60,13 +60,13 @@ async function handleProfile(profileId){
     };
     const officeDoc = await db.collection('admin').doc('office').get();
     const { humanRight } = officeDoc.data();
-    if(!humanRight.some(a=>a.id === profileId)) throw 'ไม่มีสิทธิ์เข้าใช้งาน'
+    if(!humanRight.some(a=>a.id === profileId)) return alert('ไม่มีสิทธิ์เข้าใช้งาน')
     dispatch(fetchNormalProfile(profileInfo));
+    navigate("/office");
     toastSuccess('เข้าสู่ระบบสำเร็จ')
   } catch (error) {
     alert(error)
   } finally {
-    navigate("/office")
     setLoading(false)
   }
 }

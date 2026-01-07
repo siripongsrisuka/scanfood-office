@@ -22,15 +22,14 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
 } from 'recharts';
-import { Modal_Cancel, Modal_Customer, Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput, Modal_Package, Modal_Payment } from "../modal";
+import { Modal_Cancel, Modal_Customer, Modal_FlatlistSearchShop, Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput, Modal_Package, Modal_Payment } from "../modal";
 import { db } from "../db/firestore";
-import { OneButton, SlideOptions } from "../components";
+import { SlideOptions } from "../components";
 import { scanfoodAPI } from "../Utility/api";
-import { stringDateTimeReceipt, stringReceiptNumber, stringYMDHMS3 } from "../Utility/dateTime";
+import { stringDateTimeReceipt, stringReceiptNumber, stringYMDHMS3, yearMonth } from "../Utility/dateTime";
 import initialCustomer from "../configs/initialCustomer";
 import { colors, initialProcess } from "../configs";
-import { diffDaysCeil, diffDaysFloor, formatTime, toastSuccess } from "../Utility/function";
-import initialCancelId from "../configs/initialCancelId";
+import { diffDaysCeil, formatCurrency, formatTime, toastSuccess, wait } from "../Utility/function";
 import initialShopType from "../configs/initialShopType";
 
 const { softWhite, dark, softGray } = colors;
@@ -41,7 +40,29 @@ const options = [
         {id:'3',name:'success', value:'3'},
         {id:'4',name:'waste', value:'4'},
         {id:'5',name:'memo', value:'5'},
-    ]
+];
+
+const actionOptions = [
+    { id:'1', name:'เปิดบิล'},
+    { id:'2', name:'โทร'},
+    { id:'3', name:'แก้ไขโปรไฟล์'},
+    { id:'4', name:'ผูกบัญชีร้านค้า'},
+    { id:'5', name:'ย้ายไปถังขยะ'},
+];
+
+const processMap = {
+    'request':'รอชำระ',
+    'success':'เสร็จสมบูรณ์',
+    'paid':'ชำระเงินแล้ว',
+    'cancel':'ยกเลิก'
+};
+
+const paymentActions = [
+    { id:'1', name:'ผูกร้าน' },
+    { id:'2', name:'ขอ QR Payment' },
+    { id:'3', name:'รายละเอียด' },
+    { id:'4', name:'ยกเลิกออเดอร์' },
+]
 
 const initialOrder = {
     storeSize:20, 
@@ -49,7 +70,8 @@ const initialOrder = {
     requestDate:new Date(), 
     hardware:[], 
     note:'', 
-    deliveryType:'normal'
+    deliveryType:'normal',
+    customerId:''
 };
 
 const initialCancel = { cancelId:'', reason:'' };
@@ -81,6 +103,12 @@ function SaleScreen() {
     const [memo_Modal, setMemo_Modal] = useState(false);
     const [currentMemo, setCurrentMemo] = useState(initialMemo);
     const { content } = currentMemo;
+    const [waste, setWaste] = useState([]);
+    const [successCases, setSuccessCases] = useState([]);
+    const [connect_Modal, setConnect_Modal] = useState(false);
+    const [payments, setPayments] = useState([]);
+    const [paymentAction_Modal, setPaymentAction_Modal] = useState(false);
+
 
     const colorMap = useMemo(
         () => new Map(initialProcess.map(a=>[a.id,a.color]))
@@ -96,11 +124,85 @@ function SaleScreen() {
             fetchLicense(),
             fetchHardware(),
             fetchCustomer(),
-            fetchMemo()
+            fetchMemo(),
+            fetchWaste(),
+            fetchSuccessCases(),
+            fetchPayment()
         ]).then(()=>{
             setLoading(false)
         })
     },[]);
+
+    async function fetchPayment(){
+        try {
+            const query = await db.collection('autoPayment')
+                .where('profileId','==',profileId)
+                .orderBy('createdAt','desc')
+                .limit(30)
+                .get();
+            const results = query.docs.map(doc=>{
+                const { createdAt, requestDate, ...rest } = doc.data();
+                return {
+                    ...rest,
+                    createdAt:formatTime(createdAt),
+                    requestDate:formatTime(requestDate),
+                    id:doc.id,
+                }
+            });
+            setPayments(results)
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+    console.log('payments')
+    console.log(payments)
+
+    async function fetchWaste(){
+        const thisYearMonth = yearMonth(new Date());
+        try {
+            const query = await db.collection('customer')
+                .where('profileId','==',profileId)
+                .where('status','==','cancel')
+                .where('yearMonth','==',thisYearMonth)
+                .get();
+            const results = query.docs.map(doc=>{
+                const { createdAt, ...rest } = doc.data();
+                return {
+                    ...initialCustomer,
+                    ...rest,
+                    createdAt:formatTime(createdAt),
+                    id:doc.id,
+                }
+            });
+            setWaste(results)
+        } catch (error) {
+            console.log(error)
+        }
+    };
+
+    async function fetchSuccessCases(){
+        const thisYearMonth = yearMonth(new Date());
+        try {
+            const query = await db.collection('customer')
+                .where('profileId','==',profileId)
+                .where('status','==','paid')
+                .where('yearMonth','==',thisYearMonth)
+                .get();
+            const results = query.docs.map(doc=>{
+                const { createdAt, ...rest } = doc.data();
+                return {
+                    ...initialCustomer,
+                    ...rest,
+                    createdAt:formatTime(createdAt),
+                    id:doc.id,
+                }
+            });
+            setSuccessCases(results)
+        } catch (error) {
+            console.log(error)
+        }
+    };
 
     async function fetchCustomer(){
         const today = new Date().getTime();
@@ -125,7 +227,7 @@ function SaleScreen() {
         }
     };
 
-      async function fetchMemo(){
+    async function fetchMemo(){
         try {
             const query = await db.collection('memo')
                 .where('profileId','==',profileId)
@@ -182,7 +284,6 @@ function SaleScreen() {
         }
 
     }
-
 
     async function fetchLicense(){
         const licenseDoc = await db.collection('admin').doc('package').get();
@@ -269,13 +370,14 @@ function SaleScreen() {
                     createdAt:timestamp,
                     chargeId,
                     qrCode,
-                    shopId:'OoYpKchrpJ24H9yaIXmi',
-                    shopName:'ตำกระด้ง',
+                    shopId,
+                    shopName,
                     billDate:stringYMDHMS3(timestamp),
                     profileId,
                     profileName,
                     process:'request', // request, cancel, success
-                    team
+                    team,
+                    customerId
                     
                 })
                 return qrCode
@@ -303,21 +405,16 @@ function SaleScreen() {
 
     const [customer_Modal, setCustomer_Modal] = useState(false);
     const [currentCustomer, setCurrentCustomer] = useState(initialCustomer);
-    const { tel, id:customerId, storeSize } = currentCustomer;
+    const { tel, id:customerId, storeSize, shopId, shopName } = currentCustomer;
     function openAction(item){
         setCurrentCustomer(item);
-        setAction_Modal(true);
-    }
+        if(optionId==='1') return setAction_Modal(true);
+        setCustomer_Modal(true)
+    };
 
-    console.log(storeSize)
-    const actionOptions = [
-    { id:'1', name:'เปิดบิล'},
-    { id:'2', name:'โทร'},
-    { id:'3', name:'แก้ไขโปรไฟล์'},
-    { id:'4', name:'ย้ายไปถังขยะ'},
-]
-    function handleAction(item){
+    async function handleAction(item){
         setAction_Modal(false);
+        await wait(500)
         switch (item.id) {
             case '1':
                 setCurrent({...initialOrder, storeSize:Number(storeSize) })
@@ -331,6 +428,9 @@ function SaleScreen() {
                 setCustomer_Modal(true);
                 break;
             case '4':
+                setConnect_Modal(true);
+                break;
+            case '5':
                 setCancel_Modal(true);
                 setCurrentCancel(initialCancel);
                 break;
@@ -340,8 +440,12 @@ function SaleScreen() {
         }
     };
 
+
+
+    // 200%
     async function handleCustomer(){
         setCustomer_Modal(false);
+        if(currentCustomer.status !=='waiting') return alert('แก้ไขไม่ได้')
         setLoading(true);
         try {
             if(customerId){
@@ -362,7 +466,8 @@ function SaleScreen() {
                     profileName,
                     team,
                     billDate:stringYMDHMS3(new Date()),
-                    createdAt:new Date()
+                    createdAt:new Date(),
+                    // yearMonth:yearMonth(new Date()) // เอาไว้ใส่ตอน success หรือ cancel
                 }
                 await customerRef.set(payload);
                 setCustomers(prev=>[payload,...prev]);
@@ -382,9 +487,14 @@ function SaleScreen() {
         setLoading(true);
         try {
             const customerRef = db.collection('customer').doc(customerId);
-            await customerRef.update({ cancelId, reason });
-                setCustomers(prev=>prev.filter(a=>a.id !== customerId));
-                toastSuccess('อัปเดตสำเร็จ');
+            await customerRef.update({ 
+                cancelId, 
+                reason, 
+                status:'cancel',
+                yearMonth:yearMonth(new Date()) 
+            });
+            setCustomers(prev=>prev.filter(a=>a.id !== customerId));
+            toastSuccess('อัปเดตสำเร็จ');
         } catch (error) {
             alert(error);
         } finally {
@@ -400,11 +510,113 @@ function SaleScreen() {
     function openMemo(item){
         setCurrentMemo(item);
         setMemo_Modal(true);
+    };
+
+    async function handleConnect(item){
+        setConnect_Modal(false);
+        const { id, name, storeSize } = item;
+        setLoading(true);
+        try {
+            const updatedField = {
+                shopId:id, shopName:name, storeSize
+            }
+            const customerRef = db.collection('customer').doc(customerId);
+            await customerRef.update(updatedField);
+            setCustomers(prev=>prev.map(item=>
+                item.id === customerId
+                    ?{
+                        ...item,...updatedField
+                    }
+                    :item
+            ));
+            toastSuccess('ผูกร้านสำเร็จแล้ว')
+
+        } catch (error) {
+            alert(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const [currentPayment, setCurrentPayment] = useState(initialOrder);
+
+    async function handlePaymentAction(item){
+        setPaymentAction_Modal(false);
+        await wait(500);
+        const { qrCode, net } = currentPayment
+        switch (item.id) {
+            case '1':
+                openPaidOrder()
+                break;
+            case '2': // 100%
+                setQrcode(qrCode);
+                setPayment_Modal(true);
+                setAmount(net)
+                break;
+            case '3': // 100%
+                setCurrent(currentPayment);
+                setLicense_Modal(true);
+                break;
+            case '4':
+                const ok = window.confirm('ยืนยันการยกเลิกออเดอร์')
+                if(ok){
+                    handleCancelPayment()
+                }
+                break;
+            default:
+                break;
+        }
+    };
+
+    async function openPaidOrder(){
+        const { shopId } = currentPayment;
+        if(shopId) return alert('ผูก shop ไว้อยู่แล้ว')
+    }
+
+    // 100%
+    async function handleCancelPayment(){
+        setLoading(true);
+        try {
+            await db.runTransaction( async (transaction)=>{
+                const orderRef = db.collection('autoPayment').doc(currentPayment.id);
+                const orderDoc = await transaction.get(orderRef);
+                const { process } = orderDoc.data();
+                if(process!=='request') throw new Error(`ยกเลิกสถานะนี้ไม่ได้นะ : ${process}`);
+                transaction.update(orderRef,{ process:'cancel' })
+            });
+            setPayments(prev=>prev.map(item=>
+                item.id === currentPayment.id
+                    ?{ ...item, process:'cancel' }
+                    :item
+            ));
+            toastSuccess('ยกเลิกบิลสำเร็จ')
+        } catch (error) {
+            alert(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    function openPaymentOption(item){
+        setCurrentPayment(item);
+        setPaymentAction_Modal(true);
     }
 
   return (
     <div style={styles.container} >
         <h1>Sale</h1>
+        <Modal_FlatListTwoColumn
+            header={'Payment Action'}
+            show={paymentAction_Modal}
+            onHide={()=>{setPaymentAction_Modal(false)}}
+            value={paymentActions}
+            onClick={handlePaymentAction}
+        />
+        <Modal_FlatlistSearchShop
+            show={connect_Modal}
+            onHide={()=>{setConnect_Modal(false)}}
+            onClick={handleConnect}
+        />
         <Modal_OneInput
             show={memo_Modal}
             header={`Memo`}
@@ -452,16 +664,46 @@ function SaleScreen() {
             licenses={licenses}
             hardwares={hardwares}
             submit={handleSubmit}
+            disabled={optionId!=='1'}
 
         />
         <div style={{ display:'flex', alignItems:'center' }} >
             <SlideOptions {...{ value, handleChange, options }} />&emsp;
             <Button style={{ backgroundColor:dark, borderRadius:100, width:'40px', height:'40px', borderColor:dark, marginBottom:'12px' }} onClick={checkOpen} ><i class="bi bi-plus-circle"></i></Button>
         </div>
-        {['1','3','4'].includes(optionId)
+        {optionId==='1'
+        // {['1','3','4'].includes(optionId)
             ?<React.Fragment>
                 <h4>ทั้งหมด : {customers.length} ลูกค้า</h4>
-                {customers.map((item,index)=>{
+                {customers.map((item)=>{
+                    const { name, storeSize, shopType, note, process, day, shopId } = item;
+                    const color = colorMap.get(process);
+                    const shopTypeName = shopTypeMap.get(shopType);
+                    return <Row onClick={()=>{openAction(item)}} key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
+                                <Col xs='12' sm='4'md='3'lg='3' ><i style={{ color }} class="bi bi-circle-fill"></i>&nbsp;<span style={{ color:softGray }} >({day})</span><span  >({storeSize})</span>{name}<span><button style={{ backgroundColor:'rgba(247,199,77,0.9)'}} >ผูกบัญชีแล้ว</button></span></Col>
+                                <Col xs='6' sm='4'md='3'lg='3'  >{shopTypeName}</Col>
+                                <Col md='12' lg='6'  >Note : {note}</Col>
+                            </Row>
+                })}
+            </React.Fragment>
+            :optionId === '3'
+            ?<React.Fragment> 
+                <h4>ทั้งหมด : {customers.length} Success</h4>
+                {successCases.map((item)=>{
+                    const { name, storeSize, shopType, note, process, day } = item;
+                    const color = colorMap.get(process);
+                    const shopTypeName = shopTypeMap.get(shopType);
+                    return <Row onClick={()=>{openAction(item)}} key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
+                                <Col xs='12' sm='4'md='3'lg='3' ><i style={{ color }} class="bi bi-circle-fill"></i>&nbsp;<span style={{ color:softGray }} >({day})</span><span  >({storeSize})</span>{name}</Col>
+                                <Col xs='6' sm='4'md='3'lg='3'  >{shopTypeName}</Col>
+                                <Col md='12' lg='6'  >Note : {note}</Col>
+                            </Row>
+                })}
+            </React.Fragment>
+            :optionId==='4'
+            ?<React.Fragment> 
+                <h4>ทั้งหมด : {waste.length} Failed</h4>
+                {waste.map((item)=>{
                     const { name, storeSize, shopType, note, process, day } = item;
                     const color = colorMap.get(process);
                     const shopTypeName = shopTypeMap.get(shopType);
@@ -473,7 +715,18 @@ function SaleScreen() {
                 })}
             </React.Fragment>
             :optionId==='2'
-            ?null // so
+            ?<React.Fragment> 
+                <h4>ทั้งหมด : {payments.length} บิล</h4>
+                {payments.map((item)=>{
+                    const { name, shopName, net, process } = item;
+                    const processName = processMap[process]
+                    return <Row onClick={()=>{openPaymentOption(item)}} key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
+                                <Col xs='12' sm='6'  >{name}[{shopName}]</Col>
+                                <Col xs='6' sm='3'  >{formatCurrency(net)}</Col>
+                                <Col xs='6' sm='3'  >{processName}</Col>
+                            </Row>
+                })}
+            </React.Fragment> // so
             :optionId ==='5'
             ?<Row>
             {memo.map((item,index)=>{

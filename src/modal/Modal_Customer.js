@@ -32,7 +32,7 @@ function Modal_Customer({
   setCurrent,
   current,
 }) {
-    const { id, name, tel, province, note = [], channel, storeSize, contactPosition, shopType, process } = current;
+    const { id, name, tel, province, note = [], channel, storeSize, contactPosition, shopType, process, shopId } = current;
     const [alert_Modal, setAlert_Modal] = useState(initialAlert);
     const { status, content, onClick, variant } = alert_Modal;
 
@@ -114,7 +114,7 @@ function Modal_Customer({
             >
                 <option value="" disabled>เลือกขนาดโต๊ะ</option>
                 {initialStoreSize.map((item,index)=>{
-                    return <option key={index} value={item.value}>โต๊ะ : {item.value}</option>
+                    return <option disabled={Boolean(shopId)} key={index} value={item.value}>โต๊ะ : {item.value}</option>
                 })}
             </Form.Select>
             <br/>

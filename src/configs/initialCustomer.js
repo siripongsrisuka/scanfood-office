@@ -15,7 +15,6 @@ export default { // lead ลูกค้าที่เข้ามา
     contactPosition:'', // เจ้าของร้าน ผู้จัดการ owner, manager
     profileId:'',
     profileName:'',
-    shopId:'',
     dueDate:'',
     dueDateAt:'',
     shopType:'',

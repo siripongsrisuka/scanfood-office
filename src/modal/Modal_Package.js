@@ -9,7 +9,7 @@ import {
 import { formatCurrency, formatCurrency2, summary } from "../Utility/function";
 import { MdRadioButtonUnchecked, MdRadioButtonChecked } from 'react-icons/md'; // replace with correct MaterialCommunityIcons mapping
 import { colors } from "../configs";
-import { Card, FloatingArea, FooterButton } from "../components";
+import { Card, FloatingArea, FooterButton, OneButton } from "../components";
 import DatePicker from "react-datepicker";
 import { SlCalender } from "react-icons/sl";
 import { Button } from "rsuite";
@@ -25,7 +25,8 @@ function Modal_Package({
   current,
   setCurrent,
   submit,
-  hardwares
+  hardwares,
+  disabled
 }) {
     const { storeSize, software, requestDate = '', hardware, note = '', deliveryType = 'normal' } = current;
     
@@ -206,7 +207,7 @@ function Modal_Package({
                 <div style={{ width:'350px' }} >
                     <div style={{ display:'flex',padding:5,borderRadius:10,border: '1px solid grey',backgroundColor:white,alignItems:'center' }} >
                         <SlCalender />
-                        <div style={{ paddingLeft:10,paddingRight:10 }} >  วันที่จัดส่ง: </div>
+                        <div style={{ paddingLeft:10,paddingRight:10 }} >  วันที่: </div>
                         <DatePicker
                             dateFormat="dd/MM/yyyy"
                             selected={requestDate}
@@ -286,7 +287,13 @@ function Modal_Package({
         
     
       </Modal.Body>
-      <FooterButton {...{ onHide, submit:()=>{handleSubmit()}, rightText:'เปิดบิล' }} />
+        {disabled
+            ?<Modal.Footer>
+                <OneButton {...{ text:'ปิด', submit:onHide, variant:'secondary' }} />
+            </Modal.Footer>
+            :<FooterButton {...{ onHide, submit:()=>{handleSubmit()}, rightText:'เปิดบิล' }} />
+        }
+      
     </Modal>
   );
 };
