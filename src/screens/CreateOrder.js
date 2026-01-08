@@ -16,7 +16,7 @@ import {
   Tooltip
 } from "react-bootstrap";
 import { OneButton } from "../components";
-import { Modal_Loading, Modal_Payment } from "../modal";
+import { Modal_Loading, Modal_Qrcode } from "../modal";
 import { scanfoodAPI } from "../Utility/api";
 
 
@@ -70,7 +70,7 @@ function CreateOrder() {
   return (
     <div style={styles.container} >
         <Modal_Loading show={loading} />
-        <Modal_Payment
+        <Modal_Qrcode
             show={payment_Modal}
             onHide={()=>{setPayment_Modal(false)}}
             qrCode={qrCode}

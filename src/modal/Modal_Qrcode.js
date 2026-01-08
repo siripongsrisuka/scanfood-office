@@ -39,7 +39,7 @@ const ThaiQrCard = ({ promptPayQrString, amount = 6000 }) => {
   );
 };
 
-function Modal_Payment({
+function Modal_Qrcode({
   backdrop=true, // true/false/static
   animation=true,
   show,
@@ -136,4 +136,4 @@ const styles = {
   },
 };
 
-export default Modal_Payment;
+export default Modal_Qrcode;

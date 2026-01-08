@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Modal } from "react-bootstrap";
-import { FloatingText, FooterButton } from "../components";
+import { FloatingArea, FloatingText, FooterButton } from "../components";
 
 function Modal_OneInput({
   backdrop=false, // true/false/static
@@ -14,7 +14,8 @@ function Modal_OneInput({
   value,
   placeholder='ตั้งชื่อหมวดหมู่สินค้า',
   onClick,
-  color='danger'
+  color='danger',
+  area = false
 }) {
 
 
@@ -32,12 +33,22 @@ function Modal_OneInput({
         <h3>{header}</h3>
       </Modal.Header>
       <Modal.Body style={{display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center',zIndex:999}}  >
-        <FloatingText
+        
+        {area
+          ?<FloatingArea
+              name={placeholder}
+              placeholder={placeholder}
+              onChange={(event)=>{onChange(event.target.value)}}
+              value={value}
+          />
+          :<FloatingText
             name={placeholder}
             placeholder={placeholder}
             onChange={(event)=>{onChange(event.target.value)}}
             value={value}
         />
+        }
+        
       </Modal.Body>
       <FooterButton {...{ onHide, submit:onClick }} />
     </Modal>

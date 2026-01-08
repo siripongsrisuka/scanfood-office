@@ -1,10 +1,150 @@
 import { v4 as uuidv4 } from 'uuid';
-import { stringYMDHMS3, stringYMDHMS, minusDays, plusDays } from './dateTime';
-import { normalSort } from './sort';
+import { stringYMDHMS3, stringYMDHMS, minusDays, plusDays, yearMonth } from './dateTime';
+import { normalSort, reverseSort } from './sort';
 import { toast } from 'react-toastify';
+import { db } from '../db/firestore';
+import initialCustomer from '../configs/initialCustomer';
 
 export function toastSuccess(text='🟢 Updated successful!'){
   toast.success(text);
+};
+
+export   async function fetchLicense(){
+    const licenseDoc = await db.collection('admin').doc('package').get();
+    const { value } = licenseDoc.data();
+    return value;
+};
+
+export   async function fetchEquipment(){
+    const equiomentDoc = await db.collection('admin').doc('hardware').get();
+    const { value } = equiomentDoc.data();
+    return value;
+};
+
+export   async function fetchHardware(profileId){
+    const query = await db.collection('hardwareOrder')
+        .where('profileId','==',profileId)
+        .where('status','==','prepare')
+        .get();
+    
+    const results = query.docs.map(doc=>{
+        const { timestamp, ...rest } = doc.data();
+        return {
+            ...rest,
+            timestamp:formatTime(timestamp),
+            id:doc.id,
+        }
+    });
+    return normalSort('timestamp',results)
+};
+export  async function fetchSoftware(profileId){
+   const query = await db.collection('packageOrder')
+        .where('profileId','==',profileId)
+        .where('status','==','request')
+        .get();
+    
+    const results = query.docs.map(doc=>{
+        const { timestamp, requestDate, ...rest } = doc.data();
+        return {
+            ...rest,
+            timestamp:formatTime(timestamp),
+            requestDate:formatTime(requestDate),
+            id:doc.id,
+        }
+    });
+    return normalSort('timestamp',results)
+};
+
+export   async function fetchPayment(profileId){
+      const query = await db.collection('autoPayment')
+          .where('profileId','==',profileId)
+          .orderBy('createdAt','desc')
+          .limit(30)
+          .get();
+      const results = query.docs.map(doc=>{
+          const { createdAt, requestDate, ...rest } = doc.data();
+          return {
+              ...rest,
+              createdAt:formatTime(createdAt),
+              requestDate:formatTime(requestDate),
+              id:doc.id,
+          }
+      });
+      return normalSort('createdAt',results)
+};
+
+export   async function fetchWaste(profileId){
+    const thisYearMonth = yearMonth(new Date());
+    const query = await db.collection('customer')
+        .where('profileId','==',profileId)
+        .where('status','==','cancel')
+        .where('yearMonth','==',thisYearMonth)
+        .get();
+    const results = query.docs.map(doc=>{
+        const { createdAt, ...rest } = doc.data();
+        return {
+            ...initialCustomer,
+            ...rest,
+            createdAt:formatTime(createdAt),
+            id:doc.id,
+        }
+    });
+    return normalSort('createdAt',results)
+};
+
+export     async function fetchSuccessCases(profileId){
+  const thisYearMonth = yearMonth(new Date());
+  const query = await db.collection('customer')
+      .where('profileId','==',profileId)
+      .where('status','==','paid')
+      .where('yearMonth','==',thisYearMonth)
+      .get();
+  const results = query.docs.map(doc=>{
+      const { createdAt, ...rest } = doc.data();
+      return {
+          ...initialCustomer,
+          ...rest,
+          createdAt:formatTime(createdAt),
+          id:doc.id,
+      }
+  });
+  return normalSort('createdAt',results)
+};
+
+export    async function fetchCustomer(profileId){
+    const today = new Date().getTime();
+    const query = await db.collection('customer')
+        .where('profileId','==',profileId)
+        .where('status','==','waiting')
+        .get();
+    const results = query.docs.map(doc=>{
+        const { createdAt, ...rest } = doc.data();
+        return {
+            ...initialCustomer,
+            ...rest,
+            createdAt:formatTime(createdAt),
+            id:doc.id,
+            day:diffDaysCeil(formatTime(createdAt).getTime(),today)
+        }
+    });
+    return normalSort('createdAt',results)
+};
+
+export   async function fetchMemo(profileId){
+    const query = await db.collection('memo')
+        .where('profileId','==',profileId)
+        .orderBy('createdAt','desc')
+        .limit(30)
+        .get();
+    const results = query.docs.map(doc=>{
+        const { createdAt, ...rest } = doc.data();
+        return {
+            ...rest,
+            createdAt:formatTime(createdAt),
+            id:doc.id,
+        }
+    });
+    return normalSort('createdAt',results)
 };
 
 export function mergeArrays(arr1, arr2) {

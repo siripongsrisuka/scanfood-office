@@ -1,4 +1,4 @@
-import React, { useMemo, forwardRef } from "react";
+import React, { useMemo, forwardRef, useRef } from "react";
 import {
 //   Button,
   Modal,
@@ -15,7 +15,7 @@ import { SlCalender } from "react-icons/sl";
 import { Button } from "rsuite";
 const { white, dark, theme3, five, one, nine, softWhite, green } = colors;
 
-function Modal_Package({
+function Modal_So({
   backdrop=true, // true/false/static
   animation=true,
   show,
@@ -31,7 +31,7 @@ function Modal_Package({
     const { storeSize, software, requestDate = '', hardware, note = '', deliveryType = 'normal' } = current;
     
     const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => (
-        <div style={{ borderRadius:20 }} onClick={onClick} ref={ref}>
+        <div  style={{ borderRadius:20 }} onClick={onClick} ref={ref}>
           {value}
         </div>
     ));
@@ -307,4 +307,4 @@ const styles = {
   }
 };
 
-export default Modal_Package;
+export default Modal_So;

@@ -33,17 +33,18 @@ import Modal_Splash from "./Modal_Splash";
 import Modal_Human from "./Modal_Human";
 import Modal_FindHuman from "./Modal_FindHuman";
 import Modal_ApproveSoftware from "./Modal_ApproveSoftware";
-import Modal_Payment from "./Modal_Payment";
-import Modal_Package from "./Modal_Package";
+import Modal_Qrcode from "./Modal_Qrcode";
+import Modal_So from "./Modal_So";
 import Modal_Customer from "./Modal_Customer";
 import Modal_Cancel from "./Modal_Cancel";
-
+import Modal_DatePicker from "./Modal_DatePicker";
 
 export { 
+    Modal_DatePicker,
     Modal_Cancel,
     Modal_Customer,
-    Modal_Package,
-    Modal_Payment,
+    Modal_So,
+    Modal_Qrcode,
     Modal_ApproveSoftware,
     Modal_Human,
     Modal_Splash,

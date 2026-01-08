@@ -104,10 +104,14 @@ function Modal_Customer({
                 onChange={(event)=>{
                 event.preventDefault()
                 if(event.target.value!==storeSize){
-                    setCurrent({
-                        ...current,
-                        storeSize:event.target.value,
-                    })
+                    if(shopId){
+                        alert('ผูก ShopId ไปแล้ว แก่จำนวนโต๊ะไม่ได้')
+                    } else {
+                        setCurrent({
+                            ...current,
+                            storeSize:event.target.value,
+                        })
+                    }
                 }
                 }}
                 style={styles.container} 

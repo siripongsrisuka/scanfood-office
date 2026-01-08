@@ -6,7 +6,7 @@ import {
 import { CategoryRender, initialColors, OneButton, SearchControl, TimeControlUpgrade } from "../components";
 import { formatCurrency, searchMultiFunction, summary, toastSuccess } from "../Utility/function";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
-import { Modal_Loading, Modal_Payment } from "../modal";
+import { Modal_Loading, Modal_Qrcode } from "../modal";
 import { db } from "../db/firestore";
 import { updateNormalFieldUpgrade } from "../redux/upgradeSlice";
 
@@ -101,7 +101,7 @@ function UpgradeStoreSizeHistory() {
     <div style={styles.container} >
         <h1>ประวัติเพิ่มโต๊ะ</h1>
         <Modal_Loading show={loading} />
-        <Modal_Payment
+        <Modal_Qrcode
             show={payment_Modal}
             onHide={()=>{setPayment_Modal(false)}}
             qrCode={qrCode}

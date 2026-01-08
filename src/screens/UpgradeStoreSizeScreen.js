@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import {
   Button,
 } from "react-bootstrap";
-import { Modal_FlatlistSearchShop, Modal_Loading, Modal_Payment } from "../modal";
+import { Modal_FlatlistSearchShop, Modal_Loading, Modal_Qrcode } from "../modal";
 import { colors, initialShop, initialStoreSize } from "../configs";
 import { MdRadioButtonUnchecked, MdRadioButtonChecked } from 'react-icons/md'; // replace with correct MaterialCommunityIcons mapping
 import { db } from "../db/firestore";
@@ -182,7 +182,7 @@ function UpgradeStoreSizeScreen() {
     <div style={styles.container} >
         <h1>ปรับขนาดร้าน</h1>
         <Modal_Loading show={loading} />
-        <Modal_Payment
+        <Modal_Qrcode
             show={payment_Modal}
             onHide={()=>{setPayment_Modal(false)}}
             qrCode={qrCode}
