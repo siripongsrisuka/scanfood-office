@@ -1,11 +1,11 @@
 export default [
     {
-      label: '1. เซล',
+      label: '1. งานเซล',
     },
     {
-      topic: '1.1 Dashboard',
+      topic: '1.1 sale',
       icon: 'bi-speedometer',
-      to:'dashboard',
+      to:'sale',
       id:'100'
     },
     {

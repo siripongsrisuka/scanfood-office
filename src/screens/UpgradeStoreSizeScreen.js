@@ -117,7 +117,9 @@ function UpgradeStoreSizeScreen() {
     async function submit(){
         if(!current.id) return alert('เพิ่มร้านก่อน')
         setLoading(true);
-        const amount = 1;
+        const amount = ['xL8vqnyJ8OfkVpHJBPJvEei2D3B3','cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'].includes(profileId)
+                ?1 // payload.net
+                :net
         try {
             const timestamp = new Date();
 

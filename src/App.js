@@ -79,6 +79,7 @@ function App() {
 
           <Route path='/master' element={<MasterScreen/>} />
           <Route path='/office' element={<OfficeScreen/>} >
+            <Route index  element={<SaleScreen/>} />
             <Route path='staff' element={<StaffScreen/>} />
             <Route path='clone' element={<CloneScreen/>} />
             <Route path='importItem' element={<ImportItemStoreScreen/>} />

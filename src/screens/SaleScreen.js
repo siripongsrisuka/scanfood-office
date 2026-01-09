@@ -285,8 +285,11 @@ function SaleScreen() {
     async function handleSo(payload){
         setSo_Modal(false)
         setLoading(true);
+        
         try {
-            const amount = 1;
+            const amount = ['xL8vqnyJ8OfkVpHJBPJvEei2D3B3','cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'].includes(profileId)
+                ?1 // payload.net
+                :payload.net
             const timestamp = new Date();
             const { qrCode, paymentData } = await db.runTransaction(async (transaction) => {
 
@@ -690,7 +693,9 @@ function SaleScreen() {
             setLoading(false);
             setCurrentHardware({ id:'', note:'' })
         }
-    }
+    };
+
+
 
 
   return (
@@ -758,6 +763,7 @@ function SaleScreen() {
             onClick={handleMemo}
             placeholder='ใส่ memo'
             onChange={(value)=>{setCurrentMemo(prev=>({...prev, content:value }))}}
+            area={true}
         />
         <Modal_Cancel
             show={cancel_Modal}
