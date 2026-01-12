@@ -25,9 +25,11 @@ import initialNote from "./initialNote";
 import initialProvince from "./initialProvince";
 import initialChannel from "./initialChannel";
 import initialProcess from "./initialProcess";
+import initialTeam from "./initialTeam";
 
 
 export {
+  initialTeam,
   initialProcess,
   initialChannel,
   initialProvince,

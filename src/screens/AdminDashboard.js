@@ -47,9 +47,7 @@ function AdminDashboard() {
     <div  >
         <br/>
         <br/>
-        <div style={{position:'absolute',top:10,right:10}} >
-            <Button onClick={exit}  appearance="primary" style={{backgroundColor:dark}} ><i class="bi bi-box-arrow-right"></i></Button>
-        </div>
+
       <Row>
         <Col onClick={()=>{navigate('/diagnosis')}} lg='4' md='6' sm='12' >
             <Button color="cyan" appearance="primary" style={{height:'88px',width:'90%',marginLeft:'1rem',marginRight:'1rem',marginBottom:'1rem',fontSize:'2rem'}} >Diagnosis flowchart</Button>
@@ -57,9 +55,7 @@ function AdminDashboard() {
         <Col onClick={()=>{navigate('/store')}} lg='4' md='6' sm='12' >
             <Button color="red" appearance="primary" style={{height:'88px',width:'90%',marginLeft:'1rem',marginRight:'1rem',marginBottom:'1rem',fontSize:'2rem'}} > ร้านเดี่ยว </Button>
         </Col>
-        <Col lg='4' md='6' sm='12' >
-            <Button onClick={()=>{navigate('/sbs')}} color="yellow" appearance="primary" style={{height:'88px',width:'90%',marginLeft:'1rem',marginRight:'1rem',marginBottom:'1rem',fontSize:'2rem'}} > Customer Care </Button>
-        </Col>
+  
         <Col lg='4' md='6' sm='12' >
             <Button onClick={()=>{navigate('/equipment')}} color="green" appearance="primary" style={{height:'88px',width:'90%',marginLeft:'1rem',marginRight:'1rem',marginBottom:'1rem',fontSize:'2rem'}} > Hardware </Button>
         </Col>
@@ -81,12 +77,6 @@ function AdminDashboard() {
         </Col>
         <Col lg='4' md='6' sm='12' >
             <Button onClick={()=>{navigate('/customerCare')}} color="blue" appearance="primary" style={{height:'88px',width:'90%',marginLeft:'1rem',marginRight:'1rem',marginBottom:'1rem',fontSize:'2rem'}} > คุณลูกค้าที่น่ารัก </Button>
-        </Col>
-        <Col lg='4' md='6' sm='12' >
-            <Button onClick={()=>{commander('/transform',['pack','ton','gift'])}} color="blue" appearance="primary" style={{height:'88px',width:'90%',marginLeft:'1rem',marginRight:'1rem',marginBottom:'1rem',fontSize:'2rem'}} > เปลี่ยนไม่มีโต๊ะ ให้เป็น 1- 20 โต๊ะ </Button>
-        </Col>
-        <Col lg='4' md='6' sm='12' >
-            <Button onClick={()=>{commander('/transferExpire',['pack','gift'])}} color="blue" appearance="primary" style={{height:'88px',width:'90%',marginLeft:'1rem',marginRight:'1rem',marginBottom:'1rem',fontSize:'2rem'}} >ย้ายวันใช้งาน</Button>
         </Col>
     
         <Col lg='4' md='6' sm='12' >

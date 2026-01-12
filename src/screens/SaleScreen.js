@@ -20,7 +20,7 @@ import { scanfoodAPI } from "../Utility/api";
 import { stringDateTimeReceipt, stringFullDate, stringReceiptNumber, stringYMDHMS3, yearMonth } from "../Utility/dateTime";
 import initialCustomer from "../configs/initialCustomer";
 import { colors, initialProcess } from "../configs";
-import { diffDaysCeil, fetchCustomer, fetchEquipment, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fetchSoftware, fetchSuccessCases, fetchWaste, formatCurrency, formatTime, toastSuccess, wait } from "../Utility/function";
+import { diffDaysCeil, fetchCustomer, fetchEquipment, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fetchSoftware, fetchSuccessCases, fetchWaste, formatCurrency, formatTime, isGodIt, toastSuccess, wait } from "../Utility/function";
 import initialShopType from "../configs/initialShopType";
 import initialCancelId from "../configs/initialCancelId";
 const { softWhite, dark, softGray, greenSanta, white } = colors;
@@ -287,7 +287,7 @@ function SaleScreen() {
         setLoading(true);
         
         try {
-            const amount = ['xL8vqnyJ8OfkVpHJBPJvEei2D3B3','cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'].includes(profileId)
+            const amount = isGodIt(profileId)
                 ?1 // payload.net
                 :payload.net
             const timestamp = new Date();

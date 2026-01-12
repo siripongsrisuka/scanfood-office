@@ -4,8 +4,9 @@ import {
   Col,
   Modal,
   Button,
+  Form
 } from "react-bootstrap";
-import { colors, initialAlert } from "../configs";
+import { colors, initialAlert, initialTeam } from "../configs";
 import Switch from "react-switch";
 import Modal_Alert from "./Modal_Alert";
 import { DeleteButton, FooterButton } from "../components";
@@ -26,10 +27,9 @@ function Modal_Human({
   sideBar
 }) {
   
-    const { id, rights, name } = current;
+    const { id, rights, name, team ='', saleManagerTeam ='' } = current;
     const [alert_Modal, setAlert_Modal] = useState(initialAlert);
     const { status, content, onClick, variant } = alert_Modal;
-
 
     function manageRights(id,status){
         setCurrent(prev=>({
@@ -73,6 +73,31 @@ function Modal_Human({
       </Modal.Header>
 
       <Modal.Body style={styles.container4} >
+            <Form.Select 
+                aria-label="Default select example" 
+                value={team} 
+                onChange={(event)=>{setCurrent(prev=>({...prev,team:event.target.value}))}}
+                style={{marginTop:'1rem',marginBottom:'1rem',width:'100%'}}
+            >
+              <option value='' disabled >ทีม sale</option>
+              {initialTeam.map((item,index)=>{
+                return <option key={index} value={item} >{item}</option>
+              })}
+              
+            </Form.Select>
+            <Form.Select 
+                aria-label="Default select example" 
+                value={saleManagerTeam} 
+                onChange={(event)=>{setCurrent(prev=>({...prev,saleManagerTeam:event.target.value}))}}
+                style={{marginTop:'1rem',marginBottom:'1rem',width:'100%'}}
+            >
+              <option value='' disabled >หัวหน้าทีม Sale</option>
+              {initialTeam.map((item,index)=>{
+                return <option key={index} value={item} >{item}</option>
+              })}
+              
+            </Form.Select>
+            <br/>
             <div style={styles.container2} >
               <Button onClick={closeAllRights} variant="secondary" >ปิดสิทธิ์ทั้งหมด</Button>&emsp;
               <Button onClick={addAllRights} variant="success" >เปิดสิทธิ์ทั้งหมด</Button>&emsp;

@@ -12,6 +12,8 @@ export default {
     location:[],
     promptpayId:'',
     promptpayName:'',
-    performance:[]
+    performance:[],
+    team:'', // ถ้าเป็น sale ถึงจะมีค่านี้นะ
+    saleManagerTeam:'', // หัวหน้าทีม sale
 
 }

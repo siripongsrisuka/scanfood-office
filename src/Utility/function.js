@@ -5,6 +5,10 @@ import { toast } from 'react-toastify';
 import { db } from '../db/firestore';
 import initialCustomer from '../configs/initialCustomer';
 
+export function isGodIt (profileId){
+  return ['xL8vqnyJ8OfkVpHJBPJvEei2D3B3','cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'].includes(profileId)
+}
+
 export function toastSuccess(text='🟢 Updated successful!'){
   toast.success(text);
 };
@@ -55,12 +59,18 @@ export  async function fetchSoftware(profileId){
     return normalSort('timestamp',results)
 };
 
-export   async function fetchPayment(profileId){
-      const query = await db.collection('autoPayment')
+export   async function fetchPayment(profileId,teamId){
+      const thisYearMonth = yearMonth(new Date());
+      const query = teamId
+        ?await db.collection('autoPayment')
+          .where('team','==',teamId)
+          .where('yearMonth','==',thisYearMonth)
+          .get()
+        :await db.collection('autoPayment')
           .where('profileId','==',profileId)
           .orderBy('createdAt','desc')
           .limit(30)
-          .get();
+          .get()
       const results = query.docs.map(doc=>{
           const { createdAt, requestDate, ...rest } = doc.data();
           return {
@@ -92,13 +102,19 @@ export   async function fetchWaste(profileId){
     return normalSort('createdAt',results)
 };
 
-export     async function fetchSuccessCases(profileId){
+export     async function fetchSuccessCases(profileId,teamId){
   const thisYearMonth = yearMonth(new Date());
-  const query = await db.collection('customer')
+  const query = teamId
+    ?await db.collection('customer')
+      .where('team','==',teamId)
+      .where('status','==','paid')
+      .where('yearMonth','==',thisYearMonth)
+      .get()
+    :await db.collection('customer')
       .where('profileId','==',profileId)
       .where('status','==','paid')
       .where('yearMonth','==',thisYearMonth)
-      .get();
+      .get()
   const results = query.docs.map(doc=>{
       const { createdAt, ...rest } = doc.data();
       return {
@@ -323,24 +339,6 @@ return day
 };
 
 
-  export function findTotalPrice(option,channelId,net,qty){
-    let allChosen = []
-    for(const a of option){
-        a.choice.forEach((item)=>{
-            if(item.chose===true){
-                allChosen.push(item)
-            }
-        })
-    }
-    let totalPrice = 0  // คือ totalprice ของเมนูย่อย
-    allChosen.forEach((item)=>{
-        totalPrice += Number(findInArray(item.price,'id',channelId)?.price|| 0)
-    })
-
-    return (Number(net)+ totalPrice)*qty
-  };
-
-
 export const searchFilterFunction = (arr,search,properties='name') => {
   let display = []
   if (search) {
@@ -367,16 +365,6 @@ export function totalField(arr,field){
   return newArr
 };
 
-
-export function leanProduct(product){
-  const { BOM, addOn, category, id, option, qty, totalPrice, name } = product;
-  return {
-      BOM, addOn, category, id, option, qty, totalPrice, name,
-      tempId:uuidv4(),
-      process:'ordered',
-      productStaffs:[],
-  }
-};
 
 export function handleDigit(value){
   return value?.toLocaleString(undefined, {minimumFractionDigits: 2,maximumFractionDigits: 2})
@@ -529,15 +517,6 @@ export function findDay(packageId){
 export const useToLocale = (value) => value?.toLocaleString(undefined, {minimumFractionDigits: 2,maximumFractionDigits: 2})||'';
 export const useToLocale2 = (value) => value?.toLocaleString()||'';
 
-export function managePromotion(products){
-    return products.map((item)=>{
-      return item.promotion.status
-        ?item.promotion.type==='bath'
-            ?{...item,price:item.price[0].price,net:item.price[0].price-Number(item.promotion.value)}
-            :{...item,price:item.price[0].price,net:(item.price[0].price*(100-Number(item.promotion.value)))/100}
-        :{...item,price:item.price[0].price,net:item.price[0].price}
-    })
-}
 
 
   export function someInArray(arr,propertise,value){
@@ -552,13 +531,6 @@ export function managePromotion(products){
     return arr.filter(item=>item[propertise] === value)
   };
 
-  export function filterChoice(option){
-    let choice = []
-    for(const item of option){
-        choice = [...choice,...filterInArray(item.choice,'chose',true)]
-    }
-    return choice
-  };
 
   export function filterDeleteInArray(arr,propertise,value){
     return arr.filter(item=>item[propertise] !== value)
@@ -580,52 +552,6 @@ export function managePromotion(products){
     return [...newCategory,selectedCategory].filter(a=>a.level <= selectedCategory.level)
   };
 
-  export function manageDashboard({ selectedBill, smartCategory}){
-    let newProduct = []
-    let newCategory = []
-  
-    for(const item of selectedBill){
-      let thisProduct = item.product.filter(a=>a.process!=='cancel')
-      
-      for(const product of thisProduct){
-        const { id, qty, totalPrice, category } = product;
-
-        // 1. แยกตามสินค้า
-        let checkProduct = findInArray(newProduct,'id',id)  // สำหรับการเรียง product
-        if(checkProduct && checkProduct.id){
-          checkProduct.allQty = checkProduct.allQty + qty
-          checkProduct.allTotalPrice = checkProduct.allTotalPrice + totalPrice
-        } else {
-          newProduct.push({...product,allQty:qty,allTotalPrice:totalPrice})
-        }
-
-        //2. แยกตามหมวดหมู๋
-        if(category.length===0){
-            let checkCategory = findInArray(newCategory,'id','x') // หมวดหมู่ชั่นที่ 1
-            if(checkCategory && checkCategory.id){
-              checkCategory.allQty += qty
-              checkCategory.allTotalPrice += totalPrice
-            } else {
-              newCategory.push({id:'x',allQty:qty,allTotalPrice:totalPrice,name:'ไม่มีหมวดหมู่'})
-            }
-        } else {
-          let checkCategory = findInArray(newCategory,'id',category[0]) // หมวดหมู่ชั่นที่ 1
-          if(checkCategory && checkCategory.id){
-            checkCategory.allQty += qty
-            checkCategory.allTotalPrice += totalPrice
-          } else {
-            newCategory.push({id:category[0],allQty:qty,allTotalPrice:totalPrice,name:findInArray(smartCategory[0]?.value,'id',category[0])?.name||'ไม่ทราบหมวดหมู่'})
-          }
-        }
-
-      }
-    }
-
-    return {
-      category:newCategory,
-      product:newProduct,
-    }
-  };
 
   export function twoDigitNumber(inputValue){
     inputValue = inputValue.replace(/[^0-9\.]/g,'')

@@ -6,7 +6,7 @@ import { Modal_FlatlistSearchShop, Modal_Loading, Modal_Qrcode } from "../modal"
 import { colors, initialShop, initialStoreSize } from "../configs";
 import { MdRadioButtonUnchecked, MdRadioButtonChecked } from 'react-icons/md'; // replace with correct MaterialCommunityIcons mapping
 import { db } from "../db/firestore";
-import { diffDaysFloor, formatCurrency, formatTime, summary, toastSuccess } from "../Utility/function";
+import { diffDaysFloor, formatCurrency, formatTime, isGodIt, summary, toastSuccess } from "../Utility/function";
 import { Card, OneButton } from "../components";
 import { stringFullDate, stringReceiptNumber, stringYMDHMS3 } from "../Utility/dateTime";
 import { scanfoodAPI } from "../Utility/api";
@@ -117,7 +117,7 @@ function UpgradeStoreSizeScreen() {
     async function submit(){
         if(!current.id) return alert('เพิ่มร้านก่อน')
         setLoading(true);
-        const amount = ['xL8vqnyJ8OfkVpHJBPJvEei2D3B3','cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'].includes(profileId)
+        const amount = isGodIt(profileId)
                 ?1 // payload.net
                 :net
         try {

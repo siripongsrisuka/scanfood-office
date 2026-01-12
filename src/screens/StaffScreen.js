@@ -9,12 +9,15 @@ import { updateNormalFieldOffice } from "../redux/officeSlice";
 import { OneButton } from "../components";
 import { initialOffice } from "../configs";
 import { db } from "../db/firestore";
+import { toastSuccess } from "../Utility/function";
 
 const initialHuman = {
     id:'',
     name:'',
     tel:'',
     rights:[],
+    team:'',
+    saleManagerTeam: ''
 };
 
 function StaffScreen() {
@@ -54,7 +57,8 @@ function StaffScreen() {
         try {
           const officeRef = db.collection('admin').doc('office');
           await officeRef.update(updatedField);
-          dispatch(updateNormalFieldOffice(updatedField))
+          dispatch(updateNormalFieldOffice(updatedField));
+          toastSuccess('อัปเดตสำเร็จ')
         } catch (error) {
           alert(error)
         } finally {

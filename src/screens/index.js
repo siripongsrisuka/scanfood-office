@@ -1,7 +1,6 @@
 import HomeScreen from "./HomeScreen";
 
 
-import SbsScreen from "./SbsScreen";
 import DemoScreen from "./DemoScreen";
 import AdminDashboard from "./AdminDashboard";
 import StorePort from "./StorePort";
@@ -31,8 +30,10 @@ import SaleScreen from "./SaleScreen";
 import Test from "./Test";
 import UpgradeStoreSizeScreen from "./UpgradeStoreSizeScreen";
 import UpgradeStoreSizeHistory from "./UpgradeStoreSizeHistory";
+import SaleManagerScreen from "./SaleManagerScreen";
 
 export {
+    SaleManagerScreen,
     UpgradeStoreSizeHistory,
     UpgradeStoreSizeScreen,
     Test,
@@ -56,7 +57,6 @@ export {
     ImportItemFranchiseScreen,
     ImportItemStoreScreen,
     HomeScreen,
-    SbsScreen,
     DemoScreen,
     AdminDashboard,
     StorePort,

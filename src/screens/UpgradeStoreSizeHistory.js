@@ -4,7 +4,7 @@ import {
   Table,
 } from "react-bootstrap";
 import { CategoryRender, initialColors, OneButton, SearchControl, TimeControlUpgrade } from "../components";
-import { formatCurrency, searchMultiFunction, summary, toastSuccess } from "../Utility/function";
+import { formatCurrency, isGodIt, searchMultiFunction, summary, toastSuccess } from "../Utility/function";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { Modal_Loading, Modal_Qrcode } from "../modal";
 import { db } from "../db/firestore";
@@ -68,7 +68,7 @@ function UpgradeStoreSizeHistory() {
 
       const { id, profileId:createdId, process } = item;
       if(process !=='request') return null;
-      if(createdId !== profileId) return alert('ไม่มีสิทธิ์ไปยกเลิกของคนอื่น');
+      if(createdId !== profileId && !isGodIt(profileId)) return alert('ไม่มีสิทธิ์ไปยกเลิกของคนอื่น');
 
       const ok = window.confirm("ยืนยันการยกเลิกออเดอร์?");
       if (!ok) return;

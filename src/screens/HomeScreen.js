@@ -60,8 +60,9 @@ async function handleProfile(profileId){
     };
     const officeDoc = await db.collection('admin').doc('office').get();
     const { humanRight } = officeDoc.data();
-    if(!humanRight.some(a=>a.id === profileId)) return alert('ไม่มีสิทธิ์เข้าใช้งาน')
-    dispatch(fetchNormalProfile(profileInfo));
+    const findStaff = humanRight.find(a=>a.id === profileId);
+    if(!findStaff) return alert('ไม่มีสิทธิ์เข้าใช้งาน')
+    dispatch(fetchNormalProfile({...findStaff,...profileInfo}));
     navigate("/office");
     toastSuccess('เข้าสู่ระบบสำเร็จ')
   } catch (error) {

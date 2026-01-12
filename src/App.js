@@ -2,7 +2,6 @@ import React, { useEffect, useState, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { 
   HomeScreen,
-  SbsScreen,
   DemoScreen,
   AdminDashboard,
   StorePort,
@@ -32,6 +31,7 @@ import {
   Test,
   UpgradeStoreSizeScreen,
   UpgradeStoreSizeHistory,
+  SaleManagerScreen,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -92,13 +92,16 @@ function App() {
             <Route path='sale' element={<SaleScreen/>} />
             <Route path='upgrade' element={<UpgradeStoreSizeScreen/>} />
             <Route path='upgradeHistory' element={<UpgradeStoreSizeHistory/>} />
+            <Route path='transferExpire' element={<TransferExpireScreen/>} />
+            <Route path='transform' element={<TransformTable/>} />
+            <Route path='softwareHistory' element={<SoftwareHistory/>} />
+            <Route path='saleManager' element={<SaleManagerScreen/>} />
             
           </Route>
           <Route path='/admin' element={<AdminDashboard/>} />
   
           <Route path='store' element={<StorePort/>}/>
           <Route path='store/demo' element={<DemoScreen/>} />
-          <Route path='sbs' element={<SbsScreen/>} />
           <Route path='shop' element={<NewShopScreen/>} />
           <Route path='clone' element={<CloneScreen/>} />
           <Route path='branch/:id' element={<BranchScreen/>} />
@@ -107,10 +110,7 @@ function App() {
           <Route path='importBomFranchise' element={<ImportBomFranchiseScreen/>} />
           <Route path='importMarketPlaceFranchise' element={<ImportMarketPlaceFranchise/>} />
           <Route path='customerCare' element={<CustomerCareScreen/>} />
-          <Route path='softwareHistory' element={<SoftwareHistory/>} />
           <Route path='hardwareHistory' element={<HardwareHistory/>} />
-          <Route path='transform' element={<TransformTable/>} />
-          <Route path='transferExpire' element={<TransferExpireScreen/>} />
           <Route path='questionSetting' element={<QuestionSettingScreen/>} />
           <Route path='diagnosis' element={<DiagnosisScreen/>} />
           <Route path='test' element={<Test/>} />

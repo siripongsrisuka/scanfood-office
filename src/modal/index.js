@@ -9,7 +9,6 @@ import Modal_Promptpay from "./Modal_Promptpay";
 import Modal_CropImage from "./Modal_CropImage";
 import Modal_FlatListTwoColumn from "./Modal_FlatListTwoColumn";
 import Modal_Alert from "./Modal_Alert";
-import Modal_Sbs from "./Modal_Sbs";
 import Modal_FlatlistSelected from "./Modal_FlatlistSelected";
 import Modal_Quotation from "./Modal_Quotation";
 import Modal_Requirement from "./Modal_Requirement";
@@ -66,7 +65,6 @@ export {
     Modal_CropImage,
     Modal_FlatListTwoColumn,
     Modal_Alert,
-    Modal_Sbs,
     Modal_FlatlistSelected,
     Modal_Quotation,
     Modal_Requirement,

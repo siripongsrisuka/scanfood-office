@@ -2,25 +2,19 @@ export default [
     {
       label: '1. งานเซล',
     },
+    
     {
-      topic: '1.1 sale',
+      topic: '1.1 Sale Manager',
+      icon: 'bi-speedometer',
+      to:'saleManager',
+      id:'100'
+    },
+    {
+      topic: '1.1 เซล',
       icon: 'bi-speedometer',
       to:'sale',
       id:'100'
     },
-    {
-      topic: '1.2 ยอดขายตามร้านค้า',
-      icon:'bi-shop',
-      to:'rankingShop',
-      id:'103'
-    },
-    {
-      topic: '1.3 ยอดขายตามสินค้า',
-      icon:'bi-shop',
-      to:'rankingItem',
-      id:'104'
-    },
-   
     {
       topic: '1.4 Overview',
       icon: 'bi-speedometer',
@@ -115,19 +109,31 @@ export default [
       id:'128'
     },
     {
-      topic: '3.1 อัปโหลดสินค้าร้านเดี่ยว',
+      topic: '3.2 อัปโหลดสินค้าร้านเดี่ยว',
       icon: 'bi-speedometer',
       to: 'importItem',
       id:'128'
     },
     {
-      topic: '3.1 อัปโหลดวัตถุดิบร้านเดี่ยว',
+      topic: '3.3 อัปโหลดวัตถุดิบร้านเดี่ยว',
       icon: 'bi-speedometer',
       to: 'importBomShop',
       id:'128'
     },
     {
-      topic: '3.1 kbankReport',
+      topic: '3.4 ย้ายวันใช้งาน',
+      icon: 'bi-speedometer',
+      to: 'transferExpire',
+      id:'128'
+    },
+    {
+      topic: '3.5 เปลี่ยนไม่มีโต๊ะเป็นมีโต๊ะ',
+      icon: 'bi-speedometer',
+      to: 'transform',
+      id:'128'
+    },
+    {
+      topic: '3.99 kbankReport',
       icon: 'bi-speedometer',
       to: 'kbankReport',
       id:'128'

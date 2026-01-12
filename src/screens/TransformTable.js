@@ -1,60 +1,59 @@
-import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState } from "react";
 import {
-  Button,
-  Form,
-  Row,
-  Col,
-  Container,
   Table,
-  Modal,
-  Card,
-  Image,
-  Collapse,
-  InputGroup,
-  OverlayTrigger,
-  Tooltip
 } from "react-bootstrap";
-
-import { initialAlert, initialStore } from "../configs";
 import { db } from "../db/firestore";
-import { Modal_Alert, Modal_Loading, Modal_Success } from "../modal";
+import { Modal_Loading } from "../modal";
 import { OneButton, SearchControl } from "../components";
+import { toastSuccess } from "../Utility/function";
 
 function TransformTable() {
     const [shops, setShops] = useState([]);
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
-    const [success_Modal, setSuccess_Modal] = useState(false);
-    const [alert_Modal, setAlert_Modal] = useState(initialAlert);
-    const { status:alertStatus, content:alertContent, onClick, variant } = alert_Modal;
 
 
     async function fetchShops(){
-        const shopDocs = await db.collection('shop').where('tel','==',search).get();
-        const shops = shopDocs.docs.map(doc=>{
-            return {
-                ...doc.data(),
-                id:doc.id
-            }
-        })
-        setShops(shops)
+        setLoading(true);
+        try {
+            const shopDocs = await db.collection('shop').where('tel','==',search).get();
+            const shops = shopDocs.docs.map(doc=>{
+                return {
+                    ...doc.data(),
+                    id:doc.id
+                }
+            })
+            setShops(shops)
+        } catch (error) {
+            alert(error);
+        } finally {
+            setLoading(false)
+        }
+
     };
 
-    function transformNow(shopId){
+    async function transformNow(shopId){
+        const ok = window.confirm('ยืนยันการปรับโต๊ะ')
+        if(!ok) return;
         setLoading(true)
         try {
-            db.collection('shop').doc(shopId).update({
-                village:false,
-                storeSize:20
-            })
-            setSuccess_Modal(true);
-            setTimeout(()=>{
-                setSuccess_Modal(false);
-            },900)
-            setShops(prev=>prev.filter(a=>a.id !== shopId))
+            const response = await db.runTransaction( async (transaction)=>{
+                const shopRef = db.collection('shop').doc(shopId);
+                const shopDoc = await transaction.get(shopRef);
+                const { village, storeSize } = shopDoc.data();
+                if(!village) throw new Error("เป็นแบบมีโต๊ะอยู่แล้ว");
+                transaction.update(shopRef,{
+                    village:false,
+                    storeSize:20
+                });
+            });
+
+            toastSuccess('เปลี่ยนเป็น 20 โต๊ะเรียบร้อย');
+  
+            setShops([]);
+            setSearch('')
         } catch (error) {
-            console.log(error)
+            alert(error)
         } finally {
             setLoading(false)
         }
@@ -63,21 +62,14 @@ function TransformTable() {
 
 
   return (
-    <div id="google_translate_element" >
-        <Modal_Alert
-            show={alertStatus}
-            onHide={()=>{setAlert_Modal(initialAlert)}}
-            content={alertContent}
-            onClick={onClick}
-            variant={variant}
-        />
+    <div  >
         <Modal_Loading show={loading} />
-        <Modal_Success show={success_Modal} />
         <h1>เปลี่ยนไม่มีโต๊ะ ให้เป็น 1- 20 โต๊ะ</h1>
         <div style={{ display:'flex', margin:10}} >
             <SearchControl {...{ placeholder:'เบอร์โทร', search, setSearch }} />&emsp;
             <OneButton {...{ text:'ค้นหา', submit:fetchShops }} />
         </div>
+        {shops.length>0 &&
         <Table striped bordered hover responsive  variant="light"   >
             <thead  >
             <tr>
@@ -97,13 +89,15 @@ function TransformTable() {
                         <td style={styles.text2} >{storeSize}</td>
                         <td style={styles.text2} >{village?'ไม่มีโต๊ะ':'มีโต๊ะ'}</td>
                         <td style={styles.text2}>
-                            <Button variant="warning" onClick={()=>{setAlert_Modal({ status:true, content:`เปลี่ยนประเภท`, onClick:()=>{transformNow(id);setAlert_Modal(initialAlert)}, variant:'danger' })}} >อนุมัติ</Button>
+                            <OneButton {...{ text:'อนุมัติ', submit:()=>{transformNow(id)} }} />
                         </td>
                         </tr>
             }
             )}
             </tbody>
         </Table>
+        }
+        
     </div>
   );
 };
