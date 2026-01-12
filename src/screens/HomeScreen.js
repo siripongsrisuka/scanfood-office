@@ -62,7 +62,8 @@ async function handleProfile(profileId){
     const { humanRight } = officeDoc.data();
     const findStaff = humanRight.find(a=>a.id === profileId);
     if(!findStaff) return alert('ไม่มีสิทธิ์เข้าใช้งาน')
-    dispatch(fetchNormalProfile({...findStaff,...profileInfo}));
+      const { team, saleManagerTeam } = findStaff;
+    dispatch(fetchNormalProfile({...findStaff,...profileInfo, team, saleManagerTeam }));
     navigate("/office");
     toastSuccess('เข้าสู่ระบบสำเร็จ')
   } catch (error) {

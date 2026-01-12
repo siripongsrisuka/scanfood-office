@@ -33,7 +33,8 @@ const options = [
 
 function SaleManagerScreen() {
     const { office: { humanRight } } = useSelector(state=>state.office);
-    const { profile:{ saleManagerTeam = 'A' } } = useSelector(state=>state.profile);
+    const { profile } = useSelector(state=>state.profile);
+    const { saleManagerTeam = 'A' } = profile;
     const [loading, setLoading] = useState(false);
     const [successCase, setSuccessCase] = useState([]);
     const [payments, setPayments] = useState([]);
@@ -41,6 +42,8 @@ function SaleManagerScreen() {
     const [option, setOption] = useState({id:'1',name:'lead', value:'1' });
     const { id:optionId, name:optinName, value } = option;
     const [customers, setCustomers] = useState([]);
+
+    console.log('saleManagerTeam'+saleManagerTeam)
 
     const colorMap = useMemo(
         () => new Map(initialProcess.map(a=>[a.id,a.color]))
