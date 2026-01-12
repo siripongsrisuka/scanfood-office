@@ -21,6 +21,7 @@ import { Modal_Loading } from "../modal";
 import { normalSort } from "../Utility/sort";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { initialProcess } from "../configs";
+import { db } from "../db/firestore";
 
 const target = 220000;
 
@@ -58,6 +59,7 @@ function SaleManagerScreen() {
     useEffect(()=>{
         handlefetch()
     },[]);
+
 
     async function handlefetch(){
         setLoading(true);
