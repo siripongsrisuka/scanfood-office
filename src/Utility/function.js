@@ -127,12 +127,17 @@ export     async function fetchSuccessCases(profileId,teamId){
   return normalSort('createdAt',results)
 };
 
-export    async function fetchCustomer(profileId){
+export    async function fetchCustomer(profileId,teamId){
     const today = new Date().getTime();
-    const query = await db.collection('customer')
+    const query = teamId
+      ?await db.collection('customer')
+        .where('team','==',teamId)
+        .where('status','==','waiting')
+        .get()
+      :await db.collection('customer')
         .where('profileId','==',profileId)
         .where('status','==','waiting')
-        .get();
+        .get()
     const results = query.docs.map(doc=>{
         const { createdAt, ...rest } = doc.data();
         return {
@@ -146,12 +151,18 @@ export    async function fetchCustomer(profileId){
     return normalSort('createdAt',results)
 };
 
-export   async function fetchMemo(profileId){
-    const query = await db.collection('memo')
+export   async function fetchMemo(profileId,teamId){
+    const query = teamId
+      ?await db.collection('memo')
+        .where('team','==',teamId)
+        .orderBy('createdAt','desc')
+        .limit(90)
+        .get()
+      :await db.collection('memo')
         .where('profileId','==',profileId)
         .orderBy('createdAt','desc')
         .limit(30)
-        .get();
+        .get()
     const results = query.docs.map(doc=>{
         const { createdAt, ...rest } = doc.data();
         return {
