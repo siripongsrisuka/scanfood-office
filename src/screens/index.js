@@ -31,8 +31,10 @@ import Test from "./Test";
 import UpgradeStoreSizeScreen from "./UpgradeStoreSizeScreen";
 import UpgradeStoreSizeHistory from "./UpgradeStoreSizeHistory";
 import SaleManagerScreen from "./SaleManagerScreen";
+import MarketingBootsScreen from "./MarketingBootsScreen";
 
 export {
+    MarketingBootsScreen,
     SaleManagerScreen,
     UpgradeStoreSizeHistory,
     UpgradeStoreSizeScreen,

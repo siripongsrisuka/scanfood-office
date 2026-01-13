@@ -20,6 +20,7 @@ export default { // lead ลูกค้าที่เข้ามา
     shopType:'',
     shopId:'', // บัญชีร้านจริงที่ผูก
     shopName:'', // ชื่อร้านจริงๆในระบบ
+    newUser:'', // 1 ลูกค้าเดิม,2 ลูกค้าใหม่
 };
 
 const performance = {

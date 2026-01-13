@@ -1,5 +1,14 @@
 export default [
     {
+      label: '1. Marketing',
+    },
+    {
+      topic: '1.1 Dashboard',
+      icon: 'bi-speedometer',
+      to:'marketingBoots',
+      id:'100'
+    },
+    {
       label: '1. งานเซล',
     },
     

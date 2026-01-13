@@ -1,27 +1,14 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import {
-  Button,
-  Form,
-  Row,
-  Col,
-  Container,
   Table,
-  Modal,
-  Card,
-  Image,
-  Collapse,
-  InputGroup,
-  OverlayTrigger,
-  Tooltip
 } from "react-bootstrap";
-import { OneButton, SlideOptions } from "../components";
+import { SlideOptions } from "../components";
 import { fetchCustomer, fetchMemo, fetchPayment, fetchSuccessCases, formatCurrency, summary } from "../Utility/function";
 import { Modal_Loading } from "../modal";
 import { normalSort } from "../Utility/sort";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { initialProcess } from "../configs";
-import { db } from "../db/firestore";
 
 const target = 220000;
 
@@ -42,8 +29,6 @@ function SaleManagerScreen() {
     const [option, setOption] = useState({id:'1',name:'lead', value:'1' });
     const { id:optionId, name:optinName, value } = option;
     const [customers, setCustomers] = useState([]);
-
-    console.log('saleManagerTeam'+saleManagerTeam)
 
     const colorMap = useMemo(
         () => new Map(initialProcess.map(a=>[a.id,a.color]))
@@ -76,7 +61,7 @@ function SaleManagerScreen() {
             setPayments(payments);
             setSuccessCase(successCase);
             setMemo(memo);
-            setCustomers(customers)
+            setCustomers(customers);
         } catch (error) {
             console.log(error)
         } finally {
@@ -192,8 +177,6 @@ function SaleManagerScreen() {
                 </tbody>
             </Table>
         }
-        
-
     </div>
   );
 };

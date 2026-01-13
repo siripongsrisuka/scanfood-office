@@ -48,7 +48,7 @@ function Modal_So({
 
     const hardwarePrice = summary(hardware, 'net');
     const deliveryFee = deliveryType ==='normal' && hardwarePrice >0 && hardwarePrice <4000
-        ?50
+        ?100
         :0
 
     const net = extraCharge + softwarePrice + hardwarePrice + deliveryFee;

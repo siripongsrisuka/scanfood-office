@@ -23,9 +23,7 @@ function DemoScreen() {
 
   return (
     <div style={styles.container} >
-      <h1>
-       Temp
-      </h1>
+      <h1>Temp</h1>
       <div>
 
     </div>
