@@ -105,11 +105,12 @@ const ImportItemStoreScreen = () => {
             worksheet.eachRow((row, rowNumber) => {
             if (rowNumber > 1) { // Skip header
                 extractedProducts.push({
-                name: row.getCell(1).value||'', // Assuming name in column A
-                price: row.getCell(2).value||'', // Assuming name in column A
-                category: row.getCell(3).value||'', // Assuming name in column A
-                detail: row.getCell(4).value||'', // Assuming name in column A
-                image: '',
+                  name: row.getCell(1).value||'', // Assuming name in column A
+                  price: row.getCell(2).value||'', // Assuming name in column A
+                  category: row.getCell(3).value||'', // Assuming name in column A
+                  detail: row.getCell(4).value||'', // Assuming name in column A
+                  sku: row.getCell(5).value||'', // Assuming name in column A
+                  image: '',
                 });
             }
             });
@@ -161,7 +162,7 @@ const ImportItemStoreScreen = () => {
             const date = minusMinutes(new Date(), 10);
     
             // Process products concurrently
-            const productPromises = products.map(async ({ name, price, category: thisCategory, detail, image }, index) => {
+            const productPromises = products.map(async ({ name, price, category: thisCategory, detail, image, sku }, index) => {
                 const imageId = image ? await prepareFirebaseImage(image, '/scanfoodMenu/', `${shopId}${index+1}`) : image;
                 const categoryId = findInArray(category, 'category', thisCategory)?.id;
                 
@@ -174,6 +175,7 @@ const ImportItemStoreScreen = () => {
                     timestamp: plusSecond(date, 3 * index),
                     shopId,
                     imageId,
+                    sku
                 };
     
                 batch.set(db.collection('product').doc(), newItem);
@@ -258,21 +260,23 @@ const fileInputRef = useRef(null);
                     <tr>
                     <th style={styles.text2}>No.</th>
                     <th style={styles.text}>name</th>
-                    <th style={styles.text4}>detail</th>
-                    <th style={styles.text}>category</th>
                     <th style={styles.text}>price</th>
+                    <th style={styles.text}>category</th>
+                    <th style={styles.text4}>detail</th>
+                    <th style={styles.text4}>sku</th>
                     <th style={styles.text}>image</th>
                     </tr>
                 </thead>
                 <tbody  >
                     {products.map((item, index) => {
-                    const { name, category, detail, price, image } = item;
+                    const { name, category, detail, price, image, sku } = item;
                     return <tr  key={index} >
                             <td style={styles.text3}>{index+1}.</td>
                             <td style={styles.text3} >{name}</td>
-                            <td style={styles.text3}>{detail}</td>
-                            <td style={styles.text3}>{category}</td>
                             <td style={styles.text3}>{price}</td>
+                            <td style={styles.text3}>{category}</td>
+                            <td style={styles.text3}>{detail}</td>
+                            <td style={styles.text3}>{sku}</td>
                             <td style={styles.text3}>
                                 <img style={{width:'100px'}} src={image} />
                             </td>
