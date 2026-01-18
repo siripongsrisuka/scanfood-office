@@ -90,9 +90,16 @@ export default [
       
     },
     {
+      topic: '2.1 งาน',
+      icon: 'bi-speedometer',
+      to: 'warehouseJob',
+      id:'128'
+    },
+
+    {
       topic: '2.1 ตั้งค่าอุปกรณ์',
       icon: 'bi-speedometer',
-      to: 'equipmentSetting',
+      to: 'hardwareSetting',
       id:'128'
     },
     {
@@ -101,12 +108,7 @@ export default [
       to: 'warehouse',
       id:'128'
     },
-    {
-      topic: '2.1 งาน',
-      icon: 'bi-speedometer',
-      to: 'equipmentSetting',
-      id:'128'
-    },
+ 
     {
       label: '3. ทีม Tech ขั้นเทพ',
     },

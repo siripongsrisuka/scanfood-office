@@ -144,7 +144,15 @@ function SaleManagerScreen() {
                     return <tr  key={id} >
                                 <td >{stringDateTimeReceipt(createdAt)}</td>
                                 <td style={styles.container4}>{profileName}</td>
-                                <td style={styles.container4}>{content}</td>
+                                <td >
+                                    {content.split('\n').map((line, index) => (
+                                        <React.Fragment key={index}>
+                                            &emsp;&nbsp;{line}
+                                            <br />
+                                        </React.Fragment>
+                                        ))}
+
+                                </td>
                             </tr>
                 })}
                 </tbody>

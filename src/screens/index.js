@@ -32,8 +32,12 @@ import UpgradeStoreSizeScreen from "./UpgradeStoreSizeScreen";
 import UpgradeStoreSizeHistory from "./UpgradeStoreSizeHistory";
 import SaleManagerScreen from "./SaleManagerScreen";
 import MarketingBootsScreen from "./MarketingBootsScreen";
+import WarehouseJobScreen from "./WarehouseJobScreen";
+import HardwareSettingScreen from "./HardwareSettingScreen";
 
 export {
+    HardwareSettingScreen,
+    WarehouseJobScreen,
     MarketingBootsScreen,
     SaleManagerScreen,
     UpgradeStoreSizeHistory,

@@ -33,6 +33,8 @@ import {
   UpgradeStoreSizeHistory,
   SaleManagerScreen,
   MarketingBootsScreen,
+  WarehouseJobScreen,
+  HardwareSettingScreen,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -98,6 +100,8 @@ function App() {
             <Route path='softwareHistory' element={<SoftwareHistory/>} />
             <Route path='saleManager' element={<SaleManagerScreen/>} />
             <Route path='marketingBoots' element={<MarketingBootsScreen/>} />
+            <Route path='warehouseJob' element={<WarehouseJobScreen/>} />
+            <Route path='hardwareSetting' element={<HardwareSettingScreen/>} />
             
           </Route>
           <Route path='/admin' element={<AdminDashboard/>} />

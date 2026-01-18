@@ -192,7 +192,7 @@ const styles = {
   },
 
   container7 : {
-    width: '200px', minWidth: '200px', position: 'fixed',backgroundColor:'#343333'
+    width: '200px', minWidth: '200px', position: 'fixed',backgroundColor:'#343333', zIndex:999
   },
   container8 : {
     display:'flex',justifyContent:'center'

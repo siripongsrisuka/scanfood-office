@@ -1,5 +1,5 @@
 import React from "react";
-import { colors } from "../configs";
+import { colorIndex, colors } from "../configs";
 import '../styles/CartScreen.css'
 
 
@@ -11,9 +11,9 @@ function CategoryRender({ options, option, setOption }) {
   return <div className="custom-scrollbar" >
             <div style={{ display:'flex' }} >
                 {options.map((a,i)=>{
-                    const { id, name } = a;
+                    const { id, name, value = '' } = a;
                     const status = id===option;
-                    const backgroundColor = status?dark:softWhite;
+                    const backgroundColor = status?colorIndex[i]:softWhite;
                     const color = status?white:dark;
 
                     return <div onClick={()=>{setOption(a)}} key={id} 
@@ -25,9 +25,17 @@ function CategoryRender({ options, option, setOption }) {
                                 color,
                                 cursor:'pointer',
                                 minWidth:'150px',
-                                textAlign:'center'
+                                textAlign:'center',
+                                position:'relative'
                             }} >
                                 {name}
+                                {value
+                                    ?<div style={{ width:"30px", height:'30px', borderRadius:30, backgroundColor:colorIndex[i], position:'absolute', top:-10, right:-10 }} >
+                                        {value}
+                                    </div>
+                                    :null
+                                }
+                                
                             </div>
                 })}
             </div>

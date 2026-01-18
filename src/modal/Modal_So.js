@@ -273,6 +273,7 @@ function Modal_So({
                 >
                     <option value="normal" >ปกติ(DHL)</option>
                     <option value="fast" >รวดเร็ว(ลาล่ามูฟ)</option>
+                    <option value="self" >รับเองที่ บ.</option>
             </Form.Select>
             <br/>
             <h2>3. โน๊ตแจ้งคลัง</h2>

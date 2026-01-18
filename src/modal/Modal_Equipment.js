@@ -248,7 +248,7 @@ const styles = {
       textAlign:"center",width:'20%'
     },
     image : {
-      width:'100%',maxWidth:300
+      width:'100%',maxWidth:200
     },
     text : {
       color:darkGray
