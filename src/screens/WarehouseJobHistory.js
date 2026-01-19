@@ -8,62 +8,30 @@ import { CategoryRender, SearchControl } from "../components";
 import { Modal_Warehouse, Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput } from "../modal";
 import { formatTime, searchMultiFunction, toastSuccess } from "../Utility/function";
 import { normalSort } from "../Utility/sort";
-import { stringDateTimeReceipt, stringYMDHMS3 } from "../Utility/dateTime";
+import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { initialWarehouse } from "../configs";
 
 
-const deliveryOptions = {
-    'normal':'DHL',
-    'fast':'Lalamove',
-    'self':'รับที่บริษัท'
-};
-
-const statusMap = {
-    'prepare':'รอจัด',
-    'packed':'จัดเสร็จแล้ว',
-}
-
-const statusOptions = [
-    { id:'1', name:"รอจัด", status:'prepare' },
-    { id:'2', name:"จัดเสร็จแล้ว", status:'packed' },
-    { id:'3', name:"ส่งแล้ว", status:'sent' },
-];
-
-function WarehouseJobScreen() {
+function WarehouseJobHistory() {
     const [current, setCurrent] = useState(initialWarehouse);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
     const [display, setDisplay] = useState([]);
     const [masterData, setMasterData] = useState([]);
-    const [option, setOption] = useState({ id:'1', name:"ทั้งหมด" });
-    const { id:optionId, name } = option;
     const [status_Modal, setStatus_Modal] = useState(false);
     const [link_Modal, setLink_Modal] = useState(false);
     const [link, setLink] = useState('');
 
 
-    const options = useMemo(()=>{
-        return [
-                { id:'1', name:"รอจัด", value:masterData.filter(a=>a.status==='prepare').length  },
-                { id:'2', name:"จัดเสร็จแล้ว", value:masterData.filter(a=>a.status==='packed').length  },
-                { id:'4', name:"ทั้งหมด", value:masterData.filter(a=>['prepare','packed'].includes(a.status)).length  },
-            ]
-    },[masterData])
-
     useEffect(()=>{
-        let arr = optionId === '4'
-            ?[...masterData]
-            :masterData.filter(a=>{
-                if(optionId === '1') return a.status==='prepare'
-                if(optionId === '2') return a.status==='packed'
-            });
+        let arr = masterData
 
         
         if(search){
             arr = searchMultiFunction(arr,search,['profileName','orderNumber'])
         }
         setDisplay(arr)
-    },[search,masterData,optionId]);
+    },[search,masterData]);
 
     useEffect(()=>{
         fetchJobs();
@@ -75,7 +43,9 @@ function WarehouseJobScreen() {
         setLoading(true);
         try {
             const query = await db.collection('hardwareOrder')
-                .where('status','in',['prepare','packed'])
+                .where('status','in',['success','sent'])
+                .orderBy('timestamp','desc')
+                .limit(100)
                 .get();
             
             const results = query.docs.map(doc=>{
@@ -110,11 +80,7 @@ function WarehouseJobScreen() {
                 const orderDoc = await transaction.get(orderRef);
                 const { status:currentStatus } = orderDoc.data();
                 if(['success','cancel'].includes(currentStatus)) throw new Error(`สถานะ : ${currentStatus} แก้ไขไม่ได้`);
-                if(status ==='sent'){
-                    transaction.update(orderRef,{ status, billDate:stringYMDHMS3(new Date()) });
-                } else {
-                    transaction.update(orderRef,{ status });
-                }
+                transaction.update(orderRef,{ status });
             });
             toastSuccess('อัปเดตสถานะสำเร็จ');
             setMasterData(prev=>prev.map(item=>
@@ -165,6 +131,8 @@ function WarehouseJobScreen() {
             setLoading(false);
         }
     };
+
+
     
 
   return (
@@ -179,17 +147,10 @@ function WarehouseJobScreen() {
             onChange={setLink}
             area={true}
         />
-        <Modal_FlatListTwoColumn
-            show={status_Modal}
-            onHide={()=>{setStatus_Modal(false)}}
-            header='เลือกสถานะ'
-            onClick={handleStatus}
-            value={statusOptions}
-        />
+  
         <Modal_Loading show={loading} />
-      <h1>งานคลัง</h1>
+      <h1>ประวัติงานคลัง</h1>
       <SearchControl {...{ placeholder:'ค้นหาด้วยชื่อเซลหรือเลขที่ใบสั่งซื้อ', search, setSearch }} />
-      <CategoryRender {...{ options, option:optionId, setOption }} />
       <h5>ทั้งหมด : {display.length} รายการ</h5>
         <br/>
       <div>
@@ -197,12 +158,12 @@ function WarehouseJobScreen() {
         <thead  >
         <tr>
             <th style={styles.container2}>วันที่</th>
-            <th style={styles.container2}>ชื่อ</th>
+            <th style={styles.container2}>เลขที่ออเดอร์</th>
+            <th style={styles.container2}>ร้านค้า</th>
+            <th style={styles.container2}>ผู้ขาย</th>
             <th style={styles.container3}>รายการ</th>
             <th style={styles.container3}>รายละเอียด</th>
-            <th style={styles.container2}>รูปแบบการจัดส่ง</th>
-            <th style={styles.container2}>สถานะ</th>
-            <th style={styles.container2}>ลิงค์</th>
+            <th style={styles.container2}>Reference</th>
         </tr>
         </thead>
         <tbody  >
@@ -223,10 +184,6 @@ function WarehouseJobScreen() {
                     <td  style={styles.text3} >
                         {note}
                     </td>
-                    <td  style={styles.container4} >{deliveryOptions[deliveryType]}</td>
-                    
-                    <td onClick={()=>{openStatus(item)}} style={styles.container4} >{statusMap[status]}</td>
-                    <td onClick={()=>{openLink(item)}}  style={styles.container4}>{link}</td>
                 </tr>
         }
         )}
@@ -253,4 +210,4 @@ const styles = {
 
 }
 
-export default WarehouseJobScreen;
+export default WarehouseJobHistory;

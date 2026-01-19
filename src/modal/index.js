@@ -20,7 +20,7 @@ import Modal_Profile from "./Modal_Profile";
 import Modal_SoftwareDetail from "./Modal_SoftwareDetail";
 import Modal_Delivery from "./Modal_Delivery";
 import Modal_FlatlistSearchFranchise from "./Modal_FlatlistSearchFranchise";
-import Modal_Equipment from "./Modal_Equipment";
+import Modal_Warehouse from "./Modal_Warehouse";
 import Modal_NewCrop from "./Modal_NewCrop";
 import Modal_Question2 from "./Modal_Question2";
 import Modal_CategorySetting from "./Modal_CategorySetting";
@@ -36,8 +36,10 @@ import Modal_Customer from "./Modal_Customer";
 import Modal_Cancel from "./Modal_Cancel";
 import Modal_DatePicker from "./Modal_DatePicker";
 import Modal_Stock from "./Modal_Stock";
+import Modal_Inbound from "./Modal_Inbound";
 
 export { 
+    Modal_Inbound,
     Modal_Stock,
     Modal_DatePicker,
     Modal_Cancel,
@@ -52,7 +54,7 @@ export {
     Modal_CategorySetting,
     Modal_Question2,
     Modal_NewCrop,
-    Modal_Equipment,
+    Modal_Warehouse,
     Modal_FlatlistSearchFranchise,
     Modal_Loading, 
     Modal_Confirm,

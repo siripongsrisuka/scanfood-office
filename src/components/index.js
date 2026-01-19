@@ -39,9 +39,15 @@ import Card from "./Card";
 import TimeControlUpgrade from "./TimeControlUpgrade";
 import initialColors from "./initialColors";
 import SlideOptions from "./SlideOptions";
+import TimeControlInbound from "./TimeControlInbound";
+import AreaFloating from "./AreaFloating";
+import TimeControlHardwareOrder from "./TimeControlHardwareOrder";
 
 
 export {
+    TimeControlHardwareOrder,
+    AreaFloating,
+    TimeControlInbound,
     SlideOptions,
     initialColors,
     TimeControlUpgrade,

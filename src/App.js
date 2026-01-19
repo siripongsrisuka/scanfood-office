@@ -34,8 +34,11 @@ import {
   SaleManagerScreen,
   MarketingBootsScreen,
   WarehouseJobScreen,
-  HardwareSettingScreen,
+  WarehouseSettingScreen,
   HardwareArrangeScreen,
+  ReportInbound,
+  WarehouseJobHistory,
+  ReportHardware,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -100,8 +103,11 @@ function App() {
             <Route path='saleManager' element={<SaleManagerScreen/>} />
             <Route path='marketingBoots' element={<MarketingBootsScreen/>} />
             <Route path='warehouseJob' element={<WarehouseJobScreen/>} />
-            <Route path='hardwareSetting' element={<HardwareSettingScreen/>} />
+            <Route path='warehouseSetting' element={<WarehouseSettingScreen/>} />
             <Route path='hardwareArrange' element={<HardwareArrangeScreen/>} />
+            <Route path='reportInbound' element={<ReportInbound/>} />
+            <Route path='warehouseJobHistory' element={<WarehouseJobHistory/>} />
+            <Route path='reportHardware' element={<ReportHardware/>} />
             
           </Route>
           <Route path='/admin' element={<AdminDashboard/>} />

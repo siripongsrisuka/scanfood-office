@@ -65,14 +65,6 @@ export default [
       id:'128'
     },
 
-
-    
-    {
-      topic: '2.1 อุปกรณ์',
-      icon: 'bi-speedometer',
-      to: 'warehouse',
-      id:'128'
-    },
     {
       topic: '2.1 ประวัติ License',
       icon: 'bi-speedometer',
@@ -93,28 +85,41 @@ export default [
       topic: '4.1 งาน',
       icon: 'bi-speedometer',
       to: 'warehouseJob',
-      id:'128'
+      id:'401'
     },
-
     {
-      topic: '4.2 ตั้งค่าอุปกรณ์',
+      topic: '4.2 ประวัติงาน',
       icon: 'bi-speedometer',
-      to: 'hardwareSetting',
-      id:'128'
-    },
-
-    {
-      topic: '4.3 จัดเรียงอุปกรณ์',
-      icon: 'bi-speedometer',
-      to: 'hardwareArrange',
-      id:'128'
+      to: 'reportHardware',
+      id:'402'
     },
     {
-      topic: '4.4 สต๊อกคงเหลือ',
+      topic: '4.3 สต๊อกคงเหลือ',
       icon: 'bi-speedometer',
       to: 'warehouse',
-      id:'128'
+      id:'403'
     },
+    {
+      topic: '4.4 ประวัติรับเข้า',
+      icon: 'bi-speedometer',
+      to: 'reportInbound',
+      id:'404'
+    },
+    
+    {
+      topic: '4.5 ตั้งค่าสินค้า',
+      icon: 'bi-speedometer',
+      to: 'warehouseSetting',
+      id:'405'
+    },
+
+    {
+      topic: '4.6 จัดเรียงสินค้า',
+      icon: 'bi-speedometer',
+      to: 'hardwareArrange',
+      id:'406'
+    },
+  
  
     {
       label: '3. ทีม Tech ขั้นเทพ',

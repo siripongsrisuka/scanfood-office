@@ -1,49 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Table,
 } from "react-bootstrap";
-import { formatTime, toastSuccess } from "../Utility/function";
+import { toastSuccess } from "../Utility/function";
 import '../styles/CartScreen.css'
 import "react-datepicker/dist/react-datepicker.css";
 import { db } from "../db/firestore";
 import { Modal_Arrange, Modal_Loading } from "../modal";
 import { minusDays, plusSecond } from "../Utility/dateTime";
 import { OneButton, RootImage } from "../components";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchNormalWarehouse } from "../redux/warehouseSlice";
 
 function HardwareArrangeScreen() {
+  const dispatch = useDispatch();
+  const { warehouse } = useSelector(state=>state.warehouse);
   const [loading, setLoading] = useState(false);
   const [arrange_Modal, setArrange_Modal] = useState(false);
   const [alphaData, setAlphaData] = useState([]);
-  const [masterData, setMasterData] = useState([]);
 
-    useEffect(()=>{
-        fetchHardware()
-    },[]);
-
-    async function fetchHardware(){
-        setLoading(true);
-        try {
-            const query = await db.collection('hardware').get();
-            const value = query.docs.map(doc=>{
-                const { timestamp, ...rest } = doc.data();
-                return {
-                    ...rest,
-                    timestamp:formatTime(timestamp),
-                    id:doc.id
-                }
-            });
-            const arrangeResults = value.sort((a,b)=> a.timestamp - b.timestamp)
-            setMasterData(arrangeResults);
-        } catch (error) {
-            alert(error);
-        } finally {
-            setLoading(false);
-        }
-    }
 
   function openArrange(){
     setArrange_Modal(true)
-    setAlphaData(masterData.map((item,index)=>({...item,index})))
+    setAlphaData(warehouse.map((item,index)=>({...item,index})))
   };
 
 
@@ -63,12 +42,13 @@ async function submit(){
     
         for (let j = i; j < i + batchSize && j < totalUpdates; j++) {
           const update = newReOrder[j];
-          const docRef = db.collection('hardware').doc(update.id);
+          const docRef = db.collection('warehouse').doc(update.id);
           batch.update(docRef, {timestamp: update.timestamp});
         }
         await batch.commit();
       };
-      setMasterData(alphaData)
+      dispatch(fetchNormalWarehouse(alphaData))
+      setAlphaData(alphaData)
 
       toastSuccess('อัปเดตการจัดเรียงรายการสำเร็จ')
     } catch (error) {
@@ -93,7 +73,7 @@ async function submit(){
         <h2>จัดเรียงสินค้า</h2>
             <OneButton {...{ text:'จัดเรียงใหม่', submit:openArrange, variant:'warning' }} />
         <br/>
-        <h4>ค้นพบ {masterData.length} รายการ</h4>
+        <h4>ค้นพบ {warehouse.length} รายการ</h4>
         <Table striped bordered hover responsive  variant="light"   >
             <thead  >
             <tr  >
@@ -103,7 +83,7 @@ async function submit(){
             </tr>
             </thead>
             <tbody  >
-            {masterData.map((item, index) => {
+            {warehouse.map((item, index) => {
                 const { imageId, name, id } = item;
                 return <tr  style={styles.container6} key={id} >
                             <td style={styles.container7}>{index+1}.</td>

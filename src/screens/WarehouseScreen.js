@@ -3,58 +3,35 @@ import {
   Table,
 } from "react-bootstrap";
 import { db } from "../db/firestore";
-import { SearchControl } from "../components";
-import { Modal_Loading, Modal_Stock } from "../modal";
-import { formatTime, searchFilterFunction, toastSuccess } from "../Utility/function";
-import { useSelector } from "react-redux";
+import { SearchAndBottom } from "../components";
+import { Modal_Inbound, Modal_Loading, Modal_Stock } from "../modal";
+import { searchFilterFunction, toastSuccess } from "../Utility/function";
+import { useDispatch, useSelector } from "react-redux";
+import { updateNormalWarehouse } from "../redux/warehouseSlice";
+import { initialWarehouse } from "../configs";
+import { stringYMDHMS3 } from "../Utility/dateTime";
 
-const initialEquipment = { id:'', name:'', imageId:'', detail:'', price:'' };
 
 function WarehouseScreen() {
-    const { profile:{ id:profileId } } = useSelector(state=>state.profile)
-    const [equipments, setEquipment] = useState([]);
-    const [current, setCurrent] = useState(initialEquipment);
+    const dispatch = useDispatch();
+    const { warehouse } = useSelector(state=>state.warehouse);
+    const { profile:{ id:profileId, name:profileName } } = useSelector(state=>state.profile)
+    const [current, setCurrent] = useState(initialWarehouse);
     const [equipment_Modal, setEquipment_Modal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
     const [display, setDisplay] = useState([]);
+    const [inbound_Modal, setInbound_Modal] = useState(false);  
 
     useEffect(()=>{
-        let arr = equipments
-
+        let arr = warehouse
         
         if(search){
             arr = searchFilterFunction(arr,search,'name')
         }
         setDisplay(arr)
-    },[search,equipments]);
+    },[search,warehouse]);
 
-
-
-    useEffect(()=>{
-        fetchHardware()
-    },[]);
-
-    async function fetchHardware(){
-        setLoading(true);
-        try {
-            const query = await db.collection('hardware').get();
-            const value = query.docs.map(doc=>{
-                const { timestamp, ...rest } = doc.data();
-                return {
-                    ...rest,
-                    timestamp:formatTime(timestamp),
-                    id:doc.id
-                }
-            });
-            const arrangeResults = value.sort((a,b)=> a.timestamp - b.timestamp)
-            setEquipment(arrangeResults);
-        } catch (error) {
-            alert(error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     // 200%
     async function submit(){
@@ -62,14 +39,10 @@ function WarehouseScreen() {
         const { id, stock, safetyStock } = current;
         setLoading(true);
         try {
-            const hardwareRef = db.collection('hardware').doc(id);
-            await hardwareRef.update({ stock, safetyStock });
-
-            setEquipment(prev=>prev.map(a=>{
-                        return a.id===id
-                            ?current
-                            :a
-                    }));
+            const warehouseRef = db.collection('warehouse').doc(id);
+            await warehouseRef.update({ stock, safetyStock });
+            dispatch(updateNormalWarehouse({ id, updatedField: { stock, safetyStock } }))
+     
             toastSuccess('บันทึกข้อมูลสำเร็จ');
         } catch (error) {
             alert(error)
@@ -85,20 +58,75 @@ function WarehouseScreen() {
         setEquipment_Modal(true)
     };
 
+    async function handleInbound(inboundItems,note){
+        setInbound_Modal(false)
+        setLoading(true);
+        try {
+            const warehouseUpdates = await db.runTransaction(async (transaction) => {
+                let warehouseUpdates = [];
+                const inboundRef = db.collection('inbound').doc();
+                
+                for (const item of inboundItems) {
+                    const { id, qty } = item;
+                    const warehouseRef = db.collection('warehouse').doc(id);
+                    const doc = await transaction.get(warehouseRef);
+                    if (doc.exists) {
+                        const data = doc.data();
+                        const newStock = Number(data.stock || 0) + Number(qty);
+                        transaction.update(warehouseRef, { stock: newStock });
+                        warehouseUpdates.push({ id, stock: newStock });
+                    }
+                }
+                transaction.set(inboundRef, {
+                    items: inboundItems.map(item=>({
+                        id: item.id,
+                        name: item.name,
+                        qty: item.qty,
+                    })),
+                    note: note,
+                    createdAt: new Date(),
+                    timestamp: new Date(),
+                    billDate: stringYMDHMS3(new Date()),
+                    createdBy: profileId,
+                    createdName: profileName,
+                });
+                return warehouseUpdates;
+            });
+            warehouseUpdates.forEach(update => {
+                dispatch(updateNormalWarehouse({ id: update.id, updatedField: { stock: update.stock } }));
+            });
+       
+            toastSuccess('รับเข้าสินค้าสำเร็จ');
+        } catch (error) {
+            alert(error)
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    function openInbound(){
+        setInbound_Modal(true)
+    }
+
 
   return (
     <div >
         <Modal_Loading show={loading} />
+        <Modal_Inbound
+            show={inbound_Modal}
+            onHide={()=>{setInbound_Modal(false)}}
+            submit={handleInbound}
+        />
         <Modal_Stock
             show={equipment_Modal}
-            onHide={()=>{setEquipment_Modal(false);setCurrent(initialEquipment)}}
+            onHide={()=>{setEquipment_Modal(false);setCurrent(initialWarehouse)}}
             submit={submit}
             current={current}
             setCurrent={setCurrent}
         />
       <h1>สต๊อกคงเหลือ</h1>
-      <SearchControl {...{ placeholder:'ค้นหาด้วยชื่อ', search, setSearch }} />
-      <h6>ทั้งหมด : {equipments.length} รายการ</h6>
+      <SearchAndBottom {...{ placeholder:'ค้นหาด้วยชื่อ', search, setSearch, download:false, exportToXlsx:openInbound, text:'รับเข้า' }} />
+      <h6>ทั้งหมด : {warehouse.length} รายการ</h6>
         <br/>
       <div>
       <Table  bordered   variant="light"   >

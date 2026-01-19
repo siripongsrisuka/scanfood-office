@@ -33,12 +33,18 @@ import UpgradeStoreSizeHistory from "./UpgradeStoreSizeHistory";
 import SaleManagerScreen from "./SaleManagerScreen";
 import MarketingBootsScreen from "./MarketingBootsScreen";
 import WarehouseJobScreen from "./WarehouseJobScreen";
-import HardwareSettingScreen from "./HardwareSettingScreen";
+import WarehouseSettingScreen from "./WarehouseSettingScreen";
 import HardwareArrangeScreen from "./HardwareArrangeScreen";
+import ReportInbound from "./ReportInbound";
+import WarehouseJobHistory from "./WarehouseJobHistory";
+import ReportHardware from "./ReportHardware";
 
 export {
+    ReportHardware,
+    WarehouseJobHistory,
+    ReportInbound,
     HardwareArrangeScreen,
-    HardwareSettingScreen,
+    WarehouseSettingScreen,
     WarehouseJobScreen,
     MarketingBootsScreen,
     SaleManagerScreen,

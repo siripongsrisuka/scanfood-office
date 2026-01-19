@@ -16,7 +16,9 @@ import scenarioReducer from './scenarioSlice';
 import reportReducer from './reportSlice';
 import officeReducer from './officeSlice';
 import upgradeReducer from './upgradeSlice';
-
+import inboundReducer from './inboundSlice';
+import warehouseReducer from './warehouseSlice';
+import hardwareOrderReducer from './hardwareOrderSlice';
 
 
   const rootPersistConfig = {
@@ -63,7 +65,10 @@ import upgradeReducer from './upgradeSlice';
     scenario:scenarioReducer,
     report:reportReducer,
     office:officeReducer,
-    upgrade:upgradeReducer
+    upgrade:upgradeReducer,
+    inbound:inboundReducer,
+    warehouse:warehouseReducer,
+    hardwareOrder:hardwareOrderReducer,
     // care:careReducer,
 
   })

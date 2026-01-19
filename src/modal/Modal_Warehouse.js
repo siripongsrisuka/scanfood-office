@@ -15,6 +15,7 @@ import Modal_Alert from "./Modal_Alert";
 import Modal_NewCrop from "./Modal_NewCrop";
 import Modal_OneInput from "./Modal_OneInput";
 import Modal_FlatListTwoColumn from "./Modal_FlatListTwoColumn";
+import { useSelector } from "react-redux";
 
 const { white } = colors;
 const statusType = [
@@ -22,7 +23,7 @@ const statusType = [
     {id:2, statusName:'ปิดใช้งาน', status:false },
 ];
 
-function Modal_Equipment({
+function Modal_Warehouse({
   backdrop=true, // true/false/static
   animation=true,
   show,
@@ -32,8 +33,8 @@ function Modal_Equipment({
   submit,
   current,
   setCurrent,
-  masterData
 }) {
+    const { warehouse } = useSelector(state=>state.warehouse);
     const { imageId, name, detail, price, status, limit, stockSetStatus = false, stockSet = [] } = current;
     const [alert_Modal, setAlert_Modal] = useState(initialAlert);
     const { status:alertStatus, content:alertContent, onClick, variant } = alert_Modal;
@@ -47,9 +48,9 @@ function Modal_Equipment({
     const { qty } = currentStockSet;
     const [qty_Modal, setQty_Modal] = useState(false);
 
-  const equimentName = useMemo(() => {
-    return new Map(masterData.map(item => [item.id, item.name]));
-  }, [masterData]);
+  const warehouseName = useMemo(() => {
+    return new Map(warehouse.map(item => [item.id, item.name]));
+  }, [warehouse]);
 
 
 
@@ -90,8 +91,8 @@ function Modal_Equipment({
   };
 
   function openStockSet(){
-    // Fetch available stock sets from masterData or any other source
-    const availableSets = masterData.filter(item => item.id !== current.id && !item.stockSetStatus && !stockSet.includes(item.id)); // Example filter
+    // Fetch available stock sets from warehouse or any other source
+    const availableSets = warehouse.filter(item => item.id !== current.id && !item.stockSetStatus && !stockSet.includes(item.id)); // Example filter
     setAvailableStockSets(availableSets);
     setStockSet_Modal(true);
   }
@@ -308,7 +309,7 @@ function Modal_Equipment({
                       <tbody  >
                         {stockSet.map((item, index) => {
                           const { id, qty } = item;
-                          const name = equimentName.get(id);
+                          const name = warehouseName.get(id);
                           return  <tr  key={index} >
                                     <td style={styles.container}>{index+1}.</td>
                                     <td>{name}</td>
@@ -356,4 +357,4 @@ const styles = {
     }
 }
 
-export default Modal_Equipment;
+export default Modal_Warehouse;

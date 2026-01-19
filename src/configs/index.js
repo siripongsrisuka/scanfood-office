@@ -26,11 +26,11 @@ import initialProvince from "./initialProvince";
 import initialChannel from "./initialChannel";
 import initialProcess from "./initialProcess";
 import initialTeam from "./initialTeam";
-import initialEquipment from "./initialEquipment";
+import initialWarehouse from "./initialWarehouse";
 
 
 export {
-  initialEquipment,
+  initialWarehouse,
   initialTeam,
   initialProcess,
   initialChannel,

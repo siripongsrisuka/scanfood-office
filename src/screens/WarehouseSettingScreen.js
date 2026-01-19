@@ -4,58 +4,37 @@ import {
 } from "react-bootstrap";
 import { db, prepareFirebaseImage } from "../db/firestore";
 import { SearchAndBottom } from "../components";
-import { Modal_Equipment, Modal_Loading } from "../modal";
-import { formatCurrency, formatTime, searchFilterFunction, toastSuccess } from "../Utility/function";
-import { initialEquipment } from "../configs";
+import { Modal_Warehouse, Modal_Loading } from "../modal";
+import { formatCurrency, searchFilterFunction, toastSuccess } from "../Utility/function";
+import { initialWarehouse } from "../configs";
+import { useDispatch, useSelector } from "react-redux";
+import { addNormalWarehouse, updateNormalWarehouse } from "../redux/warehouseSlice";
 
 
-function HardwareSettingScreen() {
-    const [masterData, setMasterData] = useState([]);
-    const [current, setCurrent] = useState(initialEquipment);
-    const [equipment_Modal, setEquipment_Modal] = useState(false);
+function WarehouseSettingScreen() {
+    const dispatch = useDispatch();
+    const { warehouse } = useSelector(state=>state.warehouse);
+
+    const [current, setCurrent] = useState(initialWarehouse);
+    const [warehouse_Modal, setWarehouse_Modal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
     const [display, setDisplay] = useState([]);
 
     useEffect(()=>{
-        let arr = masterData
+        let arr = warehouse
         
         if(search){
             arr = searchFilterFunction(arr,search,'name')
         }
         setDisplay(arr)
-    },[search,masterData]);
+    },[search,warehouse]);
 
 
-
-    useEffect(()=>{
-        fetchHardware()
-    },[]);
-
-    async function fetchHardware(){
-        setLoading(true);
-        try {
-            const query = await db.collection('hardware').get();
-            const value = query.docs.map(doc=>{
-                const { timestamp, ...rest } = doc.data();
-                return {
-                    ...rest,
-                    timestamp:formatTime(timestamp),
-                    id:doc.id
-                }
-            });
-            const arrangeResults = value.sort((a,b)=> a.timestamp - b.timestamp)
-            setMasterData(arrangeResults);
-        } catch (error) {
-            alert(error);
-        } finally {
-            setLoading(false);
-        }
-    }
 
     // 200%
     async function submit(){
-        setEquipment_Modal(false)
+        setWarehouse_Modal(false)
         const { id, imageId } = current;
         let image = imageId;
         setLoading(true);
@@ -67,25 +46,15 @@ function HardwareSettingScreen() {
                 ?{...current,imageId:image}
                 :{...current,imageId:image, createdAt:new Date(), timestamp:new Date()}
             if(id){
-                const hardwareRef = db.collection('hardware').doc(id);
-                await hardwareRef.update(finalCurrent);
+                const warehouseRef = db.collection('warehouse').doc(id);
+                await warehouseRef.update(finalCurrent);
+                dispatch(updateNormalWarehouse({ id, updatedField: finalCurrent }))
             } else {
-                const hardwareRef = db.collection('hardware').doc();
-                await hardwareRef.set(finalCurrent);
+                const warehouseRef = db.collection('warehouse').doc();
+                await warehouseRef.set(finalCurrent);
+                dispatch(addNormalWarehouse({ ...finalCurrent, id:warehouseRef.id }))
             }
 
-            setMasterData(prev=>{
-                const exists = prev.find(a=>a.id===id);
-                if(exists){
-                    return prev.map(a=>{
-                        return a.id===id
-                            ?finalCurrent
-                            :a
-                    })
-                } else {
-                    return [...prev,finalCurrent]
-                }
-            });
             toastSuccess('บันทึกข้อมูลสำเร็จ');
         } catch (error) {
             alert(error)
@@ -97,28 +66,26 @@ function HardwareSettingScreen() {
     // 200%
     function openEquipment(item){
         const { stockSet } = item;
-        const hardwareIds = new Set(masterData.map(a=>a.id));
+        const hardwareIds = new Set(warehouse.map(a=>a.id));
     
-        setCurrent({...initialEquipment,...item,stockSet:stockSet.filter(a=>hardwareIds.has(a.id))})
-        setEquipment_Modal(true)
+        setCurrent({...initialWarehouse,...item,stockSet:stockSet.filter(a=>hardwareIds.has(a.id))})
+        setWarehouse_Modal(true)
     };
-
 
 
   return (
     <div >
         <Modal_Loading show={loading} />
-        <Modal_Equipment
-          show={equipment_Modal}
-          onHide={()=>{setEquipment_Modal(false);setCurrent(initialEquipment)}}
+        <Modal_Warehouse
+          show={warehouse_Modal}
+          onHide={()=>{setWarehouse_Modal(false);setCurrent(initialWarehouse)}}
           submit={submit}
           current={current}
           setCurrent={setCurrent}
-          masterData={masterData}
         />
-      <h1>ตั้งค่า Hardware</h1>
-      <SearchAndBottom {...{ placeholder:'ค้นหาด้วยชื่อ', search, setSearch, download:false, exportToXlsx:()=>{openEquipment(initialEquipment)}, text:'เพิ่มอุปกรณ์' }} />
-      <h6>ทั้งหมด : {masterData.length} รายการ</h6>
+      <h1>ตั้งค่า Warehouse</h1>
+      <SearchAndBottom {...{ placeholder:'ค้นหาด้วยชื่อ', search, setSearch, download:false, exportToXlsx:()=>{openEquipment(initialWarehouse)}, text:'เพิ่มสินค้า' }} />
+      <h6>ทั้งหมด : {warehouse.length} รายการ</h6>
         <br/>
       <div>
       <Table  bordered   variant="light"   >
@@ -134,14 +101,17 @@ function HardwareSettingScreen() {
         </thead>
         <tbody  >
         {display.map((item, index) => {
-            const { detail, imageId, name, price, status } = item;
+            const { detail, imageId, name, price, status, stockSetStatus } = item;
             return <tr onClick={()=>{openEquipment(item)}} style={{cursor: 'pointer'}} key={index}  >
                     <td  style={styles.container4}>{index+1}.</td>
-                    <td  style={styles.container4} >{name}</td>
+                    <td   >
+                        {name}
+                        {stockSetStatus && <span style={{color:'red'}}> *SET</span>}
+                        </td>
                     <td  style={styles.container4} >
                         <img style={{width:'100px'}} src={imageId} />
                     </td>
-                    <td  style={styles.container4} >{formatCurrency(price)}</td>
+                    <td  style={styles.container4} >{formatCurrency(Number(price))}</td>
                     <td   >
                     {detail.split('\n').map((line, index) => (
                         <React.Fragment key={index}>
@@ -184,4 +154,4 @@ const styles = {
     },
 }
 
-export default HardwareSettingScreen;
+export default WarehouseSettingScreen;

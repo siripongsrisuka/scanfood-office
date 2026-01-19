@@ -234,6 +234,31 @@ export const searchMultiFunction = (arr, search, properties = ['name']) => {
   });
 };
 
+  export function multiDigitNumber(inputValue){
+  inputValue = inputValue.replace(/[^0-9\.]/g,'')
+  var afterDot = '';
+  var beforeDots = inputValue.split('.'); 
+  var beforeDot = beforeDots[0];
+  if(beforeDots[1]){
+      var afterDot = beforeDots[1];
+      // if(afterDot.length > 2 ){
+      //      afterDot = afterDot.slice(0, 2);               
+      // }
+      afterDot = '.'+ afterDot;
+
+  }
+  if(beforeDot){                  
+      // if(beforeDot.length > 6 ){          
+      //     beforeDot = beforeDot.slice(0, 6);                      
+      // }
+      if(beforeDots[1] == ''){
+          beforeDot = beforeDot + '.';
+      }
+  }
+  inputValue = beforeDot + afterDot;
+  return inputValue;
+}
+
 export function daysBetween(startDate, endDate) {
   // Parse dates to remove any time components
   const start = new Date(startDate);
