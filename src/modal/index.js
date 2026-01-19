@@ -1,23 +1,14 @@
 import Modal_Loading from "./Modal_Loading";
 import Modal_FlatlistSearchFranchise from "./Modal_FlatlistSearchFranchise";
 
-import Modal_Success from './Modal_Success';
 import Modal_OneInput from "./Modal_OneInput";
 import Modal_Information from "./Modal_Infomation";
-import Modal_Product from "./Modal_Product";
-import Modal_Promptpay from "./Modal_Promptpay";
-import Modal_CropImage from "./Modal_CropImage";
 import Modal_FlatListTwoColumn from "./Modal_FlatListTwoColumn";
 import Modal_Alert from "./Modal_Alert";
 import Modal_FlatlistSelected from "./Modal_FlatlistSelected";
-import Modal_Quotation from "./Modal_Quotation";
 import Modal_Requirement from "./Modal_Requirement";
 import Modal_FlatlistSearchShop from "./Modal_FlatlistSearchShop";
-import Modal_Software from "./Modal_Software";
 import Modal_Login from "./Modal_Login";
-import Modal_Profile from "./Modal_Profile";
-import Modal_SoftwareDetail from "./Modal_SoftwareDetail";
-import Modal_Delivery from "./Modal_Delivery";
 import Modal_Warehouse from "./Modal_Warehouse";
 import Modal_NewCrop from "./Modal_NewCrop";
 import Modal_Question2 from "./Modal_Question2";
@@ -55,22 +46,13 @@ export {
     Modal_Warehouse,
     Modal_FlatlistSearchFranchise,
     Modal_Loading, 
-    Modal_Success, 
     Modal_OneInput,
     Modal_Information,
-    Modal_Product,
-    Modal_Promptpay,
-    Modal_CropImage,
     Modal_FlatListTwoColumn,
     Modal_Alert,
     Modal_FlatlistSelected,
-    Modal_Quotation,
     Modal_Requirement,
     Modal_FlatlistSearchShop,
-    Modal_Software,
     Modal_Login,
-    Modal_Profile,
-    Modal_SoftwareDetail,
-    Modal_Delivery,
     Modal_FindHuman
 };

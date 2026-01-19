@@ -9,7 +9,6 @@ import authReducer from './authSlice'
 import orderReducer from './orderSlice';
 import profileReducer from './profileSlice';
 import shopReducer from './shopSlice';
-import billReducer from './billSlice';
 import careReducer from './careSlice';
 import cardReducer from './cardSlice';
 import scenarioReducer from './scenarioSlice';
@@ -59,7 +58,6 @@ import hardwareOrderReducer from './hardwareOrderSlice';
     order:persistReducer(orderPersistConfig, orderReducer),
     profile:persistReducer(profilePersistConfig, profileReducer),
     shop:shopReducer,
-    bill:billReducer,
     care:persistReducer(carePersistConfig, careReducer),
     card:cardReducer,
     scenario:scenarioReducer,

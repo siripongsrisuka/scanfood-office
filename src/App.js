@@ -2,9 +2,6 @@ import React, { useEffect, useState, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { 
   HomeScreen,
-  DemoScreen,
-  AdminDashboard,
-  StorePort,
   CloneScreen,
   ImportItemStoreScreen,
   ImportItemFranchiseScreen,
@@ -15,21 +12,19 @@ import {
   TransformTable,
   TransferExpireScreen,
   QuestionSettingScreen,
-  MasterScreen,
   DiagnosisScreen,
   KbankReportScreen,
   OfficeScreen,
   StaffScreen,
   WarehouseScreen,
   SaleScreen,
-  Test,
   UpgradeStoreSizeScreen,
   UpgradeStoreSizeHistory,
   SaleManagerScreen,
   MarketingBootsScreen,
   WarehouseJobScreen,
   WarehouseSettingScreen,
-  HardwareArrangeScreen,
+  WarehouseArrangeScreen,
   ReportInbound,
   WarehouseJobHistory,
   ReportHardware,
@@ -76,9 +71,7 @@ function App() {
     <div >
       <Routes>
           <Route path='/' element={<HomeScreen/>} />
-          {/* <Route path='/' element={<DemoScreen/>} /> */}
 
-          <Route path='/master' element={<MasterScreen/>} />
           <Route path='/office' element={<OfficeScreen/>} >
             <Route index  element={<SaleScreen/>} />
             <Route path='staff' element={<StaffScreen/>} />
@@ -98,7 +91,7 @@ function App() {
             <Route path='marketingBoots' element={<MarketingBootsScreen/>} />
             <Route path='warehouseJob' element={<WarehouseJobScreen/>} />
             <Route path='warehouseSetting' element={<WarehouseSettingScreen/>} />
-            <Route path='hardwareArrange' element={<HardwareArrangeScreen/>} />
+            <Route path='hardwareArrange' element={<WarehouseArrangeScreen/>} />
             <Route path='reportInbound' element={<ReportInbound/>} />
             <Route path='warehouseJobHistory' element={<WarehouseJobHistory/>} />
             <Route path='reportHardware' element={<ReportHardware/>} />
@@ -106,20 +99,10 @@ function App() {
             <Route path='importItemFranchise' element={<ImportItemFranchiseScreen/>} />
             <Route path='importBomFranchise' element={<ImportBomFranchiseScreen/>} />
             <Route path='importMarketPlaceFranchise' element={<ImportMarketPlaceFranchise/>} />
+            <Route path='questionSetting' element={<QuestionSettingScreen/>} />
+            <Route path='diagnosis' element={<DiagnosisScreen/>} />
             
           </Route>
-          <Route path='/admin' element={<AdminDashboard/>} />
-  
-          <Route path='store' element={<StorePort/>}/>
-          <Route path='store/demo' element={<DemoScreen/>} />
-          <Route path='questionSetting' element={<QuestionSettingScreen/>} />
-          <Route path='diagnosis' element={<DiagnosisScreen/>} />
-          <Route path='test' element={<Test/>} />
-
-          
-
-          
-
       </Routes>
       </div>
     </Router>

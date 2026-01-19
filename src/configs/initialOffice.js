@@ -182,7 +182,21 @@ export default [
       to: 'kbankReport',
       id:'128'
     },
-    
+      {
+        label: '7. Customer Success',
+      },
+      {
+        topic: '7.1 กำหนดสิทธิ์',
+        icon: 'bi-speedometer',
+        to: 'questionSetting',
+        id:'723'
+      },
+      {
+        topic: '7.2 กำหนดสิทธิ์',
+        icon: 'bi-speedometer',
+        to: 'diagnosis',
+        id:'723'
+      },
 
     
    

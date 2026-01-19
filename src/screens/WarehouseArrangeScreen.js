@@ -12,7 +12,7 @@ import { OneButton, RootImage } from "../components";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchNormalWarehouse } from "../redux/warehouseSlice";
 
-function HardwareArrangeScreen() {
+function WarehouseArrangeScreen() {
   const dispatch = useDispatch();
   const { warehouse } = useSelector(state=>state.warehouse);
   const [loading, setLoading] = useState(false);
@@ -129,4 +129,4 @@ const styles = {
 
 };
 
-export default HardwareArrangeScreen;
+export default WarehouseArrangeScreen;
