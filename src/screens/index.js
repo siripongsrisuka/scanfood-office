@@ -15,7 +15,6 @@ import ImportBomShopScreen from "./ImportBomShopScreen";
 import ImportMarketPlaceFranchise from "./ImportMarketPlaceFranchise";
 import CustomerCareScreen from "./CustomerCareScreen";
 import SoftwareHistory from "./SoftwareHistory";
-import HardwareHistory from "./HardwareHistory";
 import TransformTable from "./TransformTable";
 import TransferExpireScreen from "./TransferExpireScreen";
 import QuestionSettingScreen from "./QuestionSettingScreen";
@@ -38,8 +37,10 @@ import HardwareArrangeScreen from "./HardwareArrangeScreen";
 import ReportInbound from "./ReportInbound";
 import WarehouseJobHistory from "./WarehouseJobHistory";
 import ReportHardware from "./ReportHardware";
+import NewShopDashboard from "./NewShopDashboard";
 
 export {
+    NewShopDashboard,
     ReportHardware,
     WarehouseJobHistory,
     ReportInbound,
@@ -62,7 +63,6 @@ export {
     QuestionSettingScreen,
     TransferExpireScreen,
     TransformTable,
-    HardwareHistory,
     SoftwareHistory,
     CustomerCareScreen,
     ImportMarketPlaceFranchise,

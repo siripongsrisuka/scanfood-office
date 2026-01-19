@@ -1,12 +1,12 @@
 import React from "react";
-import { Button, Modal, Row, Col } from "react-bootstrap";
+import { Modal, Row, Col } from "react-bootstrap";
+import { OneButton } from "../components";
 
 function Modal_Product({
   backdrop=false, // true/false/static
   animation=true,
   show,
   onHide,
-  centered=true,
   size='lg',
   value
 }) {
@@ -38,7 +38,7 @@ function Modal_Product({
         </Row>
       </Modal.Body>
       <Modal.Footer>
-            <Button onClick={onHide} variant="danger">ปิด</Button>
+        <OneButton {...{ text: "ยืนยัน", submit:onHide, variant:'secondary' }} />
       </Modal.Footer>
     </Modal>
   );

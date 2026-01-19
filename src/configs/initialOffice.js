@@ -9,6 +9,14 @@ export default [
       id:'100'
     },
     {
+      topic: '1.1 ร้านใหม่',
+      icon: 'bi-speedometer',
+      to:'newShop',
+      id:'100'
+    },
+
+    
+    {
       label: '1. งานเซล',
     },
     
@@ -71,12 +79,7 @@ export default [
       to: 'softwareHistory',
       id:'128'
     },
-      {
-      topic: '2.1 ประวัติ อุปกรณ์',
-      icon: 'bi-speedometer',
-      to: 'hardwareHistory',
-      id:'128'
-    },
+  
   {
       label: '4. คลังสินค้า',
       

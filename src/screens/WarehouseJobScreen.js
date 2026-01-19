@@ -2,15 +2,13 @@ import React, { useState, useEffect, useMemo } from "react";
 import {
   Table,
 } from "react-bootstrap";
-import { v4 as uuidv4 } from 'uuid';
-import { db, prepareFirebaseImage } from "../db/firestore";
+import { db } from "../db/firestore";
 import { CategoryRender, SearchControl } from "../components";
-import { Modal_Warehouse, Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput } from "../modal";
+import {  Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput } from "../modal";
 import { formatTime, searchMultiFunction, toastSuccess } from "../Utility/function";
 import { normalSort } from "../Utility/sort";
 import { stringDateTimeReceipt, stringYMDHMS3 } from "../Utility/dateTime";
 import { initialWarehouse } from "../configs";
-
 
 const deliveryOptions = {
     'normal':'DHL',

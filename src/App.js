@@ -16,7 +16,6 @@ import {
   ImportMarketPlaceFranchise,
   CustomerCareScreen,
   SoftwareHistory,
-  HardwareHistory,
   TransformTable,
   TransferExpireScreen,
   QuestionSettingScreen,
@@ -39,6 +38,7 @@ import {
   ReportInbound,
   WarehouseJobHistory,
   ReportHardware,
+  NewShopDashboard,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -108,6 +108,7 @@ function App() {
             <Route path='reportInbound' element={<ReportInbound/>} />
             <Route path='warehouseJobHistory' element={<WarehouseJobHistory/>} />
             <Route path='reportHardware' element={<ReportHardware/>} />
+            <Route path='newShop' element={<NewShopDashboard/>} />
             
           </Route>
           <Route path='/admin' element={<AdminDashboard/>} />
@@ -122,7 +123,6 @@ function App() {
           <Route path='importBomFranchise' element={<ImportBomFranchiseScreen/>} />
           <Route path='importMarketPlaceFranchise' element={<ImportMarketPlaceFranchise/>} />
           <Route path='customerCare' element={<CustomerCareScreen/>} />
-          <Route path='hardwareHistory' element={<HardwareHistory/>} />
           <Route path='questionSetting' element={<QuestionSettingScreen/>} />
           <Route path='diagnosis' element={<DiagnosisScreen/>} />
           <Route path='test' element={<Test/>} />
