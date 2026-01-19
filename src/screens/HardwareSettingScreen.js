@@ -2,17 +2,15 @@ import React, { useState, useEffect } from "react";
 import {
   Table,
 } from "react-bootstrap";
-import { v4 as uuidv4 } from 'uuid';
 import { db, prepareFirebaseImage } from "../db/firestore";
-import { OneButton, SearchAndBottom, SearchControl } from "../components";
+import { SearchAndBottom } from "../components";
 import { Modal_Equipment, Modal_Loading } from "../modal";
-import { searchFilterFunction, toastSuccess } from "../Utility/function";
-import { te } from "date-fns/locale";
+import { formatCurrency, formatTime, searchFilterFunction, toastSuccess } from "../Utility/function";
+import { initialEquipment } from "../configs";
 
-const initialEquipment = { id:'', name:'', imageId:'', detail:'', price:'' }
 
 function HardwareSettingScreen() {
-    const [equipments, setEquipment] = useState([]);
+    const [masterData, setMasterData] = useState([]);
     const [current, setCurrent] = useState(initialEquipment);
     const [equipment_Modal, setEquipment_Modal] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -20,14 +18,13 @@ function HardwareSettingScreen() {
     const [display, setDisplay] = useState([]);
 
     useEffect(()=>{
-        let arr = equipments
-
+        let arr = masterData
         
         if(search){
             arr = searchFilterFunction(arr,search,'name')
         }
         setDisplay(arr)
-    },[search,equipments]);
+    },[search,masterData]);
 
 
 
@@ -39,8 +36,16 @@ function HardwareSettingScreen() {
         setLoading(true);
         try {
             const query = await db.collection('hardware').get();
-            const value = query.docs.map(doc=>({...doc.data(), id:doc.id}));
-            setEquipment(value);
+            const value = query.docs.map(doc=>{
+                const { timestamp, ...rest } = doc.data();
+                return {
+                    ...rest,
+                    timestamp:formatTime(timestamp),
+                    id:doc.id
+                }
+            });
+            const arrangeResults = value.sort((a,b)=> a.timestamp - b.timestamp)
+            setMasterData(arrangeResults);
         } catch (error) {
             alert(error);
         } finally {
@@ -60,7 +65,7 @@ function HardwareSettingScreen() {
             };
             const finalCurrent = id
                 ?{...current,imageId:image}
-                :{...current,imageId:image, id:uuidv4()}
+                :{...current,imageId:image, createdAt:new Date(), timestamp:new Date()}
             if(id){
                 const hardwareRef = db.collection('hardware').doc(id);
                 await hardwareRef.update(finalCurrent);
@@ -69,7 +74,7 @@ function HardwareSettingScreen() {
                 await hardwareRef.set(finalCurrent);
             }
 
-            setEquipment(prev=>{
+            setMasterData(prev=>{
                 const exists = prev.find(a=>a.id===id);
                 if(exists){
                     return prev.map(a=>{
@@ -91,9 +96,14 @@ function HardwareSettingScreen() {
 
     // 200%
     function openEquipment(item){
-        setCurrent(item)
+        const { stockSet } = item;
+        const hardwareIds = new Set(masterData.map(a=>a.id));
+    
+        setCurrent({...initialEquipment,...item,stockSet:stockSet.filter(a=>hardwareIds.has(a.id))})
         setEquipment_Modal(true)
     };
+
+
 
   return (
     <div >
@@ -104,10 +114,11 @@ function HardwareSettingScreen() {
           submit={submit}
           current={current}
           setCurrent={setCurrent}
+          masterData={masterData}
         />
       <h1>ตั้งค่า Hardware</h1>
-      <SearchAndBottom {...{ placeholder:'ค้นหาด้วยชื่อ', search, setSearch, download:false, onClick:()=>{openEquipment(initialEquipment)}, text:'เพิ่มอุปกรณ์' }} />
-      <h6>ทั้งหมด : {equipments.length} รายการ</h6>
+      <SearchAndBottom {...{ placeholder:'ค้นหาด้วยชื่อ', search, setSearch, download:false, exportToXlsx:()=>{openEquipment(initialEquipment)}, text:'เพิ่มอุปกรณ์' }} />
+      <h6>ทั้งหมด : {masterData.length} รายการ</h6>
         <br/>
       <div>
       <Table  bordered   variant="light"   >
@@ -123,14 +134,14 @@ function HardwareSettingScreen() {
         </thead>
         <tbody  >
         {display.map((item, index) => {
-            const { detail, id, imageId, name, price, status } = item;
+            const { detail, imageId, name, price, status } = item;
             return <tr onClick={()=>{openEquipment(item)}} style={{cursor: 'pointer'}} key={index}  >
                     <td  style={styles.container4}>{index+1}.</td>
                     <td  style={styles.container4} >{name}</td>
                     <td  style={styles.container4} >
                         <img style={{width:'100px'}} src={imageId} />
                     </td>
-                    <td  style={styles.container4} >{price}</td>
+                    <td  style={styles.container4} >{formatCurrency(price)}</td>
                     <td   >
                     {detail.split('\n').map((line, index) => (
                         <React.Fragment key={index}>
@@ -155,8 +166,8 @@ const styles = {
         minHeight:'100vh',
     },
     container2 : {
-        width:'10%',
-        minWidth:'80px',
+        width:'5%',
+        minWidth:'70px',
         textAlign:'center'
     },
     container3 : {
@@ -171,12 +182,6 @@ const styles = {
         textAlign:"center",width:'20%',
         minWidth:'300px'
     },
-    text:{
-        width:'50px'
-    },
-    text2 : {
-        minWidth:'120px'
-    }
 }
 
 export default HardwareSettingScreen;

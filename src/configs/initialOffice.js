@@ -86,24 +86,31 @@ export default [
       id:'128'
     },
   {
-      label: '2. คลังสินค้า',
+      label: '4. คลังสินค้า',
       
     },
     {
-      topic: '2.1 งาน',
+      topic: '4.1 งาน',
       icon: 'bi-speedometer',
       to: 'warehouseJob',
       id:'128'
     },
 
     {
-      topic: '2.1 ตั้งค่าอุปกรณ์',
+      topic: '4.2 ตั้งค่าอุปกรณ์',
       icon: 'bi-speedometer',
       to: 'hardwareSetting',
       id:'128'
     },
+
     {
-      topic: '2.1 สต๊อกคงเหลือ',
+      topic: '4.3 จัดเรียงอุปกรณ์',
+      icon: 'bi-speedometer',
+      to: 'hardwareArrange',
+      id:'128'
+    },
+    {
+      topic: '4.4 สต๊อกคงเหลือ',
       icon: 'bi-speedometer',
       to: 'warehouse',
       id:'128'

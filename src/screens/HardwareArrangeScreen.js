@@ -1,0 +1,151 @@
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+} from "react-bootstrap";
+import { formatTime, toastSuccess } from "../Utility/function";
+import '../styles/CartScreen.css'
+import "react-datepicker/dist/react-datepicker.css";
+import { db } from "../db/firestore";
+import { Modal_Arrange, Modal_Loading } from "../modal";
+import { minusDays, plusSecond } from "../Utility/dateTime";
+import { OneButton, RootImage } from "../components";
+
+function HardwareArrangeScreen() {
+  const [loading, setLoading] = useState(false);
+  const [arrange_Modal, setArrange_Modal] = useState(false);
+  const [alphaData, setAlphaData] = useState([]);
+  const [masterData, setMasterData] = useState([]);
+
+    useEffect(()=>{
+        fetchHardware()
+    },[]);
+
+    async function fetchHardware(){
+        setLoading(true);
+        try {
+            const query = await db.collection('hardware').get();
+            const value = query.docs.map(doc=>{
+                const { timestamp, ...rest } = doc.data();
+                return {
+                    ...rest,
+                    timestamp:formatTime(timestamp),
+                    id:doc.id
+                }
+            });
+            const arrangeResults = value.sort((a,b)=> a.timestamp - b.timestamp)
+            setMasterData(arrangeResults);
+        } catch (error) {
+            alert(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+  function openArrange(){
+    setArrange_Modal(true)
+    setAlphaData(masterData.map((item,index)=>({...item,index})))
+  };
+
+
+async function submit(){
+    setArrange_Modal(false)
+    setLoading(true);
+
+    const date = minusDays(new Date(),1)
+    let newReOrder = alphaData.map((item,index)=>{return({...item,timestamp:plusSecond(date,30*index)})})
+    const batchSize = 500;
+
+    try {
+      const totalUpdates = newReOrder.length;
+    
+      for (let i = 0; i < totalUpdates; i += batchSize) {
+        const batch = db.batch();
+    
+        for (let j = i; j < i + batchSize && j < totalUpdates; j++) {
+          const update = newReOrder[j];
+          const docRef = db.collection('hardware').doc(update.id);
+          batch.update(docRef, {timestamp: update.timestamp});
+        }
+        await batch.commit();
+      };
+      setMasterData(alphaData)
+
+      toastSuccess('อัปเดตการจัดเรียงรายการสำเร็จ')
+    } catch (error) {
+      alert(error)
+    } finally {
+      setLoading(false)
+    }
+  };
+
+
+  return (
+    <div style={styles.container} >
+        <Modal_Arrange
+            show={arrange_Modal}
+            onHide={()=>{setArrange_Modal(false)}}
+            alphaData={alphaData}
+            setAlphaData={setAlphaData}
+            submit={submit}
+        />
+        <Modal_Loading show={loading} />
+     
+        <h2>จัดเรียงสินค้า</h2>
+            <OneButton {...{ text:'จัดเรียงใหม่', submit:openArrange, variant:'warning' }} />
+        <br/>
+        <h4>ค้นพบ {masterData.length} รายการ</h4>
+        <Table striped bordered hover responsive  variant="light"   >
+            <thead  >
+            <tr  >
+                <th style={styles.container4}>No.</th>
+                <th style={styles.container5}>รูปภาพ</th>
+                <th style={styles.container5}>รายการ</th>
+            </tr>
+            </thead>
+            <tbody  >
+            {masterData.map((item, index) => {
+                const { imageId, name, id } = item;
+                return <tr  style={styles.container6} key={id} >
+                            <td style={styles.container7}>{index+1}.</td>
+                            <td style={styles.container7} >
+                                {imageId
+                                    ?<img style={styles.container8} src={imageId} />
+                                    :<RootImage style={styles.container8} />
+                                }
+                            </td>
+                            <td >{name}</td>
+                        </tr>
+            })}
+            </tbody>
+        </Table>
+    </div>
+  );
+};
+
+const styles = {
+  container : {
+      height:'100vh'
+  },
+  container3 : {
+    width: '100%', overflowX: 'auto'
+  },
+  container4 : {
+    width: '5%', textAlign:'center'
+  },
+  container5 : {
+    width: '9.5%', textAlign:'center',minWidth:'150px'
+  },
+  container6 : {
+    cursor: 'pointer'
+  },
+  container7 : {
+    textAlign:'center'
+  },
+  container8 : {
+    width:'5rem',height:'5rem',borderRadius:'1rem'
+  },
+
+
+};
+
+export default HardwareArrangeScreen;

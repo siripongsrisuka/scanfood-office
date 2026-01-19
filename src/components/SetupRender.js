@@ -3,7 +3,7 @@ import { Table, Form, Button } from "react-bootstrap";
 import OneButton from "./OneButton";
 import { useDispatch } from "react-redux";
 import { updateFieldStore } from "../redux/careSlice";
-import { Modal_FlatListTwoColumn, Modal_HardwareDetail, Modal_SoftwareDetail } from "../modal";
+import { Modal_FlatListTwoColumn, Modal_SoftwareDetail } from "../modal";
 import { db } from "../db/firestore";
 import { setTimeStart, stringFullDate } from "../Utility/dateTime";
 import DatePicker from 'react-datepicker';
@@ -120,11 +120,6 @@ function SetupRender({ handleProfile, portStores, setLoading }) {
     }
 
   return    <div>
-                <Modal_HardwareDetail
-                    show={hDetail_Modal}
-                    onHide={()=>{setHDetail_Modal(false)}}
-                    current={currentDetail}
-                />
                 <Modal_SoftwareDetail
                     show={sDetail_Modal}
                     onHide={()=>{setSDetail_Modal(false)}}

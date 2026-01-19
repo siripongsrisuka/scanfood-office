@@ -9,8 +9,7 @@ import { Modal_Equipment, Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput
 import { formatTime, searchMultiFunction, toastSuccess } from "../Utility/function";
 import { normalSort } from "../Utility/sort";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
-
-const initialEquipment = { id:'', name:'', imageId:'', detail:'', price:'' };
+import { initialEquipment } from "../configs";
 
 
 const deliveryOptions = {
@@ -32,9 +31,7 @@ const statusOptions = [
 ];
 
 function WarehouseJobScreen() {
-    const [equipments, setEquipment] = useState([]);
     const [current, setCurrent] = useState(initialEquipment);
-    const [equipment_Modal, setEquipment_Modal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
     const [display, setDisplay] = useState([]);
@@ -95,40 +92,6 @@ function WarehouseJobScreen() {
             setMasterData(normalSort('timestamp',results));
         } catch (error) {
             console.log(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
- 
-
-    async function submit(){
-        setEquipment_Modal(false)
-        const { id, imageId } = current;
-        let image = imageId
-        try {
-            if(imageId && imageId.slice(0,5) !== 'https'){
-                image = await prepareFirebaseImage(imageId,'/equipment/','equipment')
-            };
-            let finalCurrent = {}
-            if(id){
-                finalCurrent = {...current,imageId:image}
-            } else {
-                finalCurrent = {...current,imageId:image, id:uuidv4()}
-            }
-            const newEquipment = id
-                ?equipments.map(a=>{
-                    return a.id===current.id
-                        ?finalCurrent
-                        :a
-                })
-                :[...equipments,finalCurrent]
-       
-            await db.collection('admin').doc('hardware').update({ value:newEquipment })
-            setEquipment(newEquipment);
-            toastSuccess();
-        } catch (error) {
-            alert(error)
         } finally {
             setLoading(false);
         }
@@ -225,13 +188,6 @@ function WarehouseJobScreen() {
             value={statusOptions}
         />
         <Modal_Loading show={loading} />
-        <Modal_Equipment
-          show={equipment_Modal}
-          onHide={()=>{setEquipment_Modal(false);setCurrent(initialEquipment)}}
-          submit={submit}
-          current={current}
-          setCurrent={setCurrent}
-        />
       <h1>งานคลัง</h1>
       <SearchControl {...{ placeholder:'ค้นหาด้วยชื่อเซลหรือเลขที่ใบสั่งซื้อ', search, setSearch }} />
       <CategoryRender {...{ options, option:optionId, setOption }} />

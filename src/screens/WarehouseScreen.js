@@ -2,21 +2,16 @@ import React, { useState, useEffect } from "react";
 import {
   Table,
 } from "react-bootstrap";
-import { v4 as uuidv4 } from 'uuid';
-import { db, prepareFirebaseImage } from "../db/firestore";
-import { OneButton, SearchControl } from "../components";
-import { Modal_Equipment, Modal_Loading } from "../modal";
-import { searchFilterFunction, toastSuccess } from "../Utility/function";
+import { db } from "../db/firestore";
+import { SearchControl } from "../components";
+import { Modal_Loading, Modal_Stock } from "../modal";
+import { formatTime, searchFilterFunction, toastSuccess } from "../Utility/function";
+import { useSelector } from "react-redux";
 
 const initialEquipment = { id:'', name:'', imageId:'', detail:'', price:'' };
-const initialWarehouse = {
-    id:'',
-    stock:'',
-    safety:'',
-    
-}
 
 function WarehouseScreen() {
+    const { profile:{ id:profileId } } = useSelector(state=>state.profile)
     const [equipments, setEquipment] = useState([]);
     const [current, setCurrent] = useState(initialEquipment);
     const [equipment_Modal, setEquipment_Modal] = useState(false);
@@ -43,41 +38,39 @@ function WarehouseScreen() {
     async function fetchHardware(){
         setLoading(true);
         try {
-            const hardwareDoc = await db.collection('admin').doc('hardware').get();
-            const { value } = hardwareDoc.data();
-            setEquipment(value);
+            const query = await db.collection('hardware').get();
+            const value = query.docs.map(doc=>{
+                const { timestamp, ...rest } = doc.data();
+                return {
+                    ...rest,
+                    timestamp:formatTime(timestamp),
+                    id:doc.id
+                }
+            });
+            const arrangeResults = value.sort((a,b)=> a.timestamp - b.timestamp)
+            setEquipment(arrangeResults);
         } catch (error) {
             alert(error);
         } finally {
             setLoading(false);
         }
-    }
+    };
 
+    // 200%
     async function submit(){
         setEquipment_Modal(false)
-        const { id, imageId } = current;
-        let image = imageId
+        const { id, stock, safetyStock } = current;
+        setLoading(true);
         try {
-            if(imageId && imageId.slice(0,5) !== 'https'){
-                image = await prepareFirebaseImage(imageId,'/equipment/','equipment')
-            };
-            let finalCurrent = {}
-            if(id){
-                finalCurrent = {...current,imageId:image}
-            } else {
-                finalCurrent = {...current,imageId:image, id:uuidv4()}
-            }
-            const newEquipment = id
-                ?equipments.map(a=>{
-                    return a.id===current.id
-                        ?finalCurrent
-                        :a
-                })
-                :[...equipments,finalCurrent]
-       
-            await db.collection('admin').doc('hardware').update({ value:newEquipment })
-            setEquipment(newEquipment);
-            toastSuccess();
+            const hardwareRef = db.collection('hardware').doc(id);
+            await hardwareRef.update({ stock, safetyStock });
+
+            setEquipment(prev=>prev.map(a=>{
+                        return a.id===id
+                            ?current
+                            :a
+                    }));
+            toastSuccess('บันทึกข้อมูลสำเร็จ');
         } catch (error) {
             alert(error)
         } finally {
@@ -85,66 +78,48 @@ function WarehouseScreen() {
         }
     };
 
+    // 200%
     function openEquipment(item){
+        if(profileId!=='cZ7XkJeZzNOrr5HEZKEPgAjtMrx2')return;
         setCurrent(item)
         setEquipment_Modal(true)
-    }
+    };
+
 
   return (
     <div >
         <Modal_Loading show={loading} />
-        <Modal_Equipment
-          show={equipment_Modal}
-          onHide={()=>{setEquipment_Modal(false);setCurrent(initialEquipment)}}
-          submit={submit}
-          current={current}
-          setCurrent={setCurrent}
+        <Modal_Stock
+            show={equipment_Modal}
+            onHide={()=>{setEquipment_Modal(false);setCurrent(initialEquipment)}}
+            submit={submit}
+            current={current}
+            setCurrent={setCurrent}
         />
       <h1>สต๊อกคงเหลือ</h1>
-      <div style={{display:'flex'}} >
-        &emsp;
-        <SearchControl {...{ placeholder:'ค้นหาด้วยชื่อ', search, setSearch }} />&emsp;
-        <OneButton {...{ text:'เพิ่มอุปกรณ์', submit:()=>{openEquipment(initialEquipment)} }} />&emsp;
-      </div>
+      <SearchControl {...{ placeholder:'ค้นหาด้วยชื่อ', search, setSearch }} />
       <h6>ทั้งหมด : {equipments.length} รายการ</h6>
         <br/>
       <div>
       <Table  bordered   variant="light"   >
         <thead  >
         <tr>
-            <th style={styles.text}>No.</th>
-            <th style={styles.text2}>ชื่อ</th>
-            <th style={styles.text2}>รูป</th>
-            <th style={styles.text2}>ราคา</th>
-            <th style={styles.text2}>คุณสมบัติ</th>
-            <th style={styles.text2}>สถานะการใช้งาน</th>
-            <th style={styles.text2}>จัดการ</th>
+            <th style={styles.container2}>No.</th>
+            <th style={styles.container3}>ชื่อ</th>
+            <th style={styles.container3}>เซฟตี้สต๊อก</th>
+            <th style={styles.container3}>สต๊อกคงเหลือ</th>
         </tr>
         </thead>
         <tbody  >
         {display.map((item, index) => {
-            const { detail, id, imageId, name, price, status } = item;
-            return <tr  style={{cursor: 'pointer'}} key={index}  >
-                    <td  style={styles.text3}>{index+1}.</td>
-                    <td  style={styles.text3} >{name}</td>
-                    <td  style={styles.text3} >
-                        <img style={{width:'100px'}} src={imageId} />
-                    </td>
-                    <td  style={styles.text3} >{price}</td>
-                    <td  style={styles.text3} >
-                    {detail.split('\n').map((line, index) => (
-                        <React.Fragment key={index}>
-                            &emsp;&nbsp;{line}
-                            <br />
-                        </React.Fragment>
-                        ))}
-                    </td>
-                    <td  style={styles.text3}>{status?'เปิดใช้งาน':'ปิดใช้งาน'}</td>
-                    <td  style={styles.text3}>
-                        <OneButton {...{ text:'จัดการ', variant:'warning', submit:()=>{openEquipment(item)} }} />
-                    </td>
-                </tr>
-        }
+                const { name, safetyStock, stock = '' } = item;
+                return <tr onClick={()=>{openEquipment(item)}} style={{cursor: 'pointer'}} key={index}  >
+                        <td  style={styles.container4}>{index+1}.</td>
+                        <td  >{name}</td>
+                        <td  style={styles.container4} >{safetyStock}</td>
+                        <td  style={styles.container4} >{stock}</td>
+                    </tr>
+            }
         )}
         </tbody>
     </Table>
@@ -154,12 +129,26 @@ function WarehouseScreen() {
 };
 
 const styles = {
-    text:{
-        width:'50px'
+    container:{
+        minHeight:'100vh',
     },
-    text2 : {
-        minWidth:'120px'
-    }
+    container2 : {
+        width:'10%',
+        minWidth:'80px',
+        textAlign:'center'
+    },
+    container3 : {
+        width:'15%',
+        minWidth:'150px',
+        textAlign:'center'
+    },
+    container4 : {
+        textAlign:'center'
+    },
+    container5 : {
+        textAlign:"center",width:'20%',
+        minWidth:'300px'
+    },
 }
 
 export default WarehouseScreen;

@@ -34,8 +34,10 @@ import SaleManagerScreen from "./SaleManagerScreen";
 import MarketingBootsScreen from "./MarketingBootsScreen";
 import WarehouseJobScreen from "./WarehouseJobScreen";
 import HardwareSettingScreen from "./HardwareSettingScreen";
+import HardwareArrangeScreen from "./HardwareArrangeScreen";
 
 export {
+    HardwareArrangeScreen,
     HardwareSettingScreen,
     WarehouseJobScreen,
     MarketingBootsScreen,

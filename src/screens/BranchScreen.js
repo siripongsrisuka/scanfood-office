@@ -7,7 +7,7 @@ import { colors, initialAlert, initialSoftware, initialStore, initialHardware } 
 import { db } from "../db/firestore";
 import { updateBranchLine, updateDemo, updateFieldStore } from "../redux/careSlice";
 import { Button } from "rsuite";
-import { Modal_Alert, Modal_Loading, Modal_OneInput, Modal_Profile, Modal_SoftwareDetail, Modal_Success, Modal_HardwareDetail } from "../modal";
+import { Modal_Alert, Modal_Loading, Modal_OneInput, Modal_Profile, Modal_SoftwareDetail, Modal_Success } from "../modal";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate , Outlet, NavLink } from 'react-router-dom';
 import { logout } from "../redux/authSlice";
 
@@ -130,11 +130,7 @@ function BranchScreen() {
 
   return (
     <div  >
-        <Modal_HardwareDetail
-            show={hardware_Modal}
-            onHide={()=>{setHardware_Modal(false)}}
-            current={currentHardware}
-        />
+      
         <Modal_SoftwareDetail
             show={software_Modal}
             onHide={()=>{setSoftware_Modal(false)}}

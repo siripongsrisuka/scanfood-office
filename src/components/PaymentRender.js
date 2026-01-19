@@ -3,7 +3,7 @@ import { Table, Form, Button } from "react-bootstrap";
 import OneButton from "./OneButton";
 import { useDispatch, useSelector } from "react-redux";
 import { updateDemo, updateFieldStore } from "../redux/careSlice";
-import { Modal_FlatListTwoColumn, Modal_Software, Modal_Quotation, Modal_Hardware, Modal_HardwareDetail, Modal_SoftwareDetail } from "../modal";
+import { Modal_FlatListTwoColumn, Modal_Software, Modal_Quotation, Modal_SoftwareDetail } from "../modal";
 import { db } from "../db/firestore";
 import { minusDays, setTimeStart, stringFullDate } from "../Utility/dateTime";
 import { daysBetween } from "../Utility/function";
@@ -82,21 +82,13 @@ function PaymentRender({ handleProfile, portStores, setLoading }) {
     }
 
   return    <div>
-                <Modal_HardwareDetail
-                    show={hDetail_Modal}
-                    onHide={()=>{setHDetail_Modal(false)}}
-                    current={currentDetail}
-                />
+           
                 <Modal_SoftwareDetail
                     show={sDetail_Modal}
                     onHide={()=>{setSDetail_Modal(false)}}
                     current={currentDetail}
                 />
-                <Modal_Hardware
-                    show={hardware_Modal}
-                    onHide={()=>{setHardware_Modal(false)}}
-                    submit={()=>{}}
-                />
+          
                 <Modal_Software
                     show={software_Modal}
                     onHide={()=>{setSoftware_Modal(false)}}

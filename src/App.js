@@ -35,12 +35,12 @@ import {
   MarketingBootsScreen,
   WarehouseJobScreen,
   HardwareSettingScreen,
+  HardwareArrangeScreen,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
 import { firebaseAuth } from './db/firestore'
 import 'rsuite/dist/rsuite.min.css';
-import EquipmentSetting from "./screens/EquipmentSetting";
 import { ToastContainer } from 'react-toastify';
 import ApproveSoftwareScreen from "./screens/ApproveSoftwareScreen";
 
@@ -88,7 +88,6 @@ function App() {
             <Route path='importItem' element={<ImportItemStoreScreen/>} />
             <Route path='importBomShop' element={<ImportBomShopScreen/>} />
             <Route path='kbankReport' element={<KbankReportScreen/>} />
-            <Route path='equipmentSetting' element={<EquipmentSetting/>} />
             <Route path='warehouse' element={<WarehouseScreen/>} />
             <Route path='approveSoftware' element={<ApproveSoftwareScreen/>} />
             <Route path='createOrder' element={<CreateOrder/>} />
@@ -102,6 +101,7 @@ function App() {
             <Route path='marketingBoots' element={<MarketingBootsScreen/>} />
             <Route path='warehouseJob' element={<WarehouseJobScreen/>} />
             <Route path='hardwareSetting' element={<HardwareSettingScreen/>} />
+            <Route path='hardwareArrange' element={<HardwareArrangeScreen/>} />
             
           </Route>
           <Route path='/admin' element={<AdminDashboard/>} />

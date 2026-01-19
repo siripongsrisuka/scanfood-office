@@ -15,11 +15,9 @@ import Modal_Requirement from "./Modal_Requirement";
 import Modal_Tax from "./Modal_Tax";
 import Modal_FlatlistSearchShop from "./Modal_FlatlistSearchShop";
 import Modal_Software from "./Modal_Software";
-import Modal_Hardware from "./Modal_Hardware";
 import Modal_Login from "./Modal_Login";
 import Modal_Profile from "./Modal_Profile";
 import Modal_SoftwareDetail from "./Modal_SoftwareDetail";
-import Modal_HardwareDetail from "./Modal_HardwareDetail";
 import Modal_Delivery from "./Modal_Delivery";
 import Modal_FlatlistSearchFranchise from "./Modal_FlatlistSearchFranchise";
 import Modal_Equipment from "./Modal_Equipment";
@@ -37,8 +35,10 @@ import Modal_So from "./Modal_So";
 import Modal_Customer from "./Modal_Customer";
 import Modal_Cancel from "./Modal_Cancel";
 import Modal_DatePicker from "./Modal_DatePicker";
+import Modal_Stock from "./Modal_Stock";
 
 export { 
+    Modal_Stock,
     Modal_DatePicker,
     Modal_Cancel,
     Modal_Customer,
@@ -71,11 +71,9 @@ export {
     Modal_Tax,
     Modal_FlatlistSearchShop,
     Modal_Software,
-    Modal_Hardware,
     Modal_Login,
     Modal_Profile,
     Modal_SoftwareDetail,
-    Modal_HardwareDetail,
     Modal_Delivery,
     Modal_FindHuman
 };

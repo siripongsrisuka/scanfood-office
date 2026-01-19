@@ -1,27 +1,26 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import {
   Button,
   Row,
   Col,
   Modal,
   Image,
-  Table,
-  Dropdown
+  Form,
+  Table
 } from "react-bootstrap";
 import { colors, initialAlert } from "../configs";
-import { FooterButton, ImageSize, InputArea, InputText, RootImage } from "../components";
+import { FooterButton, ImageSize, InputArea, InputText, OneButton, RootImage } from "../components";
 import { twoDigitNumber, } from "../Utility/function";
-
 import Modal_Alert from "./Modal_Alert";
-
 import Modal_NewCrop from "./Modal_NewCrop";
+import Modal_OneInput from "./Modal_OneInput";
+import Modal_FlatListTwoColumn from "./Modal_FlatListTwoColumn";
 
-const { darkGray, softWhite, white } = colors;
+const { white } = colors;
 const statusType = [
     {id:1, statusName:'เปิดใช้งาน', status:true},
-    {id:2, statusName:'ปิดงาน', status:false },
+    {id:2, statusName:'ปิดใช้งาน', status:false },
 ];
-
 
 function Modal_Equipment({
   backdrop=true, // true/false/static
@@ -33,13 +32,26 @@ function Modal_Equipment({
   submit,
   current,
   setCurrent,
+  masterData
 }) {
-    const { imageId, name, detail, price, status, limit } = current;
+    const { imageId, name, detail, price, status, limit, stockSetStatus = false, stockSet = [] } = current;
     const [alert_Modal, setAlert_Modal] = useState(initialAlert);
     const { status:alertStatus, content:alertContent, onClick, variant } = alert_Modal;
     const [image_Modal, setImage_Modal] = useState(false);
     const [imgSrc, setImgSrc] = useState('');
     const fileInputRef = useRef(null);
+
+    const [stockSet_Modal, setStockSet_Modal] = useState(false);
+    const [availableStockSets, setAvailableStockSets] = useState([]);
+    const [currentStockSet,setCurrentStockSet] = useState({ id:'', qty:1 });
+    const { qty } = currentStockSet;
+    const [qty_Modal, setQty_Modal] = useState(false);
+
+  const equimentName = useMemo(() => {
+    return new Map(masterData.map(item => [item.id, item.name]));
+  }, [masterData]);
+
+
 
     function confirm(){
         if(!name){
@@ -77,6 +89,51 @@ function Modal_Equipment({
     setCurrent(prev=>({...prev,imageId:''}))
   };
 
+  function openStockSet(){
+    // Fetch available stock sets from masterData or any other source
+    const availableSets = masterData.filter(item => item.id !== current.id && !item.stockSetStatus && !stockSet.includes(item.id)); // Example filter
+    setAvailableStockSets(availableSets);
+    setStockSet_Modal(true);
+  }
+
+  function handleStockSet(item){
+    const exists = stockSet.find(a=>a.id===item.id);
+    if(exists){
+        setCurrent(prev=>({...prev,stockSet:prev.stockSet.filter(a=>a.id!==item.id)}))
+    } else {
+        setCurrent(prev=>({...prev,stockSet:[...prev.stockSet,{ id:item.id,qty:1}]}))
+    }
+    setStockSet_Modal(false)
+  };
+
+  function handleDelete(item){
+    const ok = window.confirm('ต้องการลบรายการนี้หรือไม่?');
+    if(!ok) return
+    setCurrent(prev=>({...prev,stockSet:prev.stockSet.filter(a=>a.id!==item.id)}))
+  };
+
+  function openQty(item){
+    setCurrentStockSet({ ...item })
+    setQty_Modal(true)
+  }
+
+  function closeQty(){
+    setQty_Modal(false)
+    setCurrentStockSet({ id:'', qty:1 })
+  };
+
+  function handleQty(){
+    if(!qty || qty<=0){
+        alert('กรุณาใส่จำนวนที่ถูกต้อง')
+        return
+    }
+   setCurrent(prev=>({...prev,stockSet:prev.stockSet.map(a=>{
+        return a.id===currentStockSet.id
+            ?{...a, qty:qty}
+            :a
+    })}))
+    closeQty()
+  }
 
 
   return (
@@ -90,8 +147,22 @@ function Modal_Equipment({
       fullscreen={true}
       size={size}
     >
- 
-    
+      <Modal_OneInput
+          show={qty_Modal}
+          onHide={closeQty}
+          placeholder='ใส่จำนวน'
+          header='จำนวน'
+          value={qty}
+          onChange={(v)=>{setCurrentStockSet(prev=>({...prev, qty:v}))}}
+          onClick={handleQty}
+      />
+    <Modal_FlatListTwoColumn
+        header={'เลือกรายการคลังสินค้า'}
+        show={stockSet_Modal}
+        onHide={()=>{setStockSet_Modal(false)}}
+        value={availableStockSets}
+        onClick={handleStockSet}
+    />
     <Modal_NewCrop
             show={image_Modal}
             onHide={()=>{setImage_Modal(false)}}
@@ -118,7 +189,7 @@ function Modal_Equipment({
       <Modal.Body  >
 
         {/* ================= Restautrant ================== */}
-        <Row style={styles.container2}>
+        <Row >
             <Col sm='3' >1. รูปสินค้า</Col>
             <Col sm='9' >
               <form >
@@ -191,21 +262,81 @@ function Modal_Equipment({
                 สถานะการใช้งาน
             </Col>
             <Col md='9' >
-            <Dropdown data-bs-theme={darkGray}  >
-                <Dropdown.Toggle id="dropdown-button-dark-example1" variant="secondary" style={styles.container8} >
-                    {status?"เปิดใช้งาน":'ปิดใช้งาน'}
-                </Dropdown.Toggle>
-                <Dropdown.Menu style={styles.container6} >
-                    {statusType.map((item,index)=>{
-                        return(
-                            <Dropdown.Item key={index} onClick={()=>{setCurrent({...current,status:item.status})}} >{item.statusName}</Dropdown.Item>
-                        )
-                    })}
-                </Dropdown.Menu>
-            </Dropdown>
-            
+            <Form.Select 
+                  aria-label="Default select example" 
+                  value={status} 
+                  onChange={(event)=>{setCurrent(prev=>({...prev,status:event.target.value==='true'}))}}
+                  style={{marginTop:'1rem',marginBottom:'1rem', maxWidth:'300px'}}
+              >
+                <option value='' disabled >การใช้งาน</option>
+                {statusType.map((item,index)=>{
+                  return <option key={index} value={item.status} >{item.statusName}</option>
+                })}
+                
+              </Form.Select>
+          </Col>
+        </Row>
+        <Row  >
+            <Col md='3' >
+                เซตสินค้า?
+            </Col>
+            <Col md='9' >
+              <Form.Select 
+                    aria-label="Default select example" 
+                    value={stockSetStatus} 
+                    onChange={(event)=>{setCurrent(prev=>({...prev,stockSetStatus:event.target.value==='true'}))}}
+                    style={{marginTop:'1rem',marginBottom:'1rem', maxWidth:'300px'}}
+                >
+                  <option value='' disabled >การใช้งาน</option>
+                  {statusType.map((item,index)=>{
+                    return <option key={index} value={item.status} >{item.statusName}</option>
+                  })}
+                  
+                </Form.Select>
+                {stockSetStatus &&
+                  <React.Fragment>
+                    <OneButton  {...{ text:'เพิ่มรายการคลังสินค้า', submit:openStockSet }} />
+                    <Table striped bordered hover responsive  variant="light"   >
+                        <thead  >
+                        <tr>
+                          <th style={styles.container}>No.</th>
+                          <th style={styles.container2}>รายการ</th>
+                          <th style={styles.container}>จำนวน</th>
+                          <th style={styles.container}>ลบ</th>
+                        </tr>
+                      </thead>
+                      <tbody  >
+                        {stockSet.map((item, index) => {
+                          const { id, qty } = item;
+                          const name = equimentName.get(id);
+                          return  <tr  key={index} >
+                                    <td style={styles.container}>{index+1}.</td>
+                                    <td>{name}</td>
+                                    <td onClick={()=>{openQty(item)}} style={styles.container}>{qty}</td>
+                                    <td style={styles.container}>
+                                      <OneButton {...{ text:'ลบ', submit:()=>{handleDelete(item)}, variant:'danger' }} />
+                                    </td>
+                                    
+                                  </tr>
+                        }
+                        )}
+                      </tbody>
+                    </Table>
+                  </React.Fragment>
+                  
+                  }
             </Col>
         </Row>
+        <Col sm='12'>
+            <InputText
+              name='4. สั่งได้ไม่เกิน'
+              placeholder="จำนวน"
+              onChange={(event)=>{setCurrent({...current,limit:twoDigitNumber(event.target.value)})}}
+              value={limit}
+              style={{maxWidth:'400px'}}
+            />
+        </Col>
+  
       </Modal.Body>
       <FooterButton {...{ onHide, submit:confirm }} />
     </Modal>
@@ -213,45 +344,15 @@ function Modal_Equipment({
 };
 
 const styles = {
-    container : {
-        border: '1px solid #dee2e6',borderRadius:20,backgroundColor:softWhite,padding:0,width:'100%',marginBottom:'1rem'
-    },
-    container2 : {
-      marginBottom:'1rem'
-    },
 
-    container4 : {
-      marginLeft:'1rem', textAlign:'center'
-    },
-    container5 : {
-      textAlign:'center'
-    },
-    container6 : {
-        marginBottom:'1rem', marginRight:'1rem'
-    },
-    container7 : {
-      minWidth:'300px'
-    },
-    container8 : {
-      minWidth:'400px',marginBottom:'1rem'
-    },
-    container9 : {
-      textAlign:"center",width:'10%'
-    },
-    container10 : {
-      textAlign:"center",width:'15%'
-    },
-    container11 : {
-      textAlign:"center",width:'50%'
-    },
-    container12 : {
-      textAlign:"center",width:'20%'
-    },
     image : {
       width:'100%',maxWidth:200
     },
-    text : {
-      color:darkGray
+    container : {
+      width:'10%', minWidth:'80px', textAlign:'center'
+    },
+    container2 : {
+      width:'15%', minWidth:'200px', textAlign:'center'
     }
 }
 
