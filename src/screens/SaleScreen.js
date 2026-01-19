@@ -20,7 +20,7 @@ import { scanfoodAPI } from "../Utility/api";
 import { stringDateTimeReceipt, stringFullDate, stringReceiptNumber, stringYMDHMS3, yearMonth } from "../Utility/dateTime";
 import initialCustomer from "../configs/initialCustomer";
 import { colors, initialProcess } from "../configs";
-import { fetchCustomer, fetchEquipment, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fetchSoftware, fetchSuccessCases, fetchWaste, formatCurrency, formatTime, isGodIt, toastSuccess, wait } from "../Utility/function";
+import { fetchCustomer, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fetchSoftware, fetchSuccessCases, fetchWaste, formatCurrency, formatTime, isGodIt, toastSuccess, wait } from "../Utility/function";
 import initialShopType from "../configs/initialShopType";
 import initialCancelId from "../configs/initialCancelId";
 const { softWhite, dark, softGray, greenSanta, white } = colors;
@@ -111,10 +111,10 @@ const initialSoftware = {
 
 function SaleScreen() {
     const { profile:{ id:profileId, name:profileName, team = "A" } } = useSelector(state=>state.profile);
+    const { warehouse } = useSelector(state=>state.warehouse);
 
     const [loading, setLoading] = useState(false);
     const [licenses, setLicenses] = useState([]);
-    const [equipments, setEquipments] = useState([]);
     const [so_Modal, setSo_Modal] = useState(false);
     const [currentSo, setCurrentSo] = useState(initialSo);
 
@@ -180,9 +180,8 @@ function SaleScreen() {
     async function handleFetchAll(){
         setLoading(true);
         try {
-            const [licenses, equipments, hardwares, softwares, payments, wastes, successCases, customers, memo ] = await Promise.all([
+            const [licenses, hardwares, softwares, payments, wastes, successCases, customers, memo ] = await Promise.all([
                 fetchLicense(),
-                fetchEquipment(),
                 fetchHardware(profileId),
                 fetchSoftware(profileId),
                 fetchPayment(profileId),
@@ -192,7 +191,6 @@ function SaleScreen() {
                 fetchMemo(profileId)
             ])
             setLicenses(licenses); // ราคา software
-            setEquipments(equipments); // ราคา hardware
             setHardwares(hardwares); // hardware ท่ีรอจัดส่ง
             setSoftwares(softwares); // software ที่รอ activate
             setPayments(payments); // payments ย้อนหลัง 30 doc
@@ -284,100 +282,127 @@ function SaleScreen() {
     // 200%
     async function handleSo(payload){
         setSo_Modal(false)
-        setLoading(true);
+        const { hardware } = currentSo;
+
+        const countProduct = hardware.filter(a => !a.stockSetStatus).map(a=>({ id:a.id, qty:a.qty }));
+      const stockSet = hardware
+        .filter(a => a.stockSetStatus)
+        .flatMap(c =>
+          c.stockSet.map(d => ({
+            id: d.id,
+            qty: Number(d.qty) * Number(c.qty)
+          }))
+        );
+      // Flatten all products into one array (normalize qty for countProduct)
+      const products = [
+        ...countProduct,
+        ...stockSet
+      ];
+
+    const productMap = new Map();
+      for (const { id, qty } of products) {
+        productMap.set(id, (productMap.get(id) || 0) + qty);
+      }
+
+      // Convert Map back to array format
+      const uniqueProducts = Array.from(productMap, ([id, qty]) => ({ id, qty }));
+      console.log('uniqueProducts')
+        console.log(uniqueProducts)
+        // setSo_Modal(false)
+        // setLoading(true);
         
-        try {
-            const amount = isGodIt(profileId)
-                ?1 // payload.net
-                :payload.net
-            const timestamp = new Date();
-            const { qrCode, paymentData } = await db.runTransaction(async (transaction) => {
+        // try {
+        //     const amount = isGodIt(profileId)
+        //         ?1 // payload.net
+        //         :payload.net
+        //     const timestamp = new Date();
+        //     const { qrCode, paymentData } = await db.runTransaction(async (transaction) => {
 
-                const docNumberRef = db.collection("admin").doc('documentNumber');
-                const autoPaymentRef = db.collection('autoPayment').doc();
-                const docNumberDoc = await transaction.get(docNumberRef);
+        //         const docNumberRef = db.collection("admin").doc('documentNumber');
+        //         const autoPaymentRef = db.collection('autoPayment').doc();
+        //         const docNumberDoc = await transaction.get(docNumberRef);
 
-                const { value } = docNumberDoc.data();
-                const thisCurrentSo = value.find(a=>a.id==='so')
-                let newValue = [];
-                const thisMonth = timestamp.getMonth() + 1;
-                let receiptNumber = `SO${stringReceiptNumber(1)}`;
-                if(thisCurrentSo){
-                    const { month, run } = thisCurrentSo;
-                    let newRun = run + 1;
-                    receiptNumber = `SO${stringReceiptNumber(newRun)}`;
+        //         const { value } = docNumberDoc.data();
+        //         const thisCurrentSo = value.find(a=>a.id==='so')
+        //         let newValue = [];
+        //         const thisMonth = timestamp.getMonth() + 1;
+        //         let receiptNumber = `SO${stringReceiptNumber(1)}`;
+        //         if(thisCurrentSo){
+        //             const { month, run } = thisCurrentSo;
+        //             let newRun = run + 1;
+        //             receiptNumber = `SO${stringReceiptNumber(newRun)}`;
                     
-                    if (thisMonth !== month) {
-                        newRun = 1;
-                        receiptNumber = `SO${stringReceiptNumber(newRun)}`;
-                        newValue = value.map(a=>{
-                        return a.id==='so'
-                            ?{ month: thisMonth, run: newRun, id:'so' }
-                            :a
-                        })
-                    } else {
-                    newValue = value.map(a=>{
-                        return a.id==='so'
-                            ?{ month, run: newRun, id:'so' }
-                            :a
-                    })
-                    }
-                } else {
-                    newValue = [...value,{ month: thisMonth, run: 1, id:'so' }]
-                };
+        //             if (thisMonth !== month) {
+        //                 newRun = 1;
+        //                 receiptNumber = `SO${stringReceiptNumber(newRun)}`;
+        //                 newValue = value.map(a=>{
+        //                 return a.id==='so'
+        //                     ?{ month: thisMonth, run: newRun, id:'so' }
+        //                     :a
+        //                 })
+        //             } else {
+        //             newValue = value.map(a=>{
+        //                 return a.id==='so'
+        //                     ?{ month, run: newRun, id:'so' }
+        //                     :a
+        //             })
+        //             }
+        //         } else {
+        //             newValue = [...value,{ month: thisMonth, run: 1, id:'so' }]
+        //         };
 
-                const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,{ 
-                    channelType:'posxpay',
-                    shopId:`sale:${autoPaymentRef.id}`,
-                    amount,
-                    serial:'WQRN002405000023',
-                    token:process.env.REACT_APP_API_TOKEN,
-                    ref2:'auto'
-                });
-                const { 
-                    referenceId,
-                    chargeId,
-                    qrCode,
-                } = data?.data;
+        //         const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,{ 
+        //             channelType:'posxpay',
+        //             shopId:`sale:${autoPaymentRef.id}`,
+        //             amount,
+        //             serial:'WQRN002405000023',
+        //             token:process.env.REACT_APP_API_TOKEN,
+        //             ref2:'auto'
+        //         });
+        //         const { 
+        //             referenceId,
+        //             chargeId,
+        //             qrCode,
+        //         } = data?.data;
 
-                transaction.update(docNumberRef, { value:newValue });
-                const paymentData = {
-                    ...currentSo,
-                    ...payload,
-                    orderNumber:receiptNumber,
-                    createdAt:timestamp,
-                    chargeId,
-                    qrCode,
-                    shopId,
-                    shopName,
-                    billDate:stringYMDHMS3(timestamp),
-                    profileId,
-                    profileName,
-                    process:'request', // request, cancel, success, paid
-                    team,
-                    customerId,
-                    name,
-                    id:autoPaymentRef.id,
-                    requestDate:new Date(), 
-                    requestBillDate:stringYMDHMS3(new Date()),
-                };
-                transaction.set(autoPaymentRef,paymentData)
-                return {
-                    qrCode,
-                    paymentData
-                }
-            });
+        //         transaction.update(docNumberRef, { value:newValue });
+        //         const paymentData = {
+        //             ...currentSo,
+        //             ...payload,
+        //             orderNumber:receiptNumber,
+        //             createdAt:timestamp,
+        //             chargeId,
+        //             qrCode,
+        //             shopId,
+        //             shopName,
+        //             billDate:stringYMDHMS3(timestamp),
+        //             profileId,
+        //             profileName,
+        //             process:'request', // request, cancel, success, paid
+        //             team,
+        //             customerId,
+        //             name,
+        //             id:autoPaymentRef.id,
+        //             requestDate:new Date(), 
+        //             requestBillDate:stringYMDHMS3(new Date()),
+        //         };
+        //         transaction.set(autoPaymentRef,paymentData)
+        //         return {
+        //             qrCode,
+        //             paymentData
+        //         }
+        //     });
 
             
-            setQrcode(qrCode);
-            setAmount(amount);
-            setQrcode_Modal(true);
-            setPayments(prev=>[paymentData,...prev]);
-        } catch (error) {
-            alert(error);
-        } finally {
-            setLoading(false);
-        }
+        //     setQrcode(qrCode);
+        //     setAmount(amount);
+        //     setQrcode_Modal(true);
+        //     setPayments(prev=>[paymentData,...prev]);
+        // } catch (error) {
+        //     alert(error);
+        // } finally {
+        //     setLoading(false);
+        // }
     };
 
     async function handleConnect(item){
@@ -732,7 +757,7 @@ function SaleScreen() {
             current={currentSo}
             setCurrent={setCurrentSo}
             licenses={licenses}
-            hardwares={equipments}
+            hardwares={warehouse}
             submit={handleSo}
             disabled={optionId!=='1'} // ป้องกันหน้าอื่นแก้ข้อมูล so
         />

@@ -32,17 +32,7 @@ function DemoPart3() {
             :summary([...currentHardware,...currentPackage],'net')
     },[currentHardware,currentPackage,vatQuotation])
 
-    useEffect(()=>{
-        fetchHardware()
-    },[]);
 
-    async function fetchHardware(){
-        await db.collection('admin').doc('hardware').get().then((doc)=>{
-            if(doc.exists){
-                setHardwares(doc.data().value)
-            }
-        })
-    }
 
      const { thisPackage } = useMemo(()=>{
         let table = '20'

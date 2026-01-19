@@ -8,6 +8,6 @@ export default {
     limit:'',
     safetyStock:'',
     stock:'',
-    stockSetStatus:false,
+    stockSetStatus:false, 
     stockSet:[],
 }

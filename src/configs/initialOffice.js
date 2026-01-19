@@ -1,6 +1,7 @@
 export default [
     {
-      label: '1. Marketing',
+      label: '1. ภาพรวมบริษัท',
+      
     },
     {
       topic: '1.1 Dashboard',
@@ -9,7 +10,16 @@ export default [
       id:'100'
     },
     {
-      topic: '1.1 ร้านใหม่',
+      label: '2. Marketing',
+    },
+    {
+      topic: '2.1 Dashboard',
+      icon: 'bi-speedometer',
+      to:'marketingBoots',
+      id:'100'
+    },
+    {
+      topic: '2.2 ร้านใหม่',
       icon: 'bi-speedometer',
       to:'newShop',
       id:'100'
@@ -17,107 +27,97 @@ export default [
 
     
     {
-      label: '1. งานเซล',
+      label: '3. งานเซล',
     },
     
     {
-      topic: '1.1 Sale Manager',
+      topic: '3.1 Sale Manager',
       icon: 'bi-speedometer',
       to:'saleManager',
       id:'100'
     },
     {
-      topic: '1.1 เซล',
+      topic: '3.2 เซล',
       icon: 'bi-speedometer',
       to:'sale',
       id:'100'
     },
+
     {
-      topic: '1.4 Overview',
-      icon: 'bi-speedometer',
-      to: 'report',
-      id:'107'
-    },
-      {
-      label: '2. คำสั่งซื้อ',
+      label: '4. ฟีเจอร์ส่วนกลาง',
       
     },
     {
-      topic: '2.1 อนุมัติ Software',
+      topic: '4.1 แจ้งคัดลอกร้าน',
       icon: 'bi-speedometer',
       to: 'approveSoftware',
       id:'128'
     },
     {
-      topic: '2.1 สร้างออเดอร์อัตโนมัติ',
+      topic: '4.1 แจ้งคัดลอกร้าน',
       icon: 'bi-speedometer',
-      to: 'createOrder',
+      to: 'approveSoftware',
       id:'128'
     },
+ 
     {
-      topic: '2.1 เซล',
-      icon: 'bi-speedometer',
-      to: 'sale',
-      id:'128'
-    },
-    {
-      topic: '2.1 เพิ่มโต๊ะ',
+      topic: '4.4 เพิ่มโต๊ะ',
       icon: 'bi-speedometer',
       to: 'upgrade',
       id:'128'
     },
     {
-      topic: '2.1 ประวัติเพิ่มโต๊ะ',
+      topic: '4.5 ประวัติเพิ่มโต๊ะ',
       icon: 'bi-speedometer',
       to: 'upgradeHistory',
       id:'128'
     },
 
     {
-      topic: '2.1 ประวัติ License',
+      topic: '4.6 ประวัติ License',
       icon: 'bi-speedometer',
       to: 'softwareHistory',
       id:'128'
     },
   
   {
-      label: '4. คลังสินค้า',
+      label: '5. คลังสินค้า',
       
     },
     {
-      topic: '4.1 งาน',
+      topic: '5.1 งาน',
       icon: 'bi-speedometer',
       to: 'warehouseJob',
       id:'401'
     },
     {
-      topic: '4.2 ประวัติงาน',
+      topic: '5.2 ประวัติงาน',
       icon: 'bi-speedometer',
       to: 'reportHardware',
       id:'402'
     },
     {
-      topic: '4.3 สต๊อกคงเหลือ',
+      topic: '5.3 สต๊อกคงเหลือ',
       icon: 'bi-speedometer',
       to: 'warehouse',
       id:'403'
     },
     {
-      topic: '4.4 ประวัติรับเข้า',
+      topic: '5.4 ประวัติรับเข้า',
       icon: 'bi-speedometer',
       to: 'reportInbound',
       id:'404'
     },
     
     {
-      topic: '4.5 ตั้งค่าสินค้า',
+      topic: '5.5 ตั้งค่าสินค้า',
       icon: 'bi-speedometer',
       to: 'warehouseSetting',
       id:'405'
     },
 
     {
-      topic: '4.6 จัดเรียงสินค้า',
+      topic: '5.6 จัดเรียงสินค้า',
       icon: 'bi-speedometer',
       to: 'hardwareArrange',
       id:'406'
@@ -125,41 +125,59 @@ export default [
   
  
     {
-      label: '3. ทีม Tech ขั้นเทพ',
+      label: '6. ทีม Tech ขั้นเทพ',
     },
     
     {
-      topic: '3.1 คัดลอกร้าน',
+      topic: '6.1 คัดลอกร้าน',
       icon: 'bi-speedometer',
       to: 'clone',
       id:'128'
     },
     {
-      topic: '3.2 อัปโหลดสินค้าร้านเดี่ยว',
+      topic: '6.2 อัปโหลดสินค้าร้านเดี่ยว',
       icon: 'bi-speedometer',
       to: 'importItem',
       id:'128'
     },
     {
-      topic: '3.3 อัปโหลดวัตถุดิบร้านเดี่ยว',
+      topic: '6.3 อัปโหลดวัตถุดิบร้านเดี่ยว',
       icon: 'bi-speedometer',
       to: 'importBomShop',
       id:'128'
     },
     {
-      topic: '3.4 ย้ายวันใช้งาน',
+      topic: '6.4 อัปโหลดสินค้าแฟรนไชส์',
+      icon: 'bi-speedometer',
+      to: 'importItemFranchise',
+      id:'128'
+    },
+    {
+      topic: '6.5 อัปโหลดวัตถุดิบแฟรนไชส์',
+      icon: 'bi-speedometer',
+      to: 'importBomFranchise',
+      id:'128'
+    },
+    {
+      topic: '6.6 อัปโหลด Marketplace',
+      icon: 'bi-speedometer',
+      to: 'importMarketPlaceFranchise',
+      id:'128'
+    },
+    {
+      topic: '6.4 ย้ายวันใช้งาน',
       icon: 'bi-speedometer',
       to: 'transferExpire',
       id:'128'
     },
     {
-      topic: '3.5 เปลี่ยนไม่มีโต๊ะเป็นมีโต๊ะ',
+      topic: '6.5 เปลี่ยนไม่มีโต๊ะเป็นมีโต๊ะ',
       icon: 'bi-speedometer',
       to: 'transform',
       id:'128'
     },
     {
-      topic: '3.99 kbankReport',
+      topic: '6.99 kbankReport',
       icon: 'bi-speedometer',
       to: 'kbankReport',
       id:'128'
@@ -169,21 +187,12 @@ export default [
     
    
     {
-        label: '4. พนักงาน',
+        label: '7. พนักงาน',
       },
       {
-        topic: '4.1 กำหนดสิทธิ์',
+        topic: '7.1 กำหนดสิทธิ์',
         icon: 'bi-speedometer',
         to: 'staff',
         id:'723'
-      },
-      {
-        label: '5. จัดการโปรไฟล์',
-      },
-      {
-        topic: '5.1 โปรไฟล์',
-        icon: 'bi-speedometer',
-        to: 'profile',
-        id:'130'
       },
   ]

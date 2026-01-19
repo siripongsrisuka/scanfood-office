@@ -66,18 +66,7 @@ function AdminDashboard() {
         <Col lg='4' md='6' sm='12' >
             <Button onClick={()=>{commander('/approve',['pack','gift'])}} color="red" appearance="ghost" style={{height:'88px',width:'90%',marginLeft:'1rem',marginRight:'1rem',marginBottom:'1rem',fontSize:'2rem'}} >อนุมัติ คำสั่งซื้อ</Button>
         </Col>
-        <Col lg='4' md='6' sm='12' >
-            <Button onClick={()=>{navigate('/importItemFranchise')}} color="orange" appearance="primary" style={{height:'88px',width:'90%',marginLeft:'1rem',marginRight:'1rem',marginBottom:'1rem',fontSize:'2rem'}} >  import สินค้า Franchise  </Button>
-        </Col>
-        <Col lg='4' md='6' sm='12' >
-            <Button onClick={()=>{navigate('/importBomFranchise')}} color="yellow" appearance="primary" style={{height:'88px',width:'90%',marginLeft:'1rem',marginRight:'1rem',marginBottom:'1rem',fontSize:'2rem'}} > import bom Franchise </Button>
-        </Col>
-        <Col lg='4' md='6' sm='12' >
-            <Button onClick={()=>{navigate('/importMarketPlaceFranchise')}} color="cyan" appearance="primary" style={{height:'88px',width:'90%',marginLeft:'1rem',marginRight:'1rem',marginBottom:'1rem',fontSize:'2rem'}} > import marketplace Franchise </Button>
-        </Col>
-        <Col lg='4' md='6' sm='12' >
-            <Button onClick={()=>{navigate('/customerCare')}} color="blue" appearance="primary" style={{height:'88px',width:'90%',marginLeft:'1rem',marginRight:'1rem',marginBottom:'1rem',fontSize:'2rem'}} > คุณลูกค้าที่น่ารัก </Button>
-        </Col>
+   
     
         <Col lg='4' md='6' sm='12' >
             <Button onClick={()=>{commander('/questionSetting',['pack','gift'])}} color="blue" appearance="primary" style={{height:'88px',width:'90%',marginLeft:'1rem',marginRight:'1rem',marginBottom:'1rem',fontSize:'2rem'}} >QuestionSetting</Button>

@@ -78,16 +78,16 @@ async function submit(){
             <thead  >
             <tr  >
                 <th style={styles.container4}>No.</th>
-                <th style={styles.container5}>รูปภาพ</th>
+                <th style={styles.container7}>รูปภาพ</th>
                 <th style={styles.container5}>รายการ</th>
             </tr>
             </thead>
             <tbody  >
             {warehouse.map((item, index) => {
                 const { imageId, name, id } = item;
-                return <tr  style={styles.container6} key={id} >
-                            <td style={styles.container7}>{index+1}.</td>
-                            <td style={styles.container7} >
+                return <tr  key={id} >
+                            <td style={styles.container9}  >{index+1}.</td>
+                            <td style={styles.container9} >
                                 {imageId
                                     ?<img style={styles.container8} src={imageId} />
                                     :<RootImage style={styles.container8} />
@@ -104,7 +104,7 @@ async function submit(){
 
 const styles = {
   container : {
-      height:'100vh'
+      minHeight:'100vh'
   },
   container3 : {
     width: '100%', overflowX: 'auto'
@@ -113,16 +113,17 @@ const styles = {
     width: '5%', textAlign:'center'
   },
   container5 : {
-    width: '9.5%', textAlign:'center',minWidth:'150px'
-  },
-  container6 : {
-    cursor: 'pointer'
+    width: '30%', textAlign:'center',minWidth:'150px'
   },
   container7 : {
-    textAlign:'center'
+    width: '10%', textAlign:'center', minWidth:'100px'
   },
+  
   container8 : {
-    width:'5rem',height:'5rem',borderRadius:'1rem'
+    width:'5rem',height:'5rem'
+  },
+  container9 : {
+    textAlign:'center'
   },
 
 

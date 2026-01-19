@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import ExcelJS from "exceljs";
 import { db, prepareFirebaseImage } from "../db/firestore";
-import { Table } from "react-bootstrap";
-import { colors, initialProduct } from "../configs";
-import { Modal_FlatlistSearchFranchise, Modal_Loading, Modal_Success } from "../modal";
-import { Button } from "rsuite";
+import { Table,
+  Row,
+  Col
+ } from "react-bootstrap";
+import { initialProduct, initialShop } from "../configs";
+import { Modal_FlatlistSearchFranchise, Modal_Loading } from "../modal";
 import { v4 as uuidv4 } from 'uuid';
 import { minusMinutes, plusSecond } from "../Utility/dateTime";
-import { findInArray } from "../Utility/function";
+import { findInArray, toastSuccess } from "../Utility/function";
+import { Card, OneButton } from "../components";
 
-const { theme3 } = colors;
-const initialShop = { id:'', name:'', shopCategory:[] }
 
 const ImportItemFranchiseScreen = () => {
   const [products, setProducts] = useState([]);
@@ -19,9 +20,8 @@ const ImportItemFranchiseScreen = () => {
   const { id:franchiseId, name, shopCategory:smartCategory, channel, shopTypes } = shop;
   const [category, setCategory] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [success_Modal, setSuccess_Modal] = useState(false);
+  const fileInputRef = useRef(null);
 
- 
   const processImage = async (imgBuffer, imgType) => {
     return new Promise((resolve) => {
       const blob = new Blob([imgBuffer], { type: imgType });
@@ -214,9 +214,8 @@ const ImportItemFranchiseScreen = () => {
             console.log('Batch write successful');
     
             setProducts([]);
-            setShop(initialShop)
-            setSuccess_Modal(true);
-            setTimeout(() => setSuccess_Modal(false), 900);
+            setShop(initialShop);
+            toastSuccess('เพิ่มสินค้าสำเร็จ');
         } catch (error) {
             console.error('Error adding products:', error);
         } finally {
@@ -228,34 +227,47 @@ const ImportItemFranchiseScreen = () => {
 
   return (
     <div style={{padding:10}} >
+        <h1>อัปโหลดสินค้าแฟรนไชส์</h1>
+
         <Modal_Loading show={loading} />
-        <Modal_Success show={success_Modal} />
         <Modal_FlatlistSearchFranchise
             show={search_Modal}
             onHide={()=>{setSearch_Modal(false)}}
             onClick={handleShop}
         />
-        <div>
-            <Button color="red" appearance="primary" onClick={()=>{setSearch_Modal(true)}}>1. เลือกร้านค้า</Button>
-            {name
-                ?<p><h2>ร้าน : {name}</h2></p>
-                :null
-            }
-        </div>
-       {name
-            ?<React.Fragment>
-                <h2>2.Upload Excel File with Images</h2>
-                <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
-                <Button color="orange" appearance="primary" onClick={addProductsToDatabase}>3. Upload</Button>
-                <Table striped bordered hover responsive  variant="light"   >
+        <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleFileUpload}
+            style={{ display: "none" }}
+          />
+        <Row>
+          <Col md='4' sm='6' >
+              <OneButton {...{ text:'1. เลือกร้านค้า', submit:()=>{setSearch_Modal(true)}, variant:'success' }} />
+          </Col>
+          <Col md='4' sm='6' >
+              <OneButton {...{ text:'2. เลือกไฟล์', submit:() => fileInputRef.current.click(), variant:franchiseId?'success':'secondary' }} />
+          </Col>
+          <Col md='4' sm='6' >
+              <OneButton {...{ text:'3. Upload', submit:()=>{addProductsToDatabase()}, variant:franchiseId&&products.length>0?'success':'secondary'  }} />
+          </Col>
+        </Row>
+        {franchiseId
+          ?<React.Fragment>
+            <Card title="ข้อมูลแฟรนไชส์">
+              <h5>แฟรนไชส์ : {name}</h5>
+            </Card>
+            <Card title="ข้อมูลสินค้า" maxWidth={'none'} >
+              <Table striped bordered hover responsive  variant="light"   >
                     <thead  >
                     <tr>
                     <th style={styles.text2}>No.</th>
                     <th style={styles.text}>name</th>
-                    <th style={styles.text}>sku</th>
-                    <th style={styles.text4}>detail</th>
-                    <th style={styles.text}>category</th>
                     <th style={styles.text}>price</th>
+                    <th style={styles.text}>category</th>
+                    <th style={styles.text4}>detail</th>
+                    <th style={styles.text4}>sku</th>
                     <th style={styles.text}>image</th>
                     </tr>
                 </thead>
@@ -265,10 +277,10 @@ const ImportItemFranchiseScreen = () => {
                     return <tr  key={index} >
                             <td style={styles.text3}>{index+1}.</td>
                             <td style={styles.text3} >{name}</td>
-                            <td style={styles.text3} >{sku}</td>
-                            <td style={styles.text3}>{detail}</td>
-                            <td style={styles.text3}>{category}</td>
                             <td style={styles.text3}>{price}</td>
+                            <td style={styles.text3}>{category}</td>
+                            <td style={styles.text3}>{detail}</td>
+                            <td style={styles.text3}>{sku}</td>
                             <td style={styles.text3}>
                                 <img style={{width:'100px'}} src={image} />
                             </td>
@@ -276,21 +288,17 @@ const ImportItemFranchiseScreen = () => {
                     })}
                 </tbody>
                 </Table>
-            </React.Fragment>
-            :null
+            </Card>
+          </React.Fragment>
+          :null
         }
+   
       
     </div>
   );
 };
 
 const styles = {
-  container : {
-    paddingLeft:'3rem',paddingRight:'3rem'
-  },
-  container2 : {
-    backgroundColor:theme3,borderRadius:20,display:'flex',justifyContent:'center',alignItems:'center',flexDirection:'column',padding:5,marginBottom:'1rem'
-  },
   text : {
     width: '12%', textAlign:'center',minWidth:'120px'
   },

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
-import { Modal_Loading, Modal_Quotation, Modal_Success, Modal_Requirement, Modal_Tax, Modal_FlatListTwoColumn, Modal_Delivery } from "../modal";
+import { Modal_Loading, Modal_Quotation, Modal_Success, Modal_Requirement, Modal_FlatListTwoColumn, Modal_Delivery } from "../modal";
 import { colors } from "../configs";
 import { DemoPart1, DemoPart3 } from "../components";
 import { updateDemo, updateFieldStore } from "../redux/careSlice";
@@ -9,7 +9,6 @@ import { Button } from "rsuite";
 import DemoPart2 from "../components/DemoPart2";
 import { db } from "../db/firestore";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate , Outlet, NavLink } from 'react-router-dom';
-import Modal_Postcode from "../modal/Modal_Postcode";
 import { plusDays, stringDateTime3, stringReceiptNumber } from "../Utility/dateTime";
 
 
@@ -195,18 +194,7 @@ function DemoScreen() {
           onClick={handleProcess}
           value={initialProcess}
       />
-      <Modal_Tax
-        show={tax_Modal}
-        onHide={()=>{setTax_Modal(false)}}
-        currentTax={tax}
-        submit={updateTax}
-      />
-      <Modal_Postcode
-        show={postcode_Modal}
-        onHide={()=>{setPostcode_Modal(false)}}
-        current={postcode}
-        submit={updatePostcode}
-      />
+ 
       <Modal_Delivery
         show={delivery_Modal}
         onHide={()=>{setDelivery_Modal(false)}}

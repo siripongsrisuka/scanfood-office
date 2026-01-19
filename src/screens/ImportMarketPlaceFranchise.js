@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import ExcelJS from "exceljs";
 import { db, prepareFirebaseImage } from "../db/firestore";
-import { Table } from "react-bootstrap";
-import { colors, initialWarehouseItem } from "../configs";
-import { Modal_FlatlistSearchFranchise, Modal_Loading, Modal_Success } from "../modal";
-import { Button } from "rsuite";
+import { Table,
+  Row, Col
+ } from "react-bootstrap";
+import { initialWarehouseItem } from "../configs";
+import { Modal_FlatlistSearchFranchise, Modal_Loading } from "../modal";
 import { v4 as uuidv4 } from 'uuid';
 import { minusMinutes, plusSecond } from "../Utility/dateTime";
-import { findInArray } from "../Utility/function";
+import { findInArray, toastSuccess } from "../Utility/function";
+import { Card, OneButton } from "../components";
 
-const { theme3 } = colors;
 const initialShop = { id:'', name:'', warehouseCategory:[] }
 
 const ImportMarketPlaceFranchise = () => {
@@ -19,8 +20,7 @@ const ImportMarketPlaceFranchise = () => {
   const { id:franchiseId, name, warehouseCategory:smartCategory } = shop;
   const [category, setCategory] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [success_Modal, setSuccess_Modal] = useState(false);
-
+    const fileInputRef = useRef(null);
 
   const processImage = async (imgBuffer, imgType) => {
     return new Promise((resolve) => {
@@ -235,9 +235,8 @@ const ImportMarketPlaceFranchise = () => {
             console.log('Batch write successful');
     
             setProducts([]);
-            setShop(initialShop)
-            setSuccess_Modal(true);
-            setTimeout(() => setSuccess_Modal(false), 900);
+            setShop(initialShop);
+            toastSuccess('เพิ่มสินค้าสำเร็จ');
         } catch (error) {
             console.error('Error adding products:', error);
         } finally {
@@ -245,109 +244,60 @@ const ImportMarketPlaceFranchise = () => {
         }
     };
 
-    function test(){
-      const date = new Date()
-      const productPromises = products.map( ({ 
-        name, price, category: thisCategory, detail, image, sku,
-        barcode, unit, weight, discount, point, minimum, maximum, stock
-    }, index) => {
-        const newItem = {
-            ...initialWarehouseItem,
-            sku,
-            barcode,
-            name,
-            price,
-            // category: categoryId ? [categoryId] : [],
-            detail: detail || '',
-            timestamp: plusSecond(date, 3 * index),
-            franchiseId,
-            imageId:image,
-            unit,
-            weight,
-            discount,
-            point,
-            minimum,
-            maximum,
-            stock,
-            image:image,
-            saleStatus:'available'
-        };
-
-        if(category){
-            const categoryId = findInArray(category, 'category', thisCategory)?.id;
-            newItem.category = [{
-                aboveId: [],
-                level: 1,
-                id:categoryId,
-                name: category,
-            }]
-        }
-        const undefinedFields = Object.entries(newItem)
-          .filter(([key, value]) => value === undefined)
-          .map(([key]) => key);
-
-        if (undefinedFields.length > 0) {
-          console.error(`❌ Undefined fields at index ${index}:`, undefinedFields);
-          console.log("Full item:", newItem);
-        }
-        return newItem
-    });
-   
-    
-    // console.log(results);
-    }
-
-    const results = products.map((item, index) => {
-      const undefinedFields = Object.keys(item).filter(key => item[key] === undefined);
-      return { index, undefinedFields };
-    }).filter(result => result.undefinedFields.length > 0);
-    console.log('results')
-    console.log(results)
-
-
   return (
-    <div style={{padding:10}} >
+    <div  >
+      <h1>อัปโหลด Marketplace แฟรนไชส์</h1>
         <Modal_Loading show={loading} />
-        <Modal_Success show={success_Modal} />
         <Modal_FlatlistSearchFranchise
             show={search_Modal}
             onHide={()=>{setSearch_Modal(false)}}
             onClick={handleShop}
         />
-        <div>
-            <Button color="red" appearance="primary" onClick={()=>{setSearch_Modal(true)}}>1. เลือกร้านค้า</Button>
-            {name
-                ?<p><h2>ร้าน : {name}</h2></p>
-                :null
-            }
-        </div>
-        {/* <Button onClick={test} >test</Button> */}
-       {name
+        <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleFileUpload}
+            style={{ display: "none" }}
+        />
+        <Row>
+            <Col md='4' sm='6' >
+                <OneButton {...{ text:'1. เลือกร้านค้า', submit:()=>{setSearch_Modal(true)}, variant:'success' }} />
+            </Col>
+            <Col md='4' sm='6' >
+                <OneButton {...{ text:'2. เลือกไฟล์', submit:() => fileInputRef.current.click(), variant:franchiseId?'success':'secondary' }} />
+            </Col>
+            <Col md='4' sm='6' >
+                <OneButton {...{ text:'3. Upload', submit:()=>{addProductsToDatabase()}, variant:franchiseId&&products.length>0?'success':'secondary'  }} />
+            </Col>
+        </Row>
+          {franchiseId
             ?<React.Fragment>
-                <h2>2.Upload Excel File with Images</h2>
-                <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
-                <Button color="orange" appearance="primary" onClick={addProductsToDatabase}>3. Upload</Button>
+            <Card title="ข้อมูลแฟรนไชส์">
+                <h5>แฟรนไชส์ : {name}</h5>
+            </Card>
+            <Card title="ข้อมูลวัตถุดิบ" maxWidth={'none'} >
                 <Table striped bordered hover responsive  variant="light"   >
                     <thead  >
-                    <tr>
-                    <th style={styles.text2}>No.</th>
-                    <th style={styles.text}>sku</th>
-                    <th style={styles.text}>barcode</th>
-                    <th style={styles.text}>name</th>
-                    <th style={styles.text}>category</th>
-                    <th style={styles.text}>unit</th>
-                    <th style={styles.text}>weight(kg)</th>
-                    <th style={styles.text}>price</th>
-                    <th style={styles.text4}>discount</th>
-                    <th style={styles.text}>point</th>
-                    <th style={styles.text}>minimum</th>
-                    <th style={styles.text}>maximum</th>
-                    <th style={styles.text}>stock</th>
-                    <th style={styles.text}>image</th>
-                    </tr>
-                </thead>
-                <tbody  >
-                    {products.map((item, index) => {
+                        <tr>
+                          <th style={styles.text2}>No.</th>
+                          <th style={styles.text}>sku</th>
+                          <th style={styles.text}>barcode</th>
+                          <th style={styles.text}>name</th>
+                          <th style={styles.text}>category</th>
+                          <th style={styles.text}>unit</th>
+                          <th style={styles.text}>weight(kg)</th>
+                          <th style={styles.text}>price</th>
+                          <th style={styles.text4}>discount</th>
+                          <th style={styles.text}>point</th>
+                          <th style={styles.text}>minimum</th>
+                          <th style={styles.text}>maximum</th>
+                          <th style={styles.text}>stock</th>
+                          <th style={styles.text}>image</th>
+                        </tr>
+                    </thead>
+                    <tbody  >
+                            {products.map((item, index) => {
                     const { name, category, discount, price, image, sku, barcode, unit, weight,
                         point, minimum, maximum, stock
                      } = item;
@@ -370,8 +320,9 @@ const ImportMarketPlaceFranchise = () => {
                             </td>
                             </tr>
                     })}
-                </tbody>
+                    </tbody>
                 </Table>
+            </Card>
             </React.Fragment>
             :null
         }
@@ -381,12 +332,6 @@ const ImportMarketPlaceFranchise = () => {
 };
 
 const styles = {
-  container : {
-    paddingLeft:'3rem',paddingRight:'3rem'
-  },
-  container2 : {
-    backgroundColor:theme3,borderRadius:20,display:'flex',justifyContent:'center',alignItems:'center',flexDirection:'column',padding:5,marginBottom:'1rem'
-  },
   text : {
     width: '12%', textAlign:'center',minWidth:'120px'
   },

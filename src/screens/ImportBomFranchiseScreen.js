@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import ExcelJS from "exceljs";
-import { db, prepareFirebaseImage } from "../db/firestore";
-import { Table } from "react-bootstrap";
-import { colors, initialProduct } from "../configs";
-import { Modal_FlatlistSearchFranchise, Modal_Loading, Modal_Success } from "../modal";
-import { Button } from "rsuite";
+import { db } from "../db/firestore";
+import { Table,
+  Row, Col
+ } from "react-bootstrap";
+import { Modal_FlatlistSearchFranchise, Modal_Loading } from "../modal";
 import { v4 as uuidv4 } from 'uuid';
-import { minusDays, minusMinutes, plusDays, plusSecond } from "../Utility/dateTime";
-import { findInArray } from "../Utility/function";
-import firebase from 'firebase/app';
+import { minusDays, plusSecond } from "../Utility/dateTime";
+import { findInArray, toastSuccess } from "../Utility/function";
+import { Card, OneButton } from "../components";
 
-const { theme3 } = colors;
+
 const initialShop = { id:'', name:'', bomCategory:[] };
 const initialBOM = {
     shopId:'',
@@ -31,75 +31,8 @@ const ImportBomFranchiseScreen = () => {
   const { id:franchiseId, name, bomCategory:smartCategory } = shop;
   const [category, setCategory] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [success_Modal, setSuccess_Modal] = useState(false);
+  const fileInputRef = useRef(null);
 
-
-  const processImage = async (imgBuffer, imgType) => {
-    return new Promise((resolve) => {
-      const blob = new Blob([imgBuffer], { type: imgType });
-      const img = new Image();
-  
-      img.onload = async () => {
-        let width = 300; // Initial width
-        let height = (img.height / img.width) * width;
-        let quality = 0.8; // Initial quality
-        let resizedBlob;
-  
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-  
-        do {
-          // Set new dimensions
-          canvas.width = width;
-          canvas.height = height;
-          ctx.clearRect(0, 0, width, height);
-          ctx.drawImage(img, 0, 0, width, height);
-  
-          // Try reducing quality if needed
-          resizedBlob = await new Promise((resolve) => 
-            canvas.toBlob(resolve, imgType, quality)
-          );
-  
-          if (resizedBlob.size > 80 * 1024) {
-            if (width > 150) {
-              width -= 30; // Reduce width (step-by-step)
-              height = (img.height / img.width) * width;
-            } else {
-              quality -= 0.1; // If width is too small, lower quality
-            }
-          }
-        } while (resizedBlob.size > 80 * 1024 && quality > 0.1);
-  
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          resolve({ 
-            resizedBase64: reader.result, 
-            resizedSize: resizedBlob.size 
-          });
-        };
-        reader.readAsDataURL(resizedBlob);
-      };
-  
-      img.src = URL.createObjectURL(blob);
-    });
-  };
-  
-  // Usage
-  const handleImageProcessing = async (img) => {
-    const imageSize = img.buffer.byteLength;
-    const MAX_SIZE = 80 * 1024; // 50KB  
-  
-    if (imageSize > MAX_SIZE) {
-      console.log(`Resizing image. Original size: ${imageSize} bytes`);
-      const { resizedBase64, resizedSize } = await processImage(img.buffer, img.type);
-      console.log(`Resized image size: ${resizedSize} bytes`);
-      return resizedBase64
-    } else {
-      const base64Image = `data:${img.type};base64,${img.buffer.toString("base64")}`;
-      return base64Image  
-    } 
-  };
-  
 
     const handleFileUpload = async (event) => {
         const file = event.target.files[0];
@@ -145,7 +78,6 @@ const ImportBomFranchiseScreen = () => {
         }
     };
 
-    console.log(products.map(a=>a.cost))
 
     function handleShop(item){
         setSearch_Modal(false)
@@ -221,11 +153,9 @@ const ImportBomFranchiseScreen = () => {
             // Commit batch operation
             await batch.commit();
             console.log('Batch write successful');
-    
+            toastSuccess('เพิ่มวัตถุดิบสำเร็จ');
             setProducts([]);
-            setShop(initialShop)
-            setSuccess_Modal(true);
-            setTimeout(() => setSuccess_Modal(false), 900);
+            setShop(initialShop);
         } catch (error) {
             console.error('Error adding products:', error);
         } finally {
@@ -236,68 +166,74 @@ const ImportBomFranchiseScreen = () => {
 
 
   return (
-    <div style={{padding:10}} >
+    <div  >
+        <h1>อัปโหลดวัตถุดิบแฟรนไชส์</h1>
         <Modal_Loading show={loading} />
-        <Modal_Success show={success_Modal} />
         <Modal_FlatlistSearchFranchise
             show={search_Modal}
             onHide={()=>{setSearch_Modal(false)}}
             onClick={handleShop}
         />
-        <div>
-            <Button color="red" appearance="primary" onClick={()=>{setSearch_Modal(true)}}>1. เลือกร้านค้า</Button>
-            {name
-                ?<p><h2>ร้าน : {name}</h2></p>
-                :null
-            }
-        </div>
-       {name
+      <input
+            ref={fileInputRef}
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleFileUpload}
+            style={{ display: "none" }}
+        />
+        <Row>
+            <Col md='4' sm='6' >
+                <OneButton {...{ text:'1. เลือกร้านค้า', submit:()=>{setSearch_Modal(true)}, variant:'success' }} />
+            </Col>
+            <Col md='4' sm='6' >
+                <OneButton {...{ text:'2. เลือกไฟล์', submit:() => fileInputRef.current.click(), variant:franchiseId?'success':'secondary' }} />
+            </Col>
+            <Col md='4' sm='6' >
+                <OneButton {...{ text:'3. Upload', submit:()=>{addProductsToDatabase()}, variant:franchiseId&&products.length>0?'success':'secondary'  }} />
+            </Col>
+        </Row>
+        {franchiseId
             ?<React.Fragment>
-                <h2>2.Upload Excel File with Images</h2>
-                <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} />
-                <Button color="orange" appearance="primary" onClick={addProductsToDatabase}>3. Upload</Button>
+            <Card title="ข้อมูลแฟรนไชส์">
+                <h5>แฟรนไชส์ : {name}</h5>
+            </Card>
+            <Card title="ข้อมูลวัตถุดิบ" maxWidth={'none'} >
                 <Table striped bordered hover responsive  variant="light"   >
                     <thead  >
-                    <tr>
-                    <th style={styles.text2}>No.</th>
-                    <th style={styles.text}>name</th>
-                    <th style={styles.text}>smallestUnit</th>
-                    <th style={styles.text4}>category</th>
-                    <th style={styles.text}>safetyStock</th>
-                    <th style={styles.text}>stock</th>
-                    <th style={styles.text}>cost</th>
-                    </tr>
-                </thead>
-                <tbody  >
-                    {products.map((item, index) => {
-                        const { name, category, smallestUnit, cost, safetyStock, stock } = item;
-                        return <tr  key={index} >
-                                    <td style={styles.text3}>{index+1}.</td>
-                                    <td style={styles.text3} >{name}</td>
-                                    <td style={styles.text3} >{smallestUnit}</td>
-                                    <td style={styles.text3}>{category}</td>
-                                    <td style={styles.text3}>{safetyStock}</td>
-                                    <td style={styles.text3}>{stock}</td>
-                                    <td style={styles.text3}>{Number(cost)}</td>
-                                </tr>
-                    })}
-                </tbody>
+                        <tr>
+                        <th style={styles.text2}>No.</th>
+                        <th style={styles.text}>name</th>
+                        <th style={styles.text}>smallestUnit</th>
+                        <th style={styles.text4}>category</th>
+                        <th style={styles.text}>safetyStock</th>
+                        <th style={styles.text}>stock</th>
+                        <th style={styles.text}>cost</th>
+                        </tr>
+                    </thead>
+                    <tbody  >
+                        {products.map((item, index) => {
+                            const { name, category, smallestUnit, cost, safetyStock, stock } = item;
+                            return <tr  key={index} >
+                                        <td style={styles.text3}>{index+1}.</td>
+                                        <td style={styles.text3} >{name}</td>
+                                        <td style={styles.text3} >{smallestUnit}</td>
+                                        <td style={styles.text3}>{category}</td>
+                                        <td style={styles.text3}>{safetyStock}</td>
+                                        <td style={styles.text3}>{stock}</td>
+                                        <td style={styles.text3}>{cost}</td>
+                                    </tr>
+                        })}
+                    </tbody>
                 </Table>
+            </Card>
             </React.Fragment>
             :null
         }
-      
     </div>
   );
 };
 
 const styles = {
-  container : {
-    paddingLeft:'3rem',paddingRight:'3rem'
-  },
-  container2 : {
-    backgroundColor:theme3,borderRadius:20,display:'flex',justifyContent:'center',alignItems:'center',flexDirection:'column',padding:5,marginBottom:'1rem'
-  },
   text : {
     width: '12%', textAlign:'center',minWidth:'120px'
   },

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { Row, Col, Button, Modal, Form } from "react-bootstrap";
+import { Row, Col, Button, Modal } from "react-bootstrap";
 import '../App.css'
-import _ from "lodash"; // For debounce function
+import _, { set } from "lodash"; // For debounce function
 import { db } from "../db/firestore";
+import { OneButton } from "../components";
 
 function Modal_FlatlistSearchFranchise({
   backdrop=true, // true/false/static
@@ -16,19 +17,18 @@ function Modal_FlatlistSearchFranchise({
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  async function fetchByTel(){
-    let queryResults = []
+  async function fetchAllFranchise(){
+    setIsLoading(true);
     try {
-      await db.collection('franchise').orderBy('timestamp','desc').get().then((docs)=>{
-        docs.forEach((doc)=>{
-          queryResults.push({...doc.data(),id:doc.id})
-        })
-      })
-      setResults(queryResults);
+      const query = await db.collection('franchise').orderBy('timestamp','desc').get();
+      const results = query.docs.map((doc)=>({ ...doc.data(), id: doc.id }));
+ 
+      setResults(results);
     } catch (error) {
       console.log(error)
+    } finally{
+      setIsLoading(false);
     }
-
   }
 
 
@@ -48,17 +48,17 @@ function Modal_FlatlistSearchFranchise({
       // className="loading-screen"
     >
       <Modal.Header closeButton>
-        <h4><b>เลือกร้านค้า</b></h4>
+        <h4><b>เลือกแฟรนไชส์</b></h4>
       </Modal.Header>
       <Modal.Body style={styles.container3} >
-        <Button onClick={fetchByTel} >ค้นหา</Button>
+        <OneButton {...{ text: "ค้นหาแฟรนไชส์", submit: fetchAllFranchise, variant:'warning' }} />
         
         <br/>
         {isLoading ? (
           <p>Loading...</p>
         ) : (
           <ul>
-            <h4>ค้นพบ {results.length} ร้าน</h4>
+            <h4>ค้นพบ {results.length} แฟรนไชส์</h4>
             <Row style={styles.container4} >
                 {results?.map((item,index)=>{
                     return(

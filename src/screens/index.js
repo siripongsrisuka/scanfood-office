@@ -4,16 +4,12 @@ import HomeScreen from "./HomeScreen";
 import DemoScreen from "./DemoScreen";
 import AdminDashboard from "./AdminDashboard";
 import StorePort from "./StorePort";
-import NewShopScreen from "./NewShopScreen";
 import CloneScreen from "./CloneScreen";
-import BranchScreen from "./BranchScreen";
-import ApproveScreen from "./ApproveScreen";
 import ImportItemStoreScreen from "./ImportItemStoreScreen";
 import ImportItemFranchiseScreen from "./ImportItemFranchiseScreen";
 import ImportBomFranchiseScreen from "./ImportBomFranchiseScreen";
 import ImportBomShopScreen from "./ImportBomShopScreen";
 import ImportMarketPlaceFranchise from "./ImportMarketPlaceFranchise";
-import CustomerCareScreen from "./CustomerCareScreen";
 import SoftwareHistory from "./SoftwareHistory";
 import TransformTable from "./TransformTable";
 import TransferExpireScreen from "./TransferExpireScreen";
@@ -24,7 +20,6 @@ import KbankReportScreen from "./KbankReportScreen";
 import OfficeScreen from "./OfficeScreen";
 import StaffScreen from "./StaffScreen";
 import WarehouseScreen from "./WarehouseScreen";
-import CreateOrder from "./CreateOrder";
 import SaleScreen from "./SaleScreen";
 import Test from "./Test";
 import UpgradeStoreSizeScreen from "./UpgradeStoreSizeScreen";
@@ -53,7 +48,6 @@ export {
     UpgradeStoreSizeScreen,
     Test,
     SaleScreen,
-    CreateOrder,
     WarehouseScreen,
     StaffScreen,
     OfficeScreen,
@@ -64,7 +58,6 @@ export {
     TransferExpireScreen,
     TransformTable,
     SoftwareHistory,
-    CustomerCareScreen,
     ImportMarketPlaceFranchise,
     ImportBomShopScreen,
     ImportBomFranchiseScreen,
@@ -74,8 +67,5 @@ export {
     DemoScreen,
     AdminDashboard,
     StorePort,
-    NewShopScreen,
     CloneScreen,
-    BranchScreen,
-    ApproveScreen
 };

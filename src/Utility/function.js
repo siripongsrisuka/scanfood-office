@@ -19,11 +19,6 @@ export   async function fetchLicense(){
     return value;
 };
 
-export   async function fetchEquipment(){
-    const equiomentDoc = await db.collection('admin').doc('hardware').get();
-    const { value } = equiomentDoc.data();
-    return value;
-};
 
 export   async function fetchHardware(profileId){
     const query = await db.collection('hardwareOrder')

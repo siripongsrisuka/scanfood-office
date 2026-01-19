@@ -2,15 +2,13 @@ import React, { useState, useRef } from "react";
 import ExcelJS from "exceljs";
 import { db, prepareFirebaseImage } from "../db/firestore";
 import { Row, Col, Table } from "react-bootstrap";
-import { colors, initialProduct } from "../configs";
-import { Modal_FlatlistSearchShop, Modal_Loading, Modal_Success } from "../modal";
+import { initialProduct, initialShop } from "../configs";
+import { Modal_FlatlistSearchShop, Modal_Loading } from "../modal";
 import { v4 as uuidv4 } from 'uuid';
 import { minusMinutes, plusSecond, stringFullDate } from "../Utility/dateTime";
 import { findInArray, toastSuccess } from "../Utility/function";
 import { Card, OneButton } from "../components";
 
-const { theme3 } = colors;
-const initialShop = { id:'', name:'', smartCategory:[], createdDate:new Date() }
 
 const ImportItemStoreScreen = () => {
   const [products, setProducts] = useState([]);
@@ -19,7 +17,6 @@ const ImportItemStoreScreen = () => {
   const { id:shopId, name, smartCategory, createdDate } = shop;
   const [category, setCategory] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [success_Modal, setSuccess_Modal] = useState(false);
 
 
   const processImage = async (imgBuffer, imgType) => {
@@ -224,7 +221,6 @@ const fileInputRef = useRef(null);
     <div  >
         <h1>อัปโหลดสินค้าร้านเดี่ยว</h1>
         <Modal_Loading show={loading} />
-        <Modal_Success show={success_Modal} />
         <Modal_FlatlistSearchShop
             show={search_Modal}
             onHide={()=>{setSearch_Modal(false)}}
@@ -296,12 +292,6 @@ const fileInputRef = useRef(null);
 };
 
 const styles = {
-  container : {
-    paddingLeft:'3rem',paddingRight:'3rem'
-  },
-  container2 : {
-    backgroundColor:theme3,borderRadius:20,display:'flex',justifyContent:'center',alignItems:'center',flexDirection:'column',padding:5,marginBottom:'1rem'
-  },
   text : {
     width: '12%', textAlign:'center',minWidth:'120px'
   },

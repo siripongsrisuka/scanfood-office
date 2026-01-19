@@ -5,16 +5,12 @@ import {
   DemoScreen,
   AdminDashboard,
   StorePort,
-  NewShopScreen,
   CloneScreen,
-  BranchScreen,
-  ApproveScreen,
   ImportItemStoreScreen,
   ImportItemFranchiseScreen,
   ImportBomFranchiseScreen,
   ImportBomShopScreen,
   ImportMarketPlaceFranchise,
-  CustomerCareScreen,
   SoftwareHistory,
   TransformTable,
   TransferExpireScreen,
@@ -25,7 +21,6 @@ import {
   OfficeScreen,
   StaffScreen,
   WarehouseScreen,
-  CreateOrder,
   SaleScreen,
   Test,
   UpgradeStoreSizeScreen,
@@ -93,7 +88,6 @@ function App() {
             <Route path='kbankReport' element={<KbankReportScreen/>} />
             <Route path='warehouse' element={<WarehouseScreen/>} />
             <Route path='approveSoftware' element={<ApproveSoftwareScreen/>} />
-            <Route path='createOrder' element={<CreateOrder/>} />
             <Route path='sale' element={<SaleScreen/>} />
             <Route path='upgrade' element={<UpgradeStoreSizeScreen/>} />
             <Route path='upgradeHistory' element={<UpgradeStoreSizeHistory/>} />
@@ -109,20 +103,15 @@ function App() {
             <Route path='warehouseJobHistory' element={<WarehouseJobHistory/>} />
             <Route path='reportHardware' element={<ReportHardware/>} />
             <Route path='newShop' element={<NewShopDashboard/>} />
+            <Route path='importItemFranchise' element={<ImportItemFranchiseScreen/>} />
+            <Route path='importBomFranchise' element={<ImportBomFranchiseScreen/>} />
+            <Route path='importMarketPlaceFranchise' element={<ImportMarketPlaceFranchise/>} />
             
           </Route>
           <Route path='/admin' element={<AdminDashboard/>} />
   
           <Route path='store' element={<StorePort/>}/>
           <Route path='store/demo' element={<DemoScreen/>} />
-          <Route path='shop' element={<NewShopScreen/>} />
-          <Route path='clone' element={<CloneScreen/>} />
-          <Route path='branch/:id' element={<BranchScreen/>} />
-          <Route path='approve' element={<ApproveScreen/>} />
-          <Route path='importItemFranchise' element={<ImportItemFranchiseScreen/>} />
-          <Route path='importBomFranchise' element={<ImportBomFranchiseScreen/>} />
-          <Route path='importMarketPlaceFranchise' element={<ImportMarketPlaceFranchise/>} />
-          <Route path='customerCare' element={<CustomerCareScreen/>} />
           <Route path='questionSetting' element={<QuestionSettingScreen/>} />
           <Route path='diagnosis' element={<DiagnosisScreen/>} />
           <Route path='test' element={<Test/>} />
