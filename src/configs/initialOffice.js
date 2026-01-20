@@ -27,7 +27,7 @@ export default [
 
     
     {
-      label: '3. งานเซล',
+      label: '3. Sales',
     },
     
     {
@@ -42,45 +42,29 @@ export default [
       to:'sale',
       id:'100'
     },
-
     {
-      label: '4. ฟีเจอร์ส่วนกลาง',
-      
-    },
-    {
-      topic: '4.1 แจ้งคัดลอกร้าน',
+      topic: '3.3 ร้านใหม่',
       icon: 'bi-speedometer',
-      to: 'approveSoftware',
-      id:'128'
-    },
-    {
-      topic: '4.1 แจ้งคัดลอกร้าน',
-      icon: 'bi-speedometer',
-      to: 'approveSoftware',
-      id:'128'
-    },
- 
-    {
-      topic: '4.4 เพิ่มโต๊ะ',
-      icon: 'bi-speedometer',
-      to: 'upgrade',
-      id:'128'
-    },
-    {
-      topic: '4.5 ประวัติเพิ่มโต๊ะ',
-      icon: 'bi-speedometer',
-      to: 'upgradeHistory',
-      id:'128'
+      to:'newShop',
+      id:'100'
     },
 
     {
-      topic: '4.6 ประวัติ License',
-      icon: 'bi-speedometer',
-      to: 'softwareHistory',
-      id:'128'
-    },
-  
-  {
+        label: '4. Customer Success',
+      },
+      {
+        topic: '4.1 กำหนดสิทธิ์',
+        icon: 'bi-speedometer',
+        to: 'questionSetting',
+        id:'723'
+      },
+      {
+        topic: '4.2 กำหนดสิทธิ์',
+        icon: 'bi-speedometer',
+        to: 'diagnosis',
+        id:'723'
+      },
+        {
       label: '5. คลังสินค้า',
       
     },
@@ -182,29 +166,53 @@ export default [
       to: 'kbankReport',
       id:'128'
     },
-      {
-        label: '7. Customer Success',
-      },
-      {
-        topic: '7.1 กำหนดสิทธิ์',
-        icon: 'bi-speedometer',
-        to: 'questionSetting',
-        id:'723'
-      },
-      {
-        topic: '7.2 กำหนดสิทธิ์',
-        icon: 'bi-speedometer',
-        to: 'diagnosis',
-        id:'723'
-      },
+          {
+      label: '7. ฟีเจอร์ส่วนกลาง',
+      
+    },
+    {
+      topic: '7.1 แจ้งคัดลอกร้าน',
+      icon: 'bi-speedometer',
+      to: 'approveSoftware',
+      id:'128'
+    },
+    {
+      topic: '7.1 แจ้งคัดลอกร้าน',
+      icon: 'bi-speedometer',
+      to: 'approveSoftware',
+      id:'128'
+    },
+ 
+    {
+      topic: '4.4 เพิ่มโต๊ะ',
+      icon: 'bi-speedometer',
+      to: 'upgrade',
+      id:'128'
+    },
+    {
+      topic: '4.5 ประวัติเพิ่มโต๊ะ',
+      icon: 'bi-speedometer',
+      to: 'upgradeHistory',
+      id:'128'
+    },
+
+    {
+      topic: '4.6 ประวัติ License',
+      icon: 'bi-speedometer',
+      to: 'softwareHistory',
+      id:'128'
+    },
+  
+
+
 
     
    
     {
-        label: '7. พนักงาน',
+        label: '8. พนักงาน',
       },
       {
-        topic: '7.1 กำหนดสิทธิ์',
+        topic: '8.1 กำหนดสิทธิ์',
         icon: 'bi-speedometer',
         to: 'staff',
         id:'723'

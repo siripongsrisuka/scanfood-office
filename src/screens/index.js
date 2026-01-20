@@ -1,4 +1,5 @@
 import HomeScreen from "./HomeScreen";
+import StaffScreen from "./StaffScreen";
 
 
 import CloneScreen from "./CloneScreen";
@@ -14,7 +15,6 @@ import QuestionSettingScreen from "./QuestionSettingScreen";
 import DiagnosisScreen from "./DiagnosisScreen";
 import KbankReportScreen from "./KbankReportScreen";
 import OfficeScreen from "./OfficeScreen";
-import StaffScreen from "./StaffScreen";
 import WarehouseScreen from "./WarehouseScreen";
 import SaleScreen from "./SaleScreen";
 import UpgradeStoreSizeScreen from "./UpgradeStoreSizeScreen";
