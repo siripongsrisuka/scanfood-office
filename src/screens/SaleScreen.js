@@ -15,7 +15,7 @@ import {
 } from 'recharts';
 import { Modal_Cancel, Modal_Customer, Modal_FlatlistSearchShop, Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput, Modal_So, Modal_Qrcode, Modal_DatePicker } from "../modal";
 import { db } from "../db/firestore";
-import { SlideOptions } from "../components";
+import { OneButton, SlideOptions } from "../components";
 import { scanfoodAPI } from "../Utility/api";
 import { stringDateTimeReceipt, stringFullDate, stringReceiptNumber, stringYMDHMS3, yearMonth } from "../Utility/dateTime";
 import initialCustomer from "../configs/initialCustomer";
@@ -23,6 +23,7 @@ import { colors, initialProcess } from "../configs";
 import { fetchCustomer, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fetchSoftware, fetchSuccessCases, fetchWaste, formatCurrency, formatTime, isGodIt, toastSuccess, wait } from "../Utility/function";
 import initialShopType from "../configs/initialShopType";
 import initialCancelId from "../configs/initialCancelId";
+import { is } from "date-fns/locale";
 const { softWhite, dark, softGray, greenSanta, white } = colors;
 
 const data = [
@@ -49,6 +50,7 @@ const customerOptions = [
     { id:'3', name:'แก้ไขโปรไฟล์'},
     { id:'4', name:'ผูกบัญชีร้านค้า'},
     { id:'5', name:'ย้ายไปถังขยะ'},
+    { id:'6', name:'เปิดบิลเคสขอใบกำกับภาษี'},
 ];
 
 const processMap = {
@@ -110,8 +112,18 @@ const initialSoftware = {
 };
 
 function SaleScreen() {
-    const { profile:{ id:profileId, name:profileName, team = "A" } } = useSelector(state=>state.profile);
+    const { profile:{ id:thisProfileId, name:profileName, team = "A" } } = useSelector(state=>state.profile);
+    const { office:{ humanRight } } = useSelector(state=>state.office);
     const { warehouse } = useSelector(state=>state.warehouse);
+    const [currentProfile, setCurrentProfile] = useState({ id:thisProfileId, name:'' });
+    const { id:profileId } = currentProfile;
+    const [profile_Modal, setProfile_Modal] = useState(false);
+
+
+    function openProfile(){
+        setProfile_Modal(true);
+    };
+
 
     const [loading, setLoading] = useState(false);
     const [licenses, setLicenses] = useState([]);
@@ -175,7 +187,7 @@ function SaleScreen() {
 
     useEffect(()=>{
         handleFetchAll()
-    },[]);
+    },[profileId]);
 
     async function handleFetchAll(){
         setLoading(true);
@@ -273,137 +285,191 @@ function SaleScreen() {
                 setCancel_Modal(true);
                 setCurrentCancel(initialCancel);
                 break;
+            case '6': // เปิดบิลเคสขอใบกำกับภาษี
+                if(!storeSize) return alert('ไม่มี storeSize')
+                setCurrentSo({...initialSo, storeSize:Number(storeSize) })
+                setSo_Modal(true)
+                break;
         
             default:
                 break;
-        }
+        };
     };
     
     // 200%
     async function handleSo(payload){
+ 
         setSo_Modal(false)
-        const { hardware } = currentSo;
-
-        const countProduct = hardware.filter(a => !a.stockSetStatus).map(a=>({ id:a.id, qty:a.qty }));
-      const stockSet = hardware
-        .filter(a => a.stockSetStatus)
-        .flatMap(c =>
-          c.stockSet.map(d => ({
-            id: d.id,
-            qty: Number(d.qty) * Number(c.qty)
-          }))
-        );
-      // Flatten all products into one array (normalize qty for countProduct)
-      const products = [
-        ...countProduct,
-        ...stockSet
-      ];
-
-    const productMap = new Map();
-      for (const { id, qty } of products) {
-        productMap.set(id, (productMap.get(id) || 0) + qty);
-      }
-
-      // Convert Map back to array format
-      const uniqueProducts = Array.from(productMap, ([id, qty]) => ({ id, qty }));
-      console.log('uniqueProducts')
-        console.log(uniqueProducts)
-        // setSo_Modal(false)
-        // setLoading(true);
+        setLoading(true);
         
-        // try {
-        //     const amount = isGodIt(profileId)
-        //         ?1 // payload.net
-        //         :payload.net
-        //     const timestamp = new Date();
-        //     const { qrCode, paymentData } = await db.runTransaction(async (transaction) => {
+        try {
+            const amount = isGodIt(profileId)
+                ?1 // payload.net
+                :payload.net
+            const timestamp = new Date();
+            const { qrCode, paymentData } = await db.runTransaction(async (transaction) => {
 
-        //         const docNumberRef = db.collection("admin").doc('documentNumber');
-        //         const autoPaymentRef = db.collection('autoPayment').doc();
-        //         const docNumberDoc = await transaction.get(docNumberRef);
+                const docNumberRef = db.collection("admin").doc('documentNumber');
+                const autoPaymentRef = db.collection('autoPayment').doc();
+                const docNumberDoc = await transaction.get(docNumberRef);
 
-        //         const { value } = docNumberDoc.data();
-        //         const thisCurrentSo = value.find(a=>a.id==='so')
-        //         let newValue = [];
-        //         const thisMonth = timestamp.getMonth() + 1;
-        //         let receiptNumber = `SO${stringReceiptNumber(1)}`;
-        //         if(thisCurrentSo){
-        //             const { month, run } = thisCurrentSo;
-        //             let newRun = run + 1;
-        //             receiptNumber = `SO${stringReceiptNumber(newRun)}`;
+                const { value } = docNumberDoc.data();
+                const thisCurrentSo = value.find(a=>a.id==='so')
+                let newValue = [];
+                const thisMonth = timestamp.getMonth() + 1;
+                let receiptNumber = `SO${stringReceiptNumber(1)}`;
+                if(thisCurrentSo){
+                    const { month, run } = thisCurrentSo;
+                    let newRun = run + 1;
+                    receiptNumber = `SO${stringReceiptNumber(newRun)}`;
                     
-        //             if (thisMonth !== month) {
-        //                 newRun = 1;
-        //                 receiptNumber = `SO${stringReceiptNumber(newRun)}`;
-        //                 newValue = value.map(a=>{
-        //                 return a.id==='so'
-        //                     ?{ month: thisMonth, run: newRun, id:'so' }
-        //                     :a
-        //                 })
-        //             } else {
-        //             newValue = value.map(a=>{
-        //                 return a.id==='so'
-        //                     ?{ month, run: newRun, id:'so' }
-        //                     :a
-        //             })
-        //             }
-        //         } else {
-        //             newValue = [...value,{ month: thisMonth, run: 1, id:'so' }]
-        //         };
+                    if (thisMonth !== month) {
+                        newRun = 1;
+                        receiptNumber = `SO${stringReceiptNumber(newRun)}`;
+                        newValue = value.map(a=>{
+                        return a.id==='so'
+                            ?{ month: thisMonth, run: newRun, id:'so' }
+                            :a
+                        })
+                    } else {
+                    newValue = value.map(a=>{
+                        return a.id==='so'
+                            ?{ month, run: newRun, id:'so' }
+                            :a
+                    })
+                    }
+                } else {
+                    newValue = [...value,{ month: thisMonth, run: 1, id:'so' }]
+                };
 
-        //         const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,{ 
-        //             channelType:'posxpay',
-        //             shopId:`sale:${autoPaymentRef.id}`,
-        //             amount,
-        //             serial:'WQRN002405000023',
-        //             token:process.env.REACT_APP_API_TOKEN,
-        //             ref2:'auto'
-        //         });
-        //         const { 
-        //             referenceId,
-        //             chargeId,
-        //             qrCode,
-        //         } = data?.data;
+                const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,{ 
+                    channelType:'posxpay',
+                    shopId:`sale:${autoPaymentRef.id}`,
+                    amount,
+                    serial:'WQRN002405000023',
+                    token:process.env.REACT_APP_API_TOKEN,
+                    ref2:'auto'
+                });
+                const { 
+                    referenceId,
+                    chargeId,
+                    qrCode,
+                } = data?.data;
 
-        //         transaction.update(docNumberRef, { value:newValue });
-        //         const paymentData = {
-        //             ...currentSo,
-        //             ...payload,
-        //             orderNumber:receiptNumber,
-        //             createdAt:timestamp,
-        //             chargeId,
-        //             qrCode,
-        //             shopId,
-        //             shopName,
-        //             billDate:stringYMDHMS3(timestamp),
-        //             profileId,
-        //             profileName,
-        //             process:'request', // request, cancel, success, paid
-        //             team,
-        //             customerId,
-        //             name,
-        //             id:autoPaymentRef.id,
-        //             requestDate:new Date(), 
-        //             requestBillDate:stringYMDHMS3(new Date()),
-        //         };
-        //         transaction.set(autoPaymentRef,paymentData)
-        //         return {
-        //             qrCode,
-        //             paymentData
-        //         }
-        //     });
+                transaction.update(docNumberRef, { value:newValue });
+                const paymentData = {
+                    ...currentSo,
+                    ...payload,
+                    orderNumber:receiptNumber,
+                    createdAt:timestamp,
+                    chargeId,
+                    qrCode,
+                    shopId,
+                    shopName,
+                    billDate:stringYMDHMS3(timestamp),
+                    profileId,
+                    profileName,
+                    process:'request', // request, cancel, success, paid
+                    team,
+                    customerId,
+                    name,
+                    id:autoPaymentRef.id,
+                    requestDate:new Date(), 
+                    requestBillDate:stringYMDHMS3(new Date()),
+                };
+                transaction.set(autoPaymentRef,paymentData)
+                return {
+                    qrCode,
+                    paymentData
+                }
+            });
 
             
-        //     setQrcode(qrCode);
-        //     setAmount(amount);
-        //     setQrcode_Modal(true);
-        //     setPayments(prev=>[paymentData,...prev]);
-        // } catch (error) {
-        //     alert(error);
-        // } finally {
-        //     setLoading(false);
-        // }
+            setQrcode(qrCode);
+            setAmount(amount);
+            setQrcode_Modal(true);
+            setPayments(prev=>[paymentData,...prev]);
+        } catch (error) {
+            alert(error);
+        } finally {
+            setLoading(false);
+        }
     };
+
+    async function handleSoWithoutQR(payload){
+        setSo_Modal(false)
+        setLoading(true);
+        
+        try {
+   
+            const timestamp = new Date();
+             await db.runTransaction(async (transaction) => {
+
+                const docNumberRef = db.collection("admin").doc('documentNumber');
+                const autoPaymentRef = db.collection('autoPayment').doc();
+                const docNumberDoc = await transaction.get(docNumberRef);
+
+                const { value } = docNumberDoc.data();
+                const thisCurrentSo = value.find(a=>a.id==='so')
+                let newValue = [];
+                const thisMonth = timestamp.getMonth() + 1;
+                let receiptNumber = `SO${stringReceiptNumber(1)}`;
+                if(thisCurrentSo){
+                    const { month, run } = thisCurrentSo;
+                    let newRun = run + 1;
+                    receiptNumber = `SO${stringReceiptNumber(newRun)}`;
+                    
+                    if (thisMonth !== month) {
+                        newRun = 1;
+                        receiptNumber = `SO${stringReceiptNumber(newRun)}`;
+                        newValue = value.map(a=>{
+                        return a.id==='so'
+                            ?{ month: thisMonth, run: newRun, id:'so' }
+                            :a
+                        })
+                    } else {
+                    newValue = value.map(a=>{
+                        return a.id==='so'
+                            ?{ month, run: newRun, id:'so' }
+                            :a
+                    })
+                    }
+                } else {
+                    newValue = [...value,{ month: thisMonth, run: 1, id:'so' }]
+                };
+
+
+                transaction.update(docNumberRef, { value:newValue });
+                const paymentData = {
+                    ...currentSo,
+                    ...payload,
+                    orderNumber:receiptNumber,
+                    createdAt:timestamp,
+                    chargeId:'',
+                    qrCode,
+                    shopId,
+                    shopName,
+                    billDate:stringYMDHMS3(timestamp),
+                    profileId,
+                    profileName,
+                    process:'manual', // manual, request, cancel, success, paid
+                    team,
+                    customerId,
+                    name,
+                    id:autoPaymentRef.id,
+                    requestDate:new Date(), 
+                    requestBillDate:stringYMDHMS3(new Date()),
+                };
+                transaction.set(autoPaymentRef,paymentData)
+               
+            });
+            
+        } catch (error) {
+            alert(error);
+        } finally {
+            setLoading(false);
+        }
+    }
 
     async function handleConnect(item){
         setConnect_Modal(false);
@@ -585,6 +651,7 @@ function SaleScreen() {
     function checkOpen(){
         if(optionId==='5') return setMemo_Modal(true);
         setCustomer_Modal(true);
+        setCurrentCustomer(initialCustomer);
     };
 
     function openMemo(item){
@@ -721,7 +788,10 @@ function SaleScreen() {
     };
 
 
-
+    function handleProfile(item){
+        setProfile_Modal(false);
+        setCurrentProfile(item);
+    }
 
   return (
     <div style={styles.container} >
@@ -734,7 +804,16 @@ function SaleScreen() {
             </RadarChart>
             <Button style={{ backgroundColor:greenSanta, borderRadius:100, width:'40px', height:'40px', borderColor:greenSanta }} onClick={checkOpen} ><i class="bi bi-plus-circle"></i></Button>
         </div>
+        {isGodIt(profileId) && <OneButton {...{ text:"Profile", submit:openProfile }} />}
+        
         <SlideOptions {...{ value, handleChange, options }} />
+        <Modal_FlatListTwoColumn
+            header={'Profile'}
+            show={profile_Modal}
+            onHide={()=>{setProfile_Modal(false)}}
+            value={humanRight}
+            onClick={handleProfile}
+        />
         <Modal_OneInput
             show={note_Modal}
             header={`Note`}
@@ -811,6 +890,7 @@ function SaleScreen() {
             current={currentCustomer}
             setCurrent={setCurrentCustomer}
             submit={handleCustomer}
+            disabled={currentCustomer.status !=='waiting'}
 
         />
         <Modal_FlatListTwoColumn
@@ -856,7 +936,7 @@ function SaleScreen() {
                 {successCases.map((item)=>{
                     const { name,  shopType,  process,  revenue } = item;
                     const shopTypeName = shopTypeMap.get(shopType);
-                    return <Row  key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
+                    return <Row onClick={()=>{openCustomerAction(item)}} key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' ,cursor:'pointer' }} >
                                 <Col xs='12' sm='4'md='3'lg='3' >{name}</Col>
                                 <Col xs='6' sm='4'md='3'lg='3'  >{shopTypeName}</Col>
                                 <Col xs='6' sm='4'md='3'lg='3'  >Revenue : {formatCurrency(revenue)}</Col>
@@ -870,7 +950,7 @@ function SaleScreen() {
                     const { name, shopType,reason, cancelId } = item;
                     const shopTypeName = shopTypeMap.get(shopType);
                     const cancelName = cancelMap.get(cancelId)
-                    return <Row  key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
+                    return <Row onClick={()=>{openCustomerAction(item)}} key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative', cursor:'pointer' }} >
                                 <Col xs='12' sm='4'md='3'lg='3' >{name}</Col>
                                 <Col xs='6' sm='4'md='3'lg='3'  >{shopTypeName}</Col>
                                 <Col xs='6' sm='4'md='3'lg='3'  >เหตุผล : {cancelName}</Col>

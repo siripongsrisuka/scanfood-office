@@ -1,18 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  Button,
-  Form,
-  Row,
-  Col, 
-  Container,
-  Table,
-  Modal,
-  Card,
-  Image,
-  Collapse,
-} from "react-bootstrap";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, Outlet, NavLink } from 'react-router-dom';
-import { initialOffice, colors, initialAdmin, initialAlert } from "../configs";
+import { initialOffice, colors, initialAlert } from "../configs";
 import { useSelector, useDispatch } from "react-redux";
 import '../styles/Restaurant.css'
 import { logout } from "../redux/authSlice";
@@ -35,6 +23,7 @@ function OfficeScreen() {
   const { profile } = useSelector((state)=> state.profile);
   const { id:profileId } = profile;
   const { office : {  humanRight }  } = useSelector((state)=> state.office);
+
   useEffect(() => {  // เอาไว้กำหนด display ของ sidebar
     // Function to update the window width state
     dispatch(fetchOffice());
@@ -59,9 +48,9 @@ function OfficeScreen() {
   
 
   const { sideBar, listDisplay } = useMemo(()=>{
-    let sideBar = initialOffice;
-      // const { rights } = humanRight.find(a=>a.id===profileId) || { rights:[] }
-      // sideBar = sideBar.filter(a=>a.label || rights.includes(a.id))
+      let sideBar = initialOffice;
+      const { rights } = humanRight.find(a=>a.id===profileId) || { rights:[] }
+      sideBar = sideBar.filter(a=>a.label || rights.includes(a.id))
     return {
       sideBar,
       listDisplay:transformData(sideBar.filter(a=>a.label!=='ออกจากระบบ'))

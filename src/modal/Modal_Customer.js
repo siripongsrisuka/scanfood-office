@@ -31,6 +31,7 @@ function Modal_Customer({
   submit,
   setCurrent,
   current,
+  disabled=false,
 }) {
     const { id, name, tel, province, note = [], channel, storeSize, contactPosition, shopType, process, shopId } = current;
     const [alert_Modal, setAlert_Modal] = useState(initialAlert);
@@ -202,7 +203,17 @@ function Modal_Customer({
                 })}
             </Form.Select>
       </Modal.Body>
-        <FooterButton {...{ onHide, submit }} />
+      {disabled
+        ?<Modal.Footer>
+            <OneButton
+                text={'ปิด'}
+                variant={'secondary'}
+                submit={onHide}
+            />
+        </Modal.Footer>
+        :<FooterButton {...{ onHide, submit }} />
+        }
+        
       
     </Modal>
   );

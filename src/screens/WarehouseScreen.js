@@ -24,11 +24,10 @@ function WarehouseScreen() {
     const [inbound_Modal, setInbound_Modal] = useState(false);  
 
     useEffect(()=>{
-        let arr = warehouse
-        
-        if(search){
-            arr = searchFilterFunction(arr,search,'name')
-        }
+        const arr = search
+            ?searchFilterFunction(warehouse,search,'name')
+            :[...warehouse];
+   
         setDisplay(arr)
     },[search,warehouse]);
 
@@ -106,7 +105,7 @@ function WarehouseScreen() {
 
     function openInbound(){
         setInbound_Modal(true)
-    }
+    };
 
 
   return (
@@ -140,12 +139,12 @@ function WarehouseScreen() {
         </thead>
         <tbody  >
         {display.map((item, index) => {
-                const { name, safetyStock, stock = '' } = item;
+                const { name, safetyStock, stock = '', stockSetStatus } = item;
                 return <tr onClick={()=>{openEquipment(item)}} style={{cursor: 'pointer'}} key={index}  >
                         <td  style={styles.container4}>{index+1}.</td>
                         <td  >{name}</td>
-                        <td  style={styles.container4} >{safetyStock}</td>
-                        <td  style={styles.container4} >{stock}</td>
+                        <td  style={styles.container4} >{stockSetStatus?"-":safetyStock}</td>
+                        <td  style={styles.container4} >{stockSetStatus?"-":stock}</td>
                     </tr>
             }
         )}
@@ -161,12 +160,12 @@ const styles = {
         minHeight:'100vh',
     },
     container2 : {
-        width:'10%',
-        minWidth:'80px',
+        width:'5%',
+        minWidth:'70px',
         textAlign:'center'
     },
     container3 : {
-        width:'15%',
+        width:'20%',
         minWidth:'150px',
         textAlign:'center'
     },

@@ -1,20 +1,20 @@
 import HomeScreen from "./HomeScreen";
 import StaffScreen from "./StaffScreen";
-
-
-import CloneScreen from "./CloneScreen";
+import OfficeScreen from "./OfficeScreen";
 import ImportItemStoreScreen from "./ImportItemStoreScreen";
 import ImportItemFranchiseScreen from "./ImportItemFranchiseScreen";
 import ImportBomFranchiseScreen from "./ImportBomFranchiseScreen";
 import ImportBomShopScreen from "./ImportBomShopScreen";
 import ImportMarketPlaceFranchise from "./ImportMarketPlaceFranchise";
+import CloneScreen from "./CloneScreen";
+
+
 import SoftwareHistory from "./SoftwareHistory";
 import TransformTable from "./TransformTable";
 import TransferExpireScreen from "./TransferExpireScreen";
 import QuestionSettingScreen from "./QuestionSettingScreen";
 import DiagnosisScreen from "./DiagnosisScreen";
 import KbankReportScreen from "./KbankReportScreen";
-import OfficeScreen from "./OfficeScreen";
 import WarehouseScreen from "./WarehouseScreen";
 import SaleScreen from "./SaleScreen";
 import UpgradeStoreSizeScreen from "./UpgradeStoreSizeScreen";

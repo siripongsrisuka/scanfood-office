@@ -72,39 +72,39 @@ export default [
       topic: '5.1 งาน',
       icon: 'bi-speedometer',
       to: 'warehouseJob',
-      id:'401'
+      id:'501'
     },
     {
       topic: '5.2 ประวัติงาน',
       icon: 'bi-speedometer',
       to: 'reportHardware',
-      id:'402'
+      id:'502'
     },
     {
       topic: '5.3 สต๊อกคงเหลือ',
       icon: 'bi-speedometer',
       to: 'warehouse',
-      id:'403'
+      id:'503'
     },
     {
       topic: '5.4 ประวัติรับเข้า',
       icon: 'bi-speedometer',
       to: 'reportInbound',
-      id:'404'
+      id:'504'
     },
     
     {
       topic: '5.5 ตั้งค่าสินค้า',
       icon: 'bi-speedometer',
       to: 'warehouseSetting',
-      id:'405'
+      id:'505'
     },
 
     {
       topic: '5.6 จัดเรียงสินค้า',
       icon: 'bi-speedometer',
       to: 'hardwareArrange',
-      id:'406'
+      id:'506'
     },
   
  

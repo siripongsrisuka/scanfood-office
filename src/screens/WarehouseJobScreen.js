@@ -223,7 +223,7 @@ function WarehouseJobScreen() {
                     </td>
                     <td  style={styles.container4} >{deliveryOptions[deliveryType]}</td>
                     
-                    <td onClick={()=>{openStatus(item)}} style={styles.container4} >{statusMap[status]}</td>
+                    <td onClick={()=>{openStatus(item)}} style={styles.container4} >{statusMap[status]}<i class="bi bi-pen-fill"></i></td>
                     <td onClick={()=>{openLink(item)}}  style={styles.container4}>{link}</td>
                 </tr>
         }
