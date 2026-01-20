@@ -52,7 +52,7 @@ function Modal_Inbound({
         setQty_Modal(true)
       } else {
         const inboundIds = new Set(inboundItems.map(a=>a.id));
-        let existWarehouse = warehouse.filter(a=>!inboundIds.has(a.id));
+        let existWarehouse = warehouse.filter(a=>!inboundIds.has(a.id) && !a.stockSetStatus);
       
         setExistWarehouse(existWarehouse);
         setCurrent_Modal(true);
