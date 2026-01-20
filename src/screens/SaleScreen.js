@@ -24,7 +24,7 @@ import { fetchCustomer, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fe
 import initialShopType from "../configs/initialShopType";
 import initialCancelId from "../configs/initialCancelId";
 import { is } from "date-fns/locale";
-const { softWhite, dark, softGray, greenSanta, white } = colors;
+const { softWhite, dark, softGray, greenSanta, white, blue } = colors;
 
 const data = [
     { subject: 'R', A: 120 },
@@ -802,7 +802,11 @@ function SaleScreen() {
                 <PolarRadiusAxis domain={[0, 100]} />
                 <Radar dataKey="A" stroke="#d32f2f" fill="#d32f2f" fillOpacity={0.3} />
             </RadarChart>
-            <Button style={{ backgroundColor:greenSanta, borderRadius:100, width:'40px', height:'40px', borderColor:greenSanta }} onClick={checkOpen} ><i class="bi bi-plus-circle"></i></Button>
+            <div>
+                <Button style={{ backgroundColor:blue, borderRadius:100, width:'40px', height:'40px', borderColor:greenSanta }} onClick={handleFetchAll} ><i class="bi bi-arrow-clockwise"></i></Button>&emsp;
+                <Button style={{ backgroundColor:greenSanta, borderRadius:100, width:'40px', height:'40px', borderColor:greenSanta }} onClick={checkOpen} ><i class="bi bi-plus-circle"></i></Button>
+            </div>
+   
         </div>
         {isGodIt(profileId) && <OneButton {...{ text:"Profile", submit:openProfile }} />}
         
