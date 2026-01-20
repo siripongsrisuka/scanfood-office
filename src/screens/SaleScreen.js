@@ -34,15 +34,15 @@ const data = [
     { subject: 'L', A: 85 },
 ];
 
-const options = [
-        {id:'1',name:'lead', value:'1'},
-        {id:'2',name:'so', value:'2'},
-        {id:'3',name:'success', value:'3'},
-        {id:'4',name:'waste', value:'4'},
-        {id:'5',name:'memo', value:'5'},
-        {id:'6',name:'SW', value:'6'},
-        {id:'7',name:'HW', value:'7'},
-];
+// const options = [
+//         {id:'1',name:'lead', value:'1'},
+//         {id:'2',name:'so', value:'2'},
+//         {id:'3',name:'success', value:'3'},
+//         {id:'4',name:'waste', value:'4'},
+//         {id:'5',name:'memo', value:'5'},
+//         {id:'6',name:'SW', value:'6'},
+//         {id:'7',name:'HW', value:'7'},
+// ];
 
 const customerOptions = [
     { id:'1', name:'เปิดบิล'},
@@ -112,7 +112,7 @@ const initialSoftware = {
 };
 
 function SaleScreen() {
-    const { profile:{ id:thisProfileId, name:profileName, team = "A" } } = useSelector(state=>state.profile);
+    const { profile:{ id:thisProfileId, name:profileName, team = "A", saleManagerTeam = '' } } = useSelector(state=>state.profile);
     const { office:{ humanRight } } = useSelector(state=>state.office);
     const { warehouse } = useSelector(state=>state.warehouse);
     const [currentProfile, setCurrentProfile] = useState({ id:thisProfileId, name:'' });
@@ -171,6 +171,29 @@ function SaleScreen() {
     const [note_Modal, setNote_Modal] = useState(false);
     const [currentHardware, setCurrentHardware] = useState({ id:'', note:''});
     const { note, id:hardwareId } = currentHardware;
+
+    const thisOptions = [
+        {id:'1',name:'lead', value:'1'},
+        {id:'2',name:'so', value:'2'},
+        {id:'3',name:'success', value:'3'},
+        {id:'4',name:'waste', value:'4'},
+        {id:'5',name:'memo', value:'5'},
+        {id:'6',name:'SW', value:'6'},
+        {id:'7',name:'HW', value:'7'},
+    ];
+
+    const options = useMemo(()=>{
+        return thisOptions.map(a=>({ id:a.id, name:a.name, value:a.value, length:
+            a.id === '1' ? customers.length
+            :a.id === '2' ? payments.length
+            :a.id === '3' ? successCases.length
+            :a.id === '4' ? waste.length
+            :a.id === '5' ? memo.length
+            :a.id === '6' ? softwares.length
+            :hardwares.length
+         }))
+    },[thisOptions,customers,payments,successCases,waste,memo,softwares,hardwares]);
+        
 
 
     const colorMap = useMemo(
@@ -808,9 +831,9 @@ function SaleScreen() {
             </div>
    
         </div>
-        {isGodIt(profileId) && <OneButton {...{ text:"Profile", submit:openProfile }} />}
+        {(isGodIt(profileId) || !!saleManagerTeam) && <OneButton {...{ text:"Profile", submit:openProfile }} />}
         
-        <SlideOptions {...{ value, handleChange, options }} />
+        <SlideOptions {...{ value, handleChange, options, show:true }} />
         <Modal_FlatListTwoColumn
             header={'Profile'}
             show={profile_Modal}
