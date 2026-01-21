@@ -76,7 +76,7 @@ function TransferOwnerScreen() {
     <div >
       <h1>ย้ายสิทธิ์ Owner</h1>
       <h5>เงื่อนไขการย้ายสิทธิ์ Owner</h5>
-      <h6>- ต้องมีสิทธิ์พนักงานเท่านั้น</h6>
+      <h6>- ต้องมีแพ็กเกจพนักงานเท่านั้น</h6>
         <Modal_FlatlistSearchShop
             show={search_Modal}
             onHide={()=>{setSearch_Modal(false)}}

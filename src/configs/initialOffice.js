@@ -48,6 +48,12 @@ export default [
       to:'newShop',
       id:'100'
     },
+    {
+      topic: '3.4 ขอวันใช้งานเพิ่ม',
+      icon: 'bi-speedometer',
+      to: 'extraDay',
+      id:'128'
+    },
 
     {
         label: '4. Customer Success',
@@ -166,7 +172,8 @@ export default [
       to: 'transferOwner',
       id:'128'
     },
-    
+ 
+
     {
       topic: '6.99 kbankReport',
       icon: 'bi-speedometer',
