@@ -161,6 +161,13 @@ export default [
       id:'128'
     },
     {
+      topic: '6.5 เปลี่ยนสิทธิ์ Owner',
+      icon: 'bi-speedometer',
+      to: 'transferOwner',
+      id:'128'
+    },
+    
+    {
       topic: '6.99 kbankReport',
       icon: 'bi-speedometer',
       to: 'kbankReport',

@@ -29,6 +29,7 @@ import {
   WarehouseJobHistory,
   ReportHardware,
   NewShopDashboard,
+  TransferOwnerScreen,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -101,6 +102,7 @@ function App() {
             <Route path='importMarketPlaceFranchise' element={<ImportMarketPlaceFranchise/>} />
             <Route path='questionSetting' element={<QuestionSettingScreen/>} />
             <Route path='diagnosis' element={<DiagnosisScreen/>} />
+            <Route path='transferOwner' element={<TransferOwnerScreen/>} />
             
           </Route>
       </Routes>

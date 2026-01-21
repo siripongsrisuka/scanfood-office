@@ -7,6 +7,7 @@ import ImportBomFranchiseScreen from "./ImportBomFranchiseScreen";
 import ImportBomShopScreen from "./ImportBomShopScreen";
 import ImportMarketPlaceFranchise from "./ImportMarketPlaceFranchise";
 import CloneScreen from "./CloneScreen";
+import TransferOwnerScreen from "./TransferOwnerScreen";
 
 
 import SoftwareHistory from "./SoftwareHistory";
@@ -30,6 +31,7 @@ import ReportHardware from "./ReportHardware";
 import NewShopDashboard from "./NewShopDashboard";
 
 export {
+    TransferOwnerScreen,
     NewShopDashboard,
     ReportHardware,
     WarehouseJobHistory,

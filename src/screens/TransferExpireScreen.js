@@ -97,7 +97,7 @@ function TransferExpireScreen() {
               <OneButton {...{ text:'2. เลือกร้านปลายทาง', submit:() => {setSearch_Modal(true);setType('copy')}, variant:original.id?'success':'secondary' }} />
           </Col>
           <Col md='4' sm='6' >
-              <OneButton {...{ text:'3. ย้านวันใช้งานตอนนี้', submit:()=>{handleTransfer()}, variant:original.id&&copy.id?'success':'secondary'  }} />
+              <OneButton {...{ text:'3. ย้ายวันใช้งานตอนนี้', submit:()=>{handleTransfer()}, variant:original.id&&copy.id?'success':'secondary'  }} />
           </Col>
         </Row>
         <Row>
