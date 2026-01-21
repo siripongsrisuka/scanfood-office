@@ -3,6 +3,7 @@ import InputText from "./InputText";
 import InputEmail from "./InputEmail";
 import InputPassword from "./InputPassword";
 import CropImage from "./CropImage";
+import TimeControlExtra from "./TimeControlExtra";
 
 import SearchControl from "./SearchControl";
 import OneButton from "./OneButton";
@@ -30,6 +31,7 @@ import TimeControlHardwareOrder from "./TimeControlHardwareOrder";
 
 
 export {
+    TimeControlExtra,
     TimeControlHardwareOrder,
     AreaFloating,
     TimeControlInbound,

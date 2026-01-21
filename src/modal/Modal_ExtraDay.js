@@ -26,7 +26,7 @@ function Modal_ExtraDay({
 }) {
     const [search_Modal, setSearch_Modal] = useState(false);
     const [shop, setShop] = useState(initialShop)
-    const { id:shopId, name, packageArray = [] } = shop;
+    const { id:shopId, name, packageArray = [], storeSize } = shop;
     const [days, setDays] = useState('');
     const [reason, setReason] = useState('');
 
@@ -40,6 +40,7 @@ function Modal_ExtraDay({
         shopName:name,
         days:Number(days),
         packageArray,
+        storeSize,
         reason,
       });
       close()

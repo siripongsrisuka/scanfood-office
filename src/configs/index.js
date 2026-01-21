@@ -26,9 +26,11 @@ import initialChannel from "./initialChannel";
 import initialProcess from "./initialProcess";
 import initialTeam from "./initialTeam";
 import initialWarehouse from "./initialWarehouse";
+import initialExtraDay from "./initialExtraDay";
 
 
 export {
+  initialExtraDay,
   initialWarehouse,
   initialTeam,
   initialProcess,

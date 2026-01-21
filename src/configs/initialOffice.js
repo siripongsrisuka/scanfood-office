@@ -54,6 +54,12 @@ export default [
       to: 'extraDay',
       id:'128'
     },
+    {
+      topic: '3.5 ประวัติขอวันใช้งานเพิ่ม',
+      icon: 'bi-speedometer',
+      to: 'extraDayHistory',
+      id:'129'
+    },
 
     {
         label: '4. Customer Success',

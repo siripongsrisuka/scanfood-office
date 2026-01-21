@@ -4,24 +4,14 @@ import {
   Table,
 } from "react-bootstrap";
 import { SearchAndBottom } from "../components";
-import { NumberYMD, plusDays, stringDateTimeReceipt } from "../Utility/dateTime";
+import { stringDateTimeReceipt, stringYMDHMS3 } from "../Utility/dateTime";
 import { formatTime, searchMultiFunction, toastSuccess } from "../Utility/function";
 import { Modal_ExtraDay, Modal_FlatListTwoColumn, Modal_Loading } from "../modal";
 import { db } from "../db/firestore";
 import { reverseSort } from "../Utility/sort";
 import { scanfoodAPI } from "../Utility/api";
+import { initialExtraDay } from "../configs";
 
-const initialExtraDay = {
-    shopId:'',
-    shopName:'',
-    profileId:'',
-    profileName:'',
-    reason:'',
-    createdAt: new Date(),
-    days:0,
-    status:'pending', // pending, approved, rejected
-
-}
 
 function ExtraDayScreen() {
     const [extraDay_Modal, setExtraDay_Modal] = useState(false);
@@ -75,7 +65,8 @@ function ExtraDayScreen() {
                 createdAt:new Date(),
                 profileId,
                 profileName,
-                status:'pending'
+                status:'pending',
+                billDate:stringYMDHMS3(new Date())
             }
             await extraDayRef.set(payload)
             setMasterData(prev=>[...prev,payload])
@@ -93,48 +84,6 @@ function ExtraDayScreen() {
         const { shopId, days, id } = item;
         setLoading(true);
         try {
-            // const shopRef = db.collection("shop").doc(shopId);
-            // const mailboxRef = db.collection('mailbox').doc();
-            // const extraDayRef = db.collection('extraDay').doc(id);
-
-            // await db.runTransaction(async (transaction) => {
-            //     const shopDoc = await transaction.get(shopRef);
-            //     const { vip = [] } = shopDoc.data();
-
-            //     const newVip = vip.map((entry) => ({
-            //         ...entry,
-            //         expire: formatTime(entry.expire),
-            //     }));
-            //     const currentDate = NumberYMD(new Date());
-            //     const currentVip = newVip.some((a) => NumberYMD(a.expire) >= currentDate)
-            //         ? newVip.map(a=>{
-            //             return {
-            //                 ...a,
-            //                 expire: NumberYMD(a.expire) >= currentDate
-            //                     ? plusDays(a.expire, days)
-            //                     : a.expire
-            //             }
-            //         })
-            //         : newVip.map(a=>({
-            //             ...a,
-            //             expire: plusDays(new Date(), days)
-            //         }))
-        
-            //     transaction.update(shopRef, {
-            //         vip: currentVip
-            //     });
-            //     transaction.update(extraDayRef, {
-            //         status: 'approved',
-            //         approvedAt: new Date(),
-            //     });
-            //     transaction.set(mailboxRef,{
-            //         content: `อนุมัติเพิ่มวันใช้งานกรณีพิเศษเรียบร้อย`,
-            //         scanfood: false,
-            //         timestamp: new Date(),
-            //         shopId,
-            //     })
-
-            // });
             const { status, data } = await scanfoodAPI.post(
                 "/office/extraDay/",
                 item
@@ -143,7 +92,7 @@ function ExtraDayScreen() {
             toastSuccess('อนุมัติวันใช้งานสำเร็จ');
 
         } catch (error) {
-            alert('เกิดข้อผิดพลาดในการอนุมัติวันใช้งาน')
+            alert(error)
         } finally {
             setLoading(false);
         }
@@ -166,7 +115,7 @@ function ExtraDayScreen() {
         }
     }
 
-    const [current, setCurrent] = useState(null);
+    const [current, setCurrent] = useState(initialExtraDay);
     const [action_Modal, setAction_Modal] = useState(false);
     const actionOptions = [
         { name:'อนุมัติ', action:approvedExtraDay },
