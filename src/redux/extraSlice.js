@@ -34,10 +34,10 @@ export const fetchExtraDay = createAsyncThunk(
           const qsnapshot = await query.get();
           if (qsnapshot.docs.length > 0) {
             qsnapshot.forEach((doc) => {
-              const { timestamp,  ...rest } = doc.data()
+              const { createdAt,  ...rest } = doc.data()
               data.push({ 
                 ...rest, 
-                timestamp: formatTime(timestamp),
+                createdAt: formatTime(createdAt),
                 id:doc.id, 
   
               });
