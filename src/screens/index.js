@@ -31,8 +31,10 @@ import WarehouseJobHistory from "./WarehouseJobHistory";
 import ReportHardware from "./ReportHardware";
 import NewShopDashboard from "./NewShopDashboard";
 import ExtraDayHistory from "./ExtraDayHistory";
+import QuestionHistoryScreen from "./QuestionHistoryScreen";
 
 export {
+    QuestionHistoryScreen,
     ExtraDayHistory,
     ExtraDayScreen,
     TransferOwnerScreen,

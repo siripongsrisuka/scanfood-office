@@ -7,7 +7,6 @@ import provinces from "./provinces";
 import district from './district';
 import subDistrict from "./subDistrict";
 import onesignalDefalut from "./onesignalDefalut";
-import initialCheckOut from "./initialCheckOut";
 import initialAlert from "./initialAlert";
 import admin from "./admin";
 import colorIndex from "./colorIndex";
@@ -27,20 +26,22 @@ import initialProcess from "./initialProcess";
 import initialTeam from "./initialTeam";
 import initialWarehouse from "./initialWarehouse";
 import initialExtraDay from "./initialExtraDay";
+import initialQuestion from "./initialQuestion";
 
 
 export {
-  initialExtraDay,
-  initialWarehouse,
-  initialTeam,
-  initialProcess,
-  initialChannel,
-  initialProvince,
-  initialNote,
-  initialRegions,
-  initialShop,
-  initialStoreSize,
-  initialOffice,
+  initialQuestion,
+    initialExtraDay,
+    initialWarehouse,
+    initialTeam,
+    initialProcess,
+    initialChannel,
+    initialProvince,
+    initialNote,
+    initialRegions,
+    initialShop,
+    initialStoreSize,
+    initialOffice,
     initialWarehouseItem,
     colors, 
     mainImage, 
@@ -50,7 +51,6 @@ export {
     subDistrict,
     district,
     onesignalDefalut,
-    initialCheckOut,
     initialAlert,
     admin,
     colorIndex,

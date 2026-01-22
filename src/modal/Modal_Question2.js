@@ -3,15 +3,15 @@ import {
   Modal,
   Row,
   Col,
-  Button
+  Button,
+  Form
 } from "react-bootstrap";
 import { DeleteButton, FooterButton, InputArea, InputText, OneButton } from "../components";
-import { colors, initialAlert } from "../configs";
-import Modal_Alert from "./Modal_Alert";
+import { colors } from "../configs";
 import { checkAddCategory, checkCategory2, findInArray, manageCategory } from "../Utility/function";
 import Modal_FlatListTwoColumn from "./Modal_FlatListTwoColumn";
 
-const { darkGray, softWhite, white  } = colors;
+const { darkGray, softWhite, white, dark  } = colors;
 
 function Modal_Question2({
   backdrop=true, // true/false/static
@@ -19,28 +19,60 @@ function Modal_Question2({
   show,
   onHide,
   centered=true,
-  size='xl',
   current,
   submit,
   setCurrent,
   deleteItem,
   currentCategory
 }) {
-    const { id, q, a, category } = current;
-    const [alert_Modal, setAlert_Modal] = useState(initialAlert);
-    const { status, content, onClick, variant } = alert_Modal;
+    const { id, question, answer, category = [], imageUrls = [], type = '' } = current;
+
     const [category_Modal, setCategory_Modal] = useState(false) //category modal
     const [selectedCategory, setSelectedCategory] = useState([]);
 
+    function confirmDelete(){
+      const ok = window.confirm(`คุณต้องการลบคำถามนี้(${question})ใช่หรือไม่?`);
+      if(!ok) return;
+        deleteItem(id)
+    }
+
     function confirm(){
-        if(!a){
+        if(!question){
             alert('กรุณาใส่คำถาม')
-        } else if(!q){
+        } else if(!answer){
             alert('กรุณาใส่คำตอบ')
         }else {
             submit()
         }
-    }
+    };
+
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+
+    // Convert each file to a Promise
+    const readers = files.map(
+      (file) =>
+        new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result?.toString() || "");
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        })
+    );
+
+    // Wait for all FileReaders to finish
+    Promise.all(readers).then((results) => {
+      // results = array of base64 strings
+      setCurrent({ ...current, imageUrls: [...(imageUrls || []), ...results] });
+    });
+  };
+
+  function deleteImage(url){
+    const ok = window.confirm("คุณต้องการลบรูปภาพนี้ใช่หรือไม่?");
+    if (!ok) return;
+    const filteredImages = imageUrls.filter(img => img !== url);
+    setCurrent({ ...current, imageUrls: filteredImages });
+  }
 
 
   return (
@@ -50,9 +82,8 @@ function Modal_Question2({
       show={show}
       onHide={onHide}
       centered={centered}
-      fullscreen='xxl-down'
-      size={size}
        className="loading-screen"
+       fullscreen
     >
 
         <Modal_FlatListTwoColumn 
@@ -62,13 +93,7 @@ function Modal_Question2({
           onClick={(value)=>{setCurrent({...current,category:manageCategory(selectedCategory,category||[],value)});setCategory_Modal(false)}}
           value={selectedCategory}
         />
-        <Modal_Alert
-            show={status}
-            onHide={()=>{setAlert_Modal(initialAlert)}}
-            content={content}
-            onClick={onClick}
-            variant={variant}
-        />
+   
       <Modal.Header closeButton>
         <h2><b>ชุดคำถาม</b></h2>
         
@@ -77,15 +102,15 @@ function Modal_Question2({
         <InputText
             name='คำถาม'
             placeholder="คำถาม"
-            onChange={(event)=>{setCurrent({...current,q:event.target.value})}}
-            value={q}
+            onChange={(event)=>{setCurrent({...current,question:event.target.value})}}
+            value={question}
             strict={true}
         />
         <InputArea
             name='คำตอบ'
             placeholder="คำตอบ"
-            onChange={(event)=>{setCurrent({...current,a:event.target.value})}}
-            value={a}
+            onChange={(event)=>{setCurrent({...current,answer:event.target.value})}}
+            value={answer}
             strict={true}
             rows={8}
         />
@@ -147,13 +172,57 @@ function Modal_Question2({
                     }
                 </Col>
             </Row>
+            <input
+              id="file-upload"
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={handleImageChange}
+              style={{ display: "none" }}
+            />
+            <label
+              htmlFor="file-upload"
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#0D8266",
+                color: white,
+                borderRadius: "8px",
+                cursor: "pointer",
+                display: "inline-block",
+              }}
+            >
+              เลือกรูปภาพ
+            </label>
+            <div style={{ display: "flex", flexWrap: "wrap", marginTop: 20 }}>
+              {imageUrls.map((img, index) => (
+                <div key={index} style={{ margin: 10, position:'relative' }}>
+                  <img
+                    src={img}
+                    alt={`upload-${index}`}
+                    style={{ width: 150, height: 150, objectFit:'contain' }}
+                  />
+                  <div onClick={()=>{deleteImage(img)}} style={{position:'absolute',top:10,right:10,zIndex:999}} >
+                    <i style={{fontSize:30,color:dark}} class="bi bi-trash3"></i>
+                  </div>
+                </div>
+              ))}
+            </div>
+          <Form.Select 
+              aria-label="Default select example" 
+              value={type} 
+              onChange={(event)=>{setCurrent({...current,type:event.target.value})}}
+              style={{marginTop:'1rem',marginBottom:'1rem',width:'100%'}} 
+          >
+            <option value={'question'}>1. question</option>
+            <option value={'problem'}>2. problem</option>
+          </Form.Select>
         {id
             ?<Row  >
                 <Col sm='3' >
                   ลบรายการ
                 </Col>
                 <Col sm='9' >
-                    <DeleteButton {...{ text:'ลบรายการ', submit:()=>{setAlert_Modal({ status:true, content:`ลบ ${q}`, onClick:()=>{setAlert_Modal(initialAlert);deleteItem(id)}, variant:'danger'})} }} />
+                    <DeleteButton {...{ text:'ลบรายการ', submit:confirmDelete }} />
                 </Col>
             </Row>
             :null
@@ -174,21 +243,7 @@ const styles = {
     container3 : {
       padding:10
     },
-    container4 : {
-      marginLeft:'1rem'
-    },
-    container5 : {
-      marginTop:'1rem'
-    },
-    container6 : {
-      width:'10%', textAlign:'center'
-    },
-    container7 : {
-      width:'20%', textAlign:'center', minWidth:'180px'
-    },
-    container8 : {
-      textAlign:'center'
-    },
+
     image : {
       width:'100%',maxWidth:300,height:undefined,aspectRatio:1 , objectFit: 'cover'
     },

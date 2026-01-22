@@ -1,29 +1,23 @@
 import React, { useState, useEffect } from "react";
 import {
-  Button,
   Table,
 } from "react-bootstrap";
-import { CategoryControl, OneButton, SearchControl } from "../components";
-import { Modal_Arrange, Modal_CategorySetting, Modal_Loading, Modal_Question2 } from "../modal";
-import { v4 as uuidv4 } from 'uuid';
+import { CategoryControl, SearchControl } from "../components";
+import { Modal_Loading } from "../modal";
 import { db } from "../db/firestore";
-import { toast } from 'react-toastify';
-import { compareArrays, searchFilterFunction, totalField } from "../Utility/function";
-
-const initialQuestion = { q:'', a:"", id:"", category:[] };
+import { compareArrays, formatTime, searchFilterFunction, toastSuccess, totalField } from "../Utility/function";
+import { useSelector } from "react-redux";
+import { normalSort } from "../Utility/sort";
 
 
 function QuestionSettingScreen() {
-
-    const [question_Modal, setQuestion_Modal] = useState(false);
-    const [currentQuestion, setCurrentQuestion] = useState(initialQuestion);
-    const [current, setCurrent] = useState([]);
+    const { profile:{ id:profileId, name:profileName } } = useSelector(state=>state.profile);
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
-    const [editCategory_Modal, setEditCategory_Modal] = useState(false);
-    const [currentCategory, setCurrentCategory] = useState([]);
+    const [category, setCategory] = useState([]);
     const [categorySetting, setCategorySetting] = useState([]);
     const [currentDisplay, setCurrentDisplay] = useState([]);
+    const [masterData, setMasterData] = useState([]);
 
     useEffect(()=>{
         handleFetch()
@@ -32,10 +26,9 @@ function QuestionSettingScreen() {
     async function handleFetch(){
         setLoading(true);
         try {
-            const questionDoc = await db.collection('admin').doc('question2').get();
-            const { value, category } = questionDoc.data();
-            setCurrent(value)
-            setCurrentCategory(category)
+            const [ category, question ] = await Promise.all([fetchCategory(), fetchQuestion()]);
+            setCategory(category)
+            setMasterData(question)
         } catch (error) {
             console.log(error)
         } finally {
@@ -43,81 +36,75 @@ function QuestionSettingScreen() {
         }
     }
 
-    function manageQuestion(){
-        const { category:thisCategory, id } = currentQuestion;
-        
-        let category = []
-        if(thisCategory.length >0){
-            const { aboveId, id } = thisCategory[thisCategory.length-1]
-            category = [...aboveId,id]
-        };
-        if(id){
-            
-            setCurrent(prev=>prev.map(a=>{
-                return a.id === id
-                    ?{...currentQuestion, category }
-                    :a
-            }))
-        } else {
-            setCurrent(prev=>[...prev,{...currentQuestion, category, id:uuidv4()}])
-        }
-        setQuestion_Modal(false)
+    async function fetchCategory(){
+        const query = await db.collection('admin').doc('question2').get();
+        const { category } = query.data();
+        return category;
+    }
+
+    async function fetchQuestion(){
+        const query = await db.collection('question').get();
+        const result = query.docs.map(doc=>({...doc.data(), id:doc.id}));
+        const arraySorted = normalSort('retweetCount', result);
+        return arraySorted;
     };
 
-    function deleteQuestion(id){
-        setCurrent(prev=>prev.filter(a=>a.id !== id))
-        setQuestion_Modal(false)
-    };
+    async function reTweet(id){
+        const ok = window.confirm('คุณแน่ใจหรือไม่ที่จะดันการเจอปัญหานี้?');
+        if(!ok) return;
 
-    const [items, setItems] = useState([]);
-    const [questionArrange_Modal, setQuestionArrange_Modal] = useState(false);
-
-    function handleQuestionArrange(items){
-        setQuestionArrange_Modal(false)
-        setCurrent(prev=>({...prev,question:items.map(({ name, index, ...rest })=>({...rest}))}))
-    };
-
-    function openQuestionArrange(){
-        setItems(current.map((item,index)=>({...item,name:item.q,index})))
-        setQuestionArrange_Modal(true)
-    };
-
-    function submit(){
         setLoading(true);
         try {
-            db.collection('admin').doc('question2').update({ value:current })
-            toast.success('🟢 บันทึกสำเร็จแล้ว');
+            const questionRef = db.collection('question').doc(id);
+            const data = await db.runTransaction(async (transaction) => {
+                const questionDoc = await transaction.get(questionRef);
+                if (!questionDoc.exists) {
+                    throw "Document does not exist!";
+                }
+
+                const data = questionDoc.data();
+                const { retweetCount = 0, lastRetweet = [] } = data;
+                const lastRetweetTime = lastRetweet.find(item => item.profileId === profileId && formatTime(item.timestamp) >= new Date(Date.now() - 24 * 60 * 60 * 1000));
+                if (lastRetweetTime) {
+                    throw "คุณได้ดันการเจอปัญหานี้แล้วในช่วง 24 ชั่วโมงที่ผ่านมา";
+                }
+                const newRetweetCount = retweetCount + 1;
+                const newLastRetweet = lastRetweet.some(item => item.profileId === profileId)
+                    ? lastRetweet.map(item =>
+                        item.profileId === profileId
+                            ? { ...item, timestamp: new Date() }
+                            : item
+                    )
+                    : [...lastRetweet, { profileId, profileName, timestamp: new Date() }];
+
+                transaction.update(questionRef, {
+                    retweetCount: newRetweetCount,
+                    lastRetweet: newLastRetweet
+                });
+                return { ...data, retweetCount: newRetweetCount, lastRetweet: newLastRetweet };
+            });
+            const newMasterData = masterData.map(item => {
+                if (item.id === id) {
+                    return { ...item, ...data };
+                }
+                return item;
+            });
+            setMasterData(normalSort('retweetCount', newMasterData));
+            toastSuccess('ดันการเจอปัญหานี้เรียบร้อยแล้ว');
         } catch (error) {
-            console.log(error)
+            alert(error);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    };
+    }
 
-    function submitCategory(value){
-        setEditCategory_Modal(false)
-        setLoading(true);
-        try {
-            db.collection('admin').doc('question2').update({ category:value });
-            setCurrentCategory(value)
-            toast.success('🟢 บันทึกสำเร็จแล้ว');
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setLoading(false)
-        }
-    };
-
-    function openCategory(){
-      setEditCategory_Modal(true)
-    };
-
-      useEffect(()=>{
-        let length = categorySetting.length;
+    useEffect(()=>{
+        const length = categorySetting.length;
+        const thisTotalField = totalField(categorySetting,'id');
         let result = []
-        for(const item of current){
+        for(const item of masterData){
             if(length >=1){
-                if(compareArrays(item.category.slice(0,length),totalField(categorySetting,'id'))){
+                if(compareArrays(item.category.slice(0,length),thisTotalField)){
                     result.push(item)
                 }
             } else {
@@ -125,96 +112,71 @@ function QuestionSettingScreen() {
             }
         }
         if(search){
-        result = searchFilterFunction(result,search,'q')
+            result = searchFilterFunction(result,search,'q')
         }
 
-        setCurrentDisplay(result)
-    },[current,categorySetting,search]);
-
-    function openProduct(item){
-        const { category:thisCategory } = item;
-        let category = currentCategory.flatMap(a=>a.value).filter(b=>thisCategory.includes(b.id));
-        setCurrentQuestion({...item, category })
-        setQuestion_Modal(true)
-    };
+        setCurrentDisplay(result);
+    },[masterData,categorySetting,search]);
 
 
   return (
-    <div style={{ padding:10 }} >
-        <Modal_Loading show={loading} />
-        <Modal_Arrange
-          show={questionArrange_Modal}
-          onHide={()=>{setQuestionArrange_Modal(false)}}
-          items={items}
-          submit={handleQuestionArrange}
-          header="เลือกลำดับที่ต้องการ"
-      />
-        <Modal_CategorySetting 
-          show={editCategory_Modal} 
-          onHide={()=>{setEditCategory_Modal(false)}}
-          value={currentCategory}
-          submit={submitCategory}
-        />
-        <Modal_Question2
-            show={question_Modal}
-            onHide={()=>{setQuestion_Modal(false)}}
-            current={currentQuestion}
-            setCurrent={setCurrentQuestion}
-            submit={manageQuestion}
-            deleteItem={deleteQuestion}
-            currentCategory={currentCategory}
-        />
-        <h1>คำถามที่พบบ่อย</h1>
+    <div style={styles.container} >
+        <h1>คำถาม/ปัญหาที่พบบ่อย</h1>
 
-       
-        <OneButton {...{ text:'เพิ่มคำถาม/คำตอบ', submit:()=>{setQuestion_Modal(true);setCurrentQuestion(initialQuestion)}, variant:'dark' }} />&emsp;
-        <OneButton {...{ text:'จัดลำดับ', submit:openQuestionArrange, variant:'warning' }} />&emsp;
-        <OneButton {...{ text:'บันทึก', submit, variant:'success' }} />&emsp;
-        <OneButton {...{ text:'จัดการหมวดหมู่', submit:openCategory, variant:'dark' }} />
-        <br/> <br/>
+        <Modal_Loading show={loading} />
+
         <SearchControl {...{ placeholder:'ค้นหาด้วยชื่อ', search, setSearch }} />
         
-        <CategoryControl {...{ warehouseCategory:currentCategory, categorySetting, setCategorySetting }} />
-        <h5>ทั้งหมด {currentDisplay.length}/{current.length} คำถาม</h5>
-        {currentDisplay.length>0
-            ?<Table striped bordered hover responsive  variant="light" style={{marginTop:'1rem'}}  >
+        <CategoryControl {...{ warehouseCategory:category, categorySetting, setCategorySetting }} />
+        <h5>ทั้งหมด {currentDisplay.length}/{masterData.length} คำถาม</h5>
+       <Table striped bordered hover responsive  variant="light" style={{marginTop:'1rem'}}  >
                 <thead  >
                 <tr>
-                    <th style={styles.container9}>ลำดับ</th>
-                    <th style={styles.container12}>คำถาม</th>
-                    <th style={styles.container11}>คำตอบ</th>
-                    <th style={styles.container10}>จัดการ</th>
+                    <th style={styles.container2}>ลำดับ</th>
+                    <th style={styles.container3}>คำถาม</th>
+                    <th style={styles.container4}>คำตอบ</th>
+                    <th style={styles.container3}>retweet</th>
                 </tr>
                 </thead>
                 <tbody  >
                 {currentDisplay.map((item,index) => {
-                    const { q, a } = item;
+                    const { question, answer, id, retweetCount = 0 } = item;
                     return <tr   key={index} >
-                                <td style={styles.container9}>{index+1}</td>
-                                <td style={styles.container12}>{q}</td>
+                                <td style={styles.container2}>{index+1}</td>
+                                <td >{question}</td>
                                 <td >
-                                {a.split('\n').map((line, index) => (
+                                {answer.split('\n').map((line, index) => (
                                 <React.Fragment key={index}>
                                     {line}
                                     <br />
                                 </React.Fragment>
                                 ))}
                                 </td>
-                                <td style={styles.container10}>
-                                <Button onClick={()=>{openProduct(item)}} variant="warning" >
-                                    จัดการ
-                                </Button>
-                                </td>
+                                <td onClick={()=>{reTweet(id)}} style={styles.container3}><i class="bi bi-chevron-double-up"></i> {retweetCount}</td>
                             </tr>
                 })}
                 </tbody>
-            </Table>
-            :null
-        }
+        </Table>
     </div>
   );
 };
 
-const styles = {}
+const styles = {
+    container : {
+        minHeight:'100vh',
+    },
+    container2 : {
+        width:'5%', minWidth:'70px', textAlign:'center'
+    },
+    container3 : {
+        width:'20%', minWidth:'150px', textAlign:'center'
+    },
+    container4 : {
+       width:'25%', minWidth:'250px', textAlign:'center'
+    },
+    container5 : {
+        textAlign:'center'
+    }
+}
 
 export default QuestionSettingScreen;

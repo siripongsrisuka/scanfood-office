@@ -32,6 +32,7 @@ import {
   TransferOwnerScreen,
   ExtraDayScreen,
   ExtraDayHistory,
+  QuestionHistoryScreen,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -107,6 +108,7 @@ function App() {
             <Route path='transferOwner' element={<TransferOwnerScreen/>} />
             <Route path='extraDay' element={<ExtraDayScreen/>} />
             <Route path='extraDayHistory' element={<ExtraDayHistory/>} />
+            <Route path='questionHistory' element={<QuestionHistoryScreen/>} />
             
           </Route>
       </Routes>

@@ -34,51 +34,50 @@ export default [
       topic: '3.1 Sale Manager',
       icon: 'bi-speedometer',
       to:'saleManager',
-      id:'100'
+      id:'301'
     },
     {
       topic: '3.2 เซล',
       icon: 'bi-speedometer',
       to:'sale',
-      id:'100'
+      id:'302'
     },
     {
       topic: '3.3 ร้านใหม่',
       icon: 'bi-speedometer',
       to:'newShop',
-      id:'100'
+      id:'303'
     },
     {
       topic: '3.4 ขอวันใช้งานเพิ่ม',
       icon: 'bi-speedometer',
       to: 'extraDay',
-      id:'128'
+      id:'304'
     },
     {
       topic: '3.5 ประวัติขอวันใช้งานเพิ่ม',
       icon: 'bi-speedometer',
       to: 'extraDayHistory',
-      id:'129'
+      id:'305'
     },
 
     {
         label: '4. Customer Success',
       },
       {
-        topic: '4.1 กำหนดสิทธิ์',
+        topic: '4.1 How to เอาตัวรอด',
         icon: 'bi-speedometer',
         to: 'questionSetting',
         id:'723'
       },
       {
-        topic: '4.2 กำหนดสิทธิ์',
+        topic: '4.2 เพิ่มคำถาม-คำตอบ',
         icon: 'bi-speedometer',
-        to: 'diagnosis',
+        to: 'questionHistory',
         id:'723'
       },
-        {
+    {
       label: '5. คลังสินค้า',
-      
     },
     {
       topic: '5.1 งาน',
@@ -104,22 +103,18 @@ export default [
       to: 'reportInbound',
       id:'504'
     },
-    
     {
       topic: '5.5 ตั้งค่าสินค้า',
       icon: 'bi-speedometer',
       to: 'warehouseSetting',
       id:'505'
     },
-
     {
       topic: '5.6 จัดเรียงสินค้า',
       icon: 'bi-speedometer',
       to: 'hardwareArrange',
       id:'506'
     },
-  
- 
     {
       label: '6. ทีม Tech ขั้นเทพ',
     },
@@ -161,19 +156,19 @@ export default [
       id:'128'
     },
     {
-      topic: '6.4 ย้ายวันใช้งาน',
+      topic: '6.7 ย้ายวันใช้งาน',
       icon: 'bi-speedometer',
       to: 'transferExpire',
       id:'128'
     },
     {
-      topic: '6.5 เปลี่ยนไม่มีโต๊ะเป็นมีโต๊ะ',
+      topic: '6.8 เปลี่ยนไม่มีโต๊ะเป็นมีโต๊ะ',
       icon: 'bi-speedometer',
       to: 'transform',
       id:'128'
     },
     {
-      topic: '6.5 เปลี่ยนสิทธิ์ Owner',
+      topic: '6.9 เปลี่ยนสิทธิ์ Owner',
       icon: 'bi-speedometer',
       to: 'transferOwner',
       id:'128'
