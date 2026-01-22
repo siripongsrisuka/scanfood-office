@@ -3,14 +3,15 @@ import {
   Table,
 } from "react-bootstrap";
 import { CategoryControl, SearchControl } from "../components";
-import { Modal_Loading } from "../modal";
+import { Modal_Loading, Modal_Question } from "../modal";
 import { db } from "../db/firestore";
 import { compareArrays, formatTime, searchFilterFunction, toastSuccess, totalField } from "../Utility/function";
 import { useSelector } from "react-redux";
 import { normalSort } from "../Utility/sort";
+import { initialQuestion } from "../configs";
 
 
-function QuestionSettingScreen() {
+function QuestionScreen() {
     const { profile:{ id:profileId, name:profileName } } = useSelector(state=>state.profile);
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
@@ -18,6 +19,13 @@ function QuestionSettingScreen() {
     const [categorySetting, setCategorySetting] = useState([]);
     const [currentDisplay, setCurrentDisplay] = useState([]);
     const [masterData, setMasterData] = useState([]);
+    const [currentQuestion, setCurrentQuestion] = useState(initialQuestion);
+    const [question_Modal, setQuestion_Modal] = useState(false);
+
+    function openQuestionModal(item){
+        setCurrentQuestion(item);
+        setQuestion_Modal(true);
+    };
 
     useEffect(()=>{
         handleFetch()
@@ -122,7 +130,11 @@ function QuestionSettingScreen() {
   return (
     <div style={styles.container} >
         <h1>คำถาม/ปัญหาที่พบบ่อย</h1>
-
+        <Modal_Question
+            show={question_Modal}
+            onHide={() => setQuestion_Modal(false)}
+            current={currentQuestion}
+        />
         <Modal_Loading show={loading} />
 
         <SearchControl {...{ placeholder:'ค้นหาด้วยชื่อ', search, setSearch }} />
@@ -143,8 +155,8 @@ function QuestionSettingScreen() {
                     const { question, answer, id, retweetCount = 0 } = item;
                     return <tr   key={index} >
                                 <td style={styles.container2}>{index+1}</td>
-                                <td >{question}</td>
-                                <td >
+                                <td onClick={()=>{openQuestionModal(item)}} >{question}</td>
+                                <td onClick={()=>{openQuestionModal(item)}} >
                                 {answer.split('\n').map((line, index) => (
                                 <React.Fragment key={index}>
                                     {line}
@@ -179,4 +191,4 @@ const styles = {
     }
 }
 
-export default QuestionSettingScreen;
+export default QuestionScreen;

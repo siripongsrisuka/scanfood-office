@@ -14,7 +14,7 @@ import ExtraDayScreen from "./ExtraDayScreen";
 import SoftwareHistory from "./SoftwareHistory";
 import TransformTable from "./TransformTable";
 import TransferExpireScreen from "./TransferExpireScreen";
-import QuestionSettingScreen from "./QuestionSettingScreen";
+import QuestionScreen from "./QuestionScreen";
 import DiagnosisScreen from "./DiagnosisScreen";
 import KbankReportScreen from "./KbankReportScreen";
 import WarehouseScreen from "./WarehouseScreen";
@@ -55,7 +55,7 @@ export {
     OfficeScreen,
     KbankReportScreen,
     DiagnosisScreen,
-    QuestionSettingScreen,
+    QuestionScreen,
     TransferExpireScreen,
     TransformTable,
     SoftwareHistory,

@@ -1,6 +1,7 @@
 import Modal_Loading from "./Modal_Loading";
 import Modal_FlatlistSearchFranchise from "./Modal_FlatlistSearchFranchise";
 import Modal_ExtraDay from "./Modal_ExtraDay";
+import Modal_Question from "./Modal_Question";
 
 import Modal_OneInput from "./Modal_OneInput";
 import Modal_Information from "./Modal_Infomation";
@@ -28,7 +29,9 @@ import Modal_DatePicker from "./Modal_DatePicker";
 import Modal_Stock from "./Modal_Stock";
 import Modal_Inbound from "./Modal_Inbound";
 
+
 export { 
+    Modal_Question,
     Modal_ExtraDay,
     Modal_Inbound,
     Modal_Stock,

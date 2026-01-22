@@ -63,18 +63,18 @@ export default [
 
     {
         label: '4. Customer Success',
-      },
+    },
       {
         topic: '4.1 How to เอาตัวรอด',
         icon: 'bi-speedometer',
         to: 'questionSetting',
-        id:'723'
+        id:'401'
       },
       {
         topic: '4.2 เพิ่มคำถาม-คำตอบ',
         icon: 'bi-speedometer',
         to: 'questionHistory',
-        id:'723'
+        id:'402'
       },
     {
       label: '5. คลังสินค้า',

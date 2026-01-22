@@ -11,7 +11,7 @@ import {
   SoftwareHistory,
   TransformTable,
   TransferExpireScreen,
-  QuestionSettingScreen,
+  QuestionScreen,
   DiagnosisScreen,
   KbankReportScreen,
   OfficeScreen,
@@ -103,7 +103,7 @@ function App() {
             <Route path='importItemFranchise' element={<ImportItemFranchiseScreen/>} />
             <Route path='importBomFranchise' element={<ImportBomFranchiseScreen/>} />
             <Route path='importMarketPlaceFranchise' element={<ImportMarketPlaceFranchise/>} />
-            <Route path='questionSetting' element={<QuestionSettingScreen/>} />
+            <Route path='questionSetting' element={<QuestionScreen/>} />
             <Route path='diagnosis' element={<DiagnosisScreen/>} />
             <Route path='transferOwner' element={<TransferOwnerScreen/>} />
             <Route path='extraDay' element={<ExtraDayScreen/>} />
