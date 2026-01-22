@@ -60,6 +60,15 @@ export default [
       to: 'extraDayHistory',
       id:'305'
     },
+    {
+      topic: '3.6 ร้านค้า 1 เดือน',
+      icon: 'bi-speedometer',
+      to: 'oneMonthShop',
+      id:'306'
+    },
+
+
+    
 
     {
         label: '4. Customer Success',
@@ -75,6 +84,12 @@ export default [
         icon: 'bi-speedometer',
         to: 'questionHistory',
         id:'402'
+      },
+      {
+        topic: '4.3 ข้อมูลลูกค้า',
+        icon: 'bi-speedometer',
+        to: 'customerProfile',
+        id:'403'
       },
     {
       label: '5. คลังสินค้า',

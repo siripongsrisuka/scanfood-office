@@ -23,7 +23,6 @@ import { colors, initialProcess } from "../configs";
 import { fetchCustomer, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fetchSoftware, fetchSuccessCases, fetchWaste, formatCurrency, formatTime, isGodIt, toastSuccess, wait } from "../Utility/function";
 import initialShopType from "../configs/initialShopType";
 import initialCancelId from "../configs/initialCancelId";
-import { is } from "date-fns/locale";
 const { softWhite, dark, softGray, greenSanta, white, blue } = colors;
 
 const data = [
@@ -51,6 +50,7 @@ const customerOptions = [
     { id:'4', name:'ผูกบัญชีร้านค้า'},
     { id:'5', name:'ย้ายไปถังขยะ'},
     { id:'6', name:'เปิดบิลเคสขอใบกำกับภาษี'},
+    { id:'7', name:'ซื้อทดลองใช้ 1 เดือน'},
 ];
 
 const processMap = {
@@ -75,7 +75,8 @@ const initialSo = {
     hardware:[], 
     note:'', 
     deliveryType:'normal',
-    customerId:''
+    customerId:'',
+    oneMonth:false, // ใช้ทดลอง 1 เดือน
 };
 
 const initialCancel = { cancelId:'', reason:'' };
@@ -278,6 +279,7 @@ function SaleScreen() {
     };
 
     function openCustomerAction(item){
+        console.log(item)
         setCurrentCustomer(item);
         if(optionId==='1') return setCustomerAction_Modal(true);
 
@@ -321,8 +323,11 @@ function SaleScreen() {
     
     // 200%
     async function handleSo(payload){
- 
+        const { oneMonth, requestDate } = currentSo;
         setSo_Modal(false)
+
+        if(!shopId && oneMonth) return alert('ยังไม่มี shopId');
+
         setLoading(true);
         
         try {
@@ -397,8 +402,8 @@ function SaleScreen() {
                     customerId,
                     name,
                     id:autoPaymentRef.id,
-                    requestDate:new Date(), 
-                    requestBillDate:stringYMDHMS3(new Date()),
+                    requestDate, 
+                    requestBillDate:stringYMDHMS3(requestDate),
                 };
                 transaction.set(autoPaymentRef,paymentData)
                 return {

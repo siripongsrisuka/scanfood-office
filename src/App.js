@@ -33,6 +33,8 @@ import {
   ExtraDayScreen,
   ExtraDayHistory,
   QuestionHistoryScreen,
+  CustomerProfileScreen,
+  OneMonthShopScreen,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -109,6 +111,8 @@ function App() {
             <Route path='extraDay' element={<ExtraDayScreen/>} />
             <Route path='extraDayHistory' element={<ExtraDayHistory/>} />
             <Route path='questionHistory' element={<QuestionHistoryScreen/>} />
+            <Route path='customerProfile' element={<CustomerProfileScreen/>} />
+            <Route path='oneMonthShop' element={<OneMonthShopScreen/>} />
             
           </Route>
       </Routes>

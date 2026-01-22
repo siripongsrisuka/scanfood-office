@@ -32,8 +32,12 @@ import ReportHardware from "./ReportHardware";
 import NewShopDashboard from "./NewShopDashboard";
 import ExtraDayHistory from "./ExtraDayHistory";
 import QuestionHistoryScreen from "./QuestionHistoryScreen";
+import CustomerProfileScreen from "./CustomerProfileScreen";
+import OneMonthShopScreen from "./OneMonthShopScreen";
 
 export {
+    OneMonthShopScreen,
+    CustomerProfileScreen,
     QuestionHistoryScreen,
     ExtraDayHistory,
     ExtraDayScreen,

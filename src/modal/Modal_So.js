@@ -28,7 +28,7 @@ function Modal_So({
   hardwares,
   disabled
 }) {
-    const { storeSize, software, requestDate = '', hardware, note = '', deliveryType = 'normal' } = current;
+    const { storeSize, software, requestDate = '', hardware, note = '', deliveryType = 'normal', oneMonth = false } = current;
     
     const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => (
         <div  style={{ borderRadius:20 }} onClick={onClick} ref={ref}>
@@ -40,9 +40,9 @@ function Modal_So({
   const { display, extraCharge, softwarePrice, net, hardwarePrice, deliveryFee } = useMemo(()=>{
     const thisSize = storeSize>100?100:storeSize;
     const display = licenses.map(({ name, price, color })=>({ name, ...price.find(b=>b.table===thisSize && b.save!==0), color }));
-    const softwarePrice = summary(software,'price')
+    const softwarePrice = oneMonth?1000:summary(software,'price')
     // เกิดจากโต็กเกิน 100 โต๊ะ
-    const extraCharge = storeSize>100
+    const extraCharge = storeSize>100 && !oneMonth
         ?((storeSize-100)/50)*3000
         :0;
 
@@ -61,11 +61,11 @@ function Modal_So({
           hardwarePrice,
           deliveryFee
       }
-  },[licenses,storeSize,software,hardware,deliveryType]);
+  },[licenses,storeSize,software,hardware,deliveryType,oneMonth]);
 
 
   function handleSubmit(){
-    if(software.length===0 && hardware.length === 0) return alert('เลือกอย่างน้อย 1 รายการ');
+    if(software.length===0 && hardware.length === 0 && !oneMonth) return alert('เลือกอย่างน้อย 1 รายการ');
 
     submit({
         extraCharge,
@@ -80,6 +80,7 @@ function Modal_So({
 
 
     function manageSoftware(item){
+        if(oneMonth) return alert('ไม่สามารถเลือกซอฟต์แวร์ในโหมด 1 เดือน') ; // ถ้าเป็นโหมด 1 เดือน ห้ามเลือกซอฟต์แวร์
         setCurrent(prev=>({
             ...prev,
             software:prev.software.some(a=>a.id === item.id)
@@ -221,6 +222,29 @@ function Modal_So({
                     </div>
                 </div>
             </div>
+            <br/>
+            <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
+                <div style={{ marginBottom: 12, fontWeight: 'bold' }}>
+                    <h2>4. ซื้อทดลองใช้ 1 เดือน</h2>
+                </div>
+                <Form.Select 
+                        aria-label="Default select example" 
+                        value={oneMonth} 
+                        onChange={(event)=>{
+                            event.preventDefault()
+                            if(event.target.value==='true'){
+                                setCurrent(prev=>({...prev, oneMonth:event.target.value==='true', software:[]}))
+                            } else {
+                                setCurrent(prev=>({...prev, oneMonth:event.target.value==='true'}))
+                            }
+                        }}
+                        style={{width:'180px'}}
+                    >
+                        <option value={false}>ไม่ใช่</option>
+                        <option value={true} >ใช่</option>
+                </Form.Select>
+            </div>
+            
         </Card>
         <Card title='Hardware' maxWidth={'95vw'} accentColor={one}  >
             <h2>1. เลือกอุปกรณ์</h2>

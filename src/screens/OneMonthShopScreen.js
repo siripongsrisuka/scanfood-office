@@ -9,7 +9,7 @@ import { searchMultiFunction } from "../Utility/function";
 import { Modal_Loading } from "../modal";
 
 
-function ExtraDayHistory() {
+function OneMonthShopScreen() {
     const { displayExtraDays, modal_ExtraDay } = useSelector((state)=> state.extra);
     const [currentDisplay, setCurrentDisplay] = useState([]) // จำนวนที่แสดงในหนึ่งหน้า
     const [resultLength, setResultLength] = useState(0);
@@ -30,7 +30,7 @@ function ExtraDayHistory() {
   return (
     <div style={styles.container} >
         <Modal_Loading show={modal_ExtraDay} />
-        <h1>ประวัติขอวันใช้งานเพิ่ม</h1>
+        <h1>ร้านค้า 1 เดือน</h1>
 
         <TimeControlExtra />
         <SearchControl {...{ placeholder:'ค้นหาด้วยชื่อร้านหรือชื่อเซล', search, setSearch }} />
@@ -41,11 +41,9 @@ function ExtraDayHistory() {
                 <tr>
                     <th style={styles.container2} >No.</th>
                     <th style={styles.container3} >วันที่</th>
+                    <th style={styles.container3} >ร้าน</th>
+                    <th style={styles.container3} >วันใช้งานสุดท้าย</th>
                     <th style={styles.container3} >เซล</th>
-                    <th style={styles.container3} >ร้านค้า</th>
-                    <th style={styles.container3} >จำนวนวัน</th>
-                    <th style={styles.container3} >เหตุผล</th>
-                    <th style={styles.container3} >สถานะ</th>
 
                 </tr>
             </thead>
@@ -83,4 +81,4 @@ const styles = {
   }
 }
 
-export default ExtraDayHistory;
+export default OneMonthShopScreen;
