@@ -279,7 +279,6 @@ function SaleScreen() {
     };
 
     function openCustomerAction(item){
-        console.log(item)
         setCurrentCustomer(item);
         if(optionId==='1') return setCustomerAction_Modal(true);
 
