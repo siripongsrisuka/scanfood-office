@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Table,
@@ -28,6 +28,7 @@ function StaffScreen() {
     const [current, setCurrent] = useState(initialHuman);
     const [newHuman_Modal, setNewHuman_Modal] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [currentHumans, setCurrentHumans] = useState([]);
 
     const sideBar = useMemo(()=>{
       let sideBar = initialOffice
@@ -35,15 +36,36 @@ function StaffScreen() {
       return sideBar.filter(a=>!a.label)
     },[])
 
+  
+
+    async function fetchHumanResource(){
+        let res = []
+        setLoading(true);
+        for(const item of humanRight){
+            await db.collection('profile').doc(item.id).get().then((doc)=>{
+                if(doc.exists){
+                    const { email, name, imageId, tel  } = doc.data();
+                    res.push({...item,email,name,imageId,tel})
+                }
+            }).catch((err)=>{res.push(item)})   
+        }
+        setCurrentHumans(res);
+        setLoading(false);
+    }
+
+    useEffect(()=>{
+      fetchHumanResource();
+    },[humanRight]);
+
  
     // 200%
     async function manageHuman(){
         setHuman_Modal(false)
         const rightIds = new Set(sideBar.map(a=>a.id))
         const { id, rights } = current;
-        const findHuman = humanRight.find(a=>a.id===id);
+        const findHuman = currentHumans.find(a=>a.id===id);
         const newHuman = findHuman
-          ?humanRight.map(item=>
+          ?currentHumans.map(item=>
             item.id === id
               ?{
                 ...current,
@@ -51,7 +73,7 @@ function StaffScreen() {
               }
               :item
           )
-          :[...humanRight,current]
+          :[...currentHumans,current]
         const updatedField = { humanRight:newHuman, humanResource:newHuman.map(a=>a.id) };
         setLoading(true);
         try {
@@ -70,7 +92,7 @@ function StaffScreen() {
     // 200%
     async function deleteHuman(id){
         setHuman_Modal(false);
-        const newHuman = humanRight.filter(a=>a.id!==id);
+        const newHuman = currentHumans.filter(a=>a.id!==id);
         setLoading(true);
         try {
           const updatedField = { humanRight:newHuman, humanResource:newHuman.map(a=>a.id) };
@@ -114,7 +136,7 @@ function StaffScreen() {
         <OneButton {...{ text:'+ เพิ่มบุคลากร', submit:()=>{setNewHuman_Modal(true)} }} />
         <br/>
         <br/>
-        <h6>บุคคากร : {humanRight.length} คน</h6>
+        <h6>บุคคากร : {currentHumans.length} คน</h6>
       <Table striped bordered hover responsive  variant="light"   >
             <thead  >
             <tr>
@@ -127,7 +149,7 @@ function StaffScreen() {
             </tr>
             </thead>
             <tbody  >
-            {humanRight.map((item, index) => {
+            {currentHumans.map((item, index) => {
                 const { id, name, tel, rights, imageId } = item;
                 return <tr  key={id} >
                             <td style={styles.container6}>{index+1}.</td>
