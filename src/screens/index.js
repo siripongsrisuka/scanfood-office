@@ -35,9 +35,11 @@ import QuestionHistoryScreen from "./QuestionHistoryScreen";
 import CustomerProfileScreen from "./CustomerProfileScreen";
 import OneMonthShopScreen from "./OneMonthShopScreen";
 import EmailKbankScreen from "./EmailKbankScreen";
+import EmailTaxScreen from "./EmailTaxScreen";
 
 export {
     EmailKbankScreen,
+    EmailTaxScreen,
     OneMonthShopScreen,
     CustomerProfileScreen,
     QuestionHistoryScreen,

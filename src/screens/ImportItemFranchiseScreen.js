@@ -226,7 +226,7 @@ const ImportItemFranchiseScreen = () => {
 
 
   return (
-    <div style={{padding:10}} >
+    <div style={styles.container} >
         <h1>อัปโหลดสินค้าแฟรนไชส์</h1>
 
         <Modal_Loading show={loading} />
@@ -299,6 +299,9 @@ const ImportItemFranchiseScreen = () => {
 };
 
 const styles = {
+  container: {
+    minHeight:'100vh'
+  },
   text : {
     width: '12%', textAlign:'center',minWidth:'120px'
   },

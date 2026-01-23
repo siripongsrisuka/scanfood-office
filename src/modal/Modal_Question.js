@@ -32,7 +32,7 @@ function Modal_Question({
       <Modal.Body  >
         <FloatingText
             text="คำถามที่พบบ่อย (FAQ)"
-            placeholder="ำถามที่พบบ่อย (FAQ)"
+            placeholder="คำถามที่พบบ่อย (FAQ)"
             value={question}
         />
         <FloatingArea

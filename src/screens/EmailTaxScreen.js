@@ -1,19 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import {
-  Button,
-  Form,
-  Row,
-  Col,
-  Container,
   Table,
-  Modal,
-  Card,
-  Image,
-  Collapse,
-  InputGroup,
-  OverlayTrigger,
-  Tooltip
 } from "react-bootstrap";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { Modal_Email, Modal_Loading } from "../modal";
@@ -30,7 +18,7 @@ const initialEmailKbank = {
     profileId:'',
 };
 
-function EmailKbankScreen() {
+function EmailTaxScreen() {
     const { profile:{ id:profileId, name:profileName } } = useSelector((state)=> state.profile);
     const [masterData ,setMasterData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -40,7 +28,7 @@ function EmailKbankScreen() {
     const [search, setSearch] = useState('');
 
     useEffect(()=>{
-        fetchEmailKbank();
+        fetchEmailTax();
     },[]);
 
     useEffect(()=>{
@@ -50,10 +38,10 @@ function EmailKbankScreen() {
         setCurrentDisplay(filtered);
     },[search, masterData]);
 
-    async function fetchEmailKbank(){
+    async function fetchEmailTax(){
         setLoading(true);
         try {
-            const query = await db.collection('emailKbank').orderBy('createdAt','desc').limit(100).get();
+            const query = await db.collection('emailTax').orderBy('createdAt','desc').limit(100).get();
             let res = []
             query.forEach((doc)=>{
                 res.push({...doc.data(), createdAt: doc.data().createdAt.toDate(), id:doc.id})
@@ -72,27 +60,27 @@ function EmailKbankScreen() {
     };
 
 
-    async function handleEmailKbank(){
-        // ส่งอีเมล Kbank
+    async function handleEmailTax(){
+        // ส่งอีเมล ขอหมายเลขเครื่อง POS
         setEmail_Modal(false)
         setLoading(true);
         try {
             const { status, data } = await scanfoodAPI.post(
-                "/email/oneshot/kbank/",
+                "/email/oneshot/tax/",
                 {
                     toList:[current.email],
                 }
             );
-            const emailKbankRef = db.collection('emailKbank').doc();
+            const emailTaxRef = db.collection('emailTax').doc();
             const payload = {
                 ...current,
-                id:emailKbankRef.id,
+                id:emailTaxRef.id,
                 createdAt:new Date(),
                 profileId,
                 profileName
             }
-            await emailKbankRef.set(payload);
-            toastSuccess('ส่งอีเมล Kbank เรียบร้อยแล้ว');
+            await emailTaxRef.set(payload);
+            toastSuccess('ส่งอีเมล ขอหมายเลขเครื่อง POS เรียบร้อยแล้ว');
             setMasterData(prev=>[payload, ...prev])
         } catch (error) {
             alert(error);
@@ -110,9 +98,9 @@ function EmailKbankScreen() {
             onHide={()=>{setEmail_Modal(false)}}
             current={current}
             setCurrent={setCurrent}
-            submit={handleEmailKbank}
+            submit={handleEmailTax}
         />
-        <h1>ส่งอีเมล Kbank</h1>
+        <h1>ส่งอีเมล ขอหมายเลขเครื่อง POS</h1>
         <SearchAndBottom {...{ search, setSearch, download:false, placeholder:'ค้นหาด้วยชื่อร้านหรืออีเมลหรือพนักงาน', text:'ส่งอีเมล', exportToXlsx:openEmailModal}} />
         <br/>
         <Table striped bordered hover responsive  variant="light"   >
@@ -157,4 +145,4 @@ const styles = {
   }
 }
 
-export default EmailKbankScreen;
+export default EmailTaxScreen;

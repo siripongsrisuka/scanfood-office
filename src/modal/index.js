@@ -28,11 +28,11 @@ import Modal_Cancel from "./Modal_Cancel";
 import Modal_DatePicker from "./Modal_DatePicker";
 import Modal_Stock from "./Modal_Stock";
 import Modal_Inbound from "./Modal_Inbound";
-import Modal_EmailKbank from "./Modal_EmailKbank";
+import Modal_Email from "./Modal_Email";
 
 
 export { 
-    Modal_EmailKbank,
+    Modal_Email,
     Modal_Question,
     Modal_ExtraDay,
     Modal_Inbound,

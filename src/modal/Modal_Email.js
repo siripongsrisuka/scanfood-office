@@ -4,7 +4,7 @@ import {
 } from "react-bootstrap";
 import { FloatingText, FooterButton } from "../components";
 
-function Modal_EmailKbank({
+function Modal_Email({
   backdrop=true, // true/false/static
   animation=true,
   show,
@@ -20,7 +20,7 @@ function Modal_EmailKbank({
     function confirm(){
       if(!shopName) return alert('กรุณาเลือกร้านค้า');
       if(!email) return alert('กรุณาใส่อีเมล');
-      const ok = window.confirm(`ยืนยันการส่งอีเมล Kbank ใช่หรือไม่ ?`);
+      const ok = window.confirm(`ยืนยันการส่งอีเมล ใช่หรือไม่ ?`);
       if(!ok) return;
       submit();
       close()
@@ -47,7 +47,7 @@ function Modal_EmailKbank({
       size={size}
     >
       <Modal.Header closeButton>
-        <h2><b>ส่งอีเมล Kbank</b></h2>
+        <h2><b>ส่งอีเมล</b></h2>
       </Modal.Header>
 
       <Modal.Body  >
@@ -71,4 +71,4 @@ function Modal_EmailKbank({
   );
 };
 
-export default Modal_EmailKbank;
+export default Modal_Email;

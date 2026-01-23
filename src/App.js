@@ -36,6 +36,7 @@ import {
   CustomerProfileScreen,
   OneMonthShopScreen,
   EmailKbankScreen,
+  EmailTaxScreen,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -115,6 +116,7 @@ function App() {
             <Route path='customerProfile' element={<CustomerProfileScreen/>} />
             <Route path='oneMonthShop' element={<OneMonthShopScreen/>} />
             <Route path='emailKbank' element={<EmailKbankScreen/>} />
+            <Route path='emailTax' element={<EmailTaxScreen/>} />
             
           </Route>
       </Routes>

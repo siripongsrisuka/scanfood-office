@@ -218,6 +218,12 @@ export default [
       to: 'emailKbank',
       id:'701'
     },
+    {
+      topic: '7.2 ส่งอีเมล ขอหมายเลขเครื่อง POS',
+      icon: 'bi-speedometer',
+      to: 'emailTax',
+      id:'702'
+    },
  
     // {
     //   topic: '4.4 เพิ่มโต๊ะ',
