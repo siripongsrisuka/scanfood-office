@@ -34,8 +34,10 @@ import ExtraDayHistory from "./ExtraDayHistory";
 import QuestionHistoryScreen from "./QuestionHistoryScreen";
 import CustomerProfileScreen from "./CustomerProfileScreen";
 import OneMonthShopScreen from "./OneMonthShopScreen";
+import EmailKbankScreen from "./EmailKbankScreen";
 
 export {
+    EmailKbankScreen,
     OneMonthShopScreen,
     CustomerProfileScreen,
     QuestionHistoryScreen,

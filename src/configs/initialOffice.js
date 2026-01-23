@@ -196,42 +196,48 @@ export default [
       to: 'kbankReport',
       id:'128'
     },
-          {
+    {
       label: '7. ฟีเจอร์ส่วนกลาง',
       
     },
+    // {
+    //   topic: '7.1 แจ้งคัดลอกร้าน',
+    //   icon: 'bi-speedometer',
+    //   to: 'approveSoftware',
+    //   id:'128'
+    // },
+    // {
+    //   topic: '7.1 แจ้งคัดลอกร้าน',
+    //   icon: 'bi-speedometer',
+    //   to: 'approveSoftware',
+    //   id:'128'
+    // },
     {
-      topic: '7.1 แจ้งคัดลอกร้าน',
+      topic: '7.1 ส่งอีเมล Kbank',
       icon: 'bi-speedometer',
-      to: 'approveSoftware',
-      id:'128'
-    },
-    {
-      topic: '7.1 แจ้งคัดลอกร้าน',
-      icon: 'bi-speedometer',
-      to: 'approveSoftware',
-      id:'128'
+      to: 'emailKbank',
+      id:'701'
     },
  
-    {
-      topic: '4.4 เพิ่มโต๊ะ',
-      icon: 'bi-speedometer',
-      to: 'upgrade',
-      id:'128'
-    },
-    {
-      topic: '4.5 ประวัติเพิ่มโต๊ะ',
-      icon: 'bi-speedometer',
-      to: 'upgradeHistory',
-      id:'128'
-    },
+    // {
+    //   topic: '4.4 เพิ่มโต๊ะ',
+    //   icon: 'bi-speedometer',
+    //   to: 'upgrade',
+    //   id:'128'
+    // },
+    // {
+    //   topic: '4.5 ประวัติเพิ่มโต๊ะ',
+    //   icon: 'bi-speedometer',
+    //   to: 'upgradeHistory',
+    //   id:'128'
+    // },
 
-    {
-      topic: '4.6 ประวัติ License',
-      icon: 'bi-speedometer',
-      to: 'softwareHistory',
-      id:'128'
-    },
+    // {
+    //   topic: '4.6 ประวัติ License',
+    //   icon: 'bi-speedometer',
+    //   to: 'softwareHistory',
+    //   id:'128'
+    // },
   
 
 
