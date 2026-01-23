@@ -36,7 +36,7 @@ function Modal_CategorySetting({
       if(show){
         setCurrentCategory(value)
       }
-    },[])
+    },[show,value]);
 
       function addNewCategory(){
         const { level, name, aboveId } = newCategory;

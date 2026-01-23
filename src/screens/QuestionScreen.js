@@ -51,7 +51,9 @@ function QuestionScreen() {
     }
 
     async function fetchQuestion(){
-        const query = await db.collection('question').get();
+        const query = await db.collection('question')
+            .where('status','==','approved')
+            .get();
         const result = query.docs.map(doc=>({...doc.data(), id:doc.id}));
         const arraySorted = normalSort('retweetCount', result);
         return arraySorted;

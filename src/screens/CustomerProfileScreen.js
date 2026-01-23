@@ -22,6 +22,7 @@ const initialCustomerProfile = {
     createdAt:new Date(),
     shops:[], 
     hardware:[], // อุปกรณ์ที่ซื้อจากเรา
+    notes:[],
 
 };
 
@@ -54,6 +55,7 @@ const initialShop = {
                 ipAddress:'', // ใส่เฉพาะเครื่องลูก
                 thaiCharacter:'', // รองรับตัวอักษรไทยหรือไม่ can or cannot or undetected
                 note:'', // หมายเหตุ เช่น เครื่องนี้ ช่องเสียบแลนไม่ค่อยดี
+
             }
         ],
         router:'',
@@ -62,6 +64,8 @@ const initialShop = {
 }
 
 function CustomerProfileScreen() {
+    const [search, setSearch] = useState('');
+    const [currentCustomer, setCurrentCustomer] = useState(initialCustomerProfile);
     
 
 

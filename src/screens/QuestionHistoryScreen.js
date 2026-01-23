@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Table,
 } from "react-bootstrap";
-import { CategoryControl, OneButton, SearchAndBottom } from "../components";
+import { CategoryControl, OneButton, SearchAndBottom, SlideOptions } from "../components";
 import { Modal_CategorySetting, Modal_FlatListTwoColumn, Modal_Loading, Modal_Question2 } from "../modal";
 import { db, prepareFirebaseImage, webImageDelete } from "../db/firestore";
 import { compareArrays, formatTime, searchFilterFunction, toastSuccess, totalField } from "../Utility/function";
 import { initialQuestion } from "../configs";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { useSelector } from "react-redux";
+import { normalSort } from "../Utility/sort";
 
 
 function QuestionHistoryScreen() {
@@ -24,6 +25,32 @@ function QuestionHistoryScreen() {
     const [masterData, setMasterData] = useState([]);
     const [oldImageUrls, setOldImageUrls] = useState([]);
     const [status_Modal, setStatus_Modal] = useState(false);
+    const [option, setOption] = useState({id:'1',name:'request', value:'1' });
+    const { id:optionId, name:optinName, value } = option;
+
+    const thisOptions = [
+        {id:'1',name:'requested', value:'1'},
+        {id:'2',name:'approved', value:'2'},
+        {id:'3',name:'rejected', value:'3'},
+        {id:'4',name:'all', value:'4'},
+    ];
+
+    const options = useMemo(()=>{
+        return thisOptions.map(a=>({ id:a.id, name:a.name, value:a.value, length:
+            a.id === '1' ? masterData.filter(a=>a.status==='requested').length
+            :a.id === '2' ? masterData.filter(a=>a.status==='approved').length
+            :a.id === '3' ? masterData.filter(a=>a.status==='rejected').length
+            : masterData.length
+         
+            }))
+    },[thisOptions,masterData]);
+
+    const handleChange = (value) => {
+      const option = options.find(a=>a.value === value)
+        setOption(option);
+    };
+
+
 
     const statusOptions = [
         { id:'approved', name:"อนุมัติ" },
@@ -41,26 +68,39 @@ function QuestionHistoryScreen() {
     };
 
     useEffect(()=>{
-        fetchQuestion()
+        handleFetch()
     },[]);
+
+
+    async function handleFetch(){
+        setLoading(true);
+        try {
+            const [ category, question ] = await Promise.all([fetchCategory(), fetchQuestion()]);
+            setCurrentCategory(category)
+            setMasterData(question)
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     // 200%
     async function fetchQuestion(){
-        setLoading(true);
-        try {
-            const query = await db.collection('question').get();
-            const result = query.docs.map(doc=>{
-                const { createdAt, ...data } = doc.data();
-                return {...data, id:doc.id, createdAt:formatTime(createdAt) }
-            });
-            setMasterData(result);
-        } catch (error) {
-            alert(error);
-        } finally {
-            setLoading(false);
-        }
+        const query = await db.collection('question').get();
+        const result = query.docs.map(doc=>{
+            const { createdAt, ...data } = doc.data();
+            return {...data, id:doc.id, createdAt:formatTime(createdAt) }
+        });
+        return normalSort('createdAt',result);
 
     };
+
+    async function fetchCategory(){
+        const query = await db.collection('admin').doc('question2').get();
+        const { category } = query.data();
+        return category;
+    }
 
     // 200%
     async function handleQuestion(){
@@ -213,13 +253,26 @@ function QuestionHistoryScreen() {
 
     function openCategory(){
         if(profileId !== 'cZ7XkJeZzNOrr5HEZKEPgAjtMrx2') return alert('คุณไม่มีสิทธิ์จัดการหมวดหมู่');
-      setEditCategory_Modal(true)
+        setEditCategory_Modal(true)
     };
 
     useEffect(()=>{
         let length = categorySetting.length;
-        let result = []
-        for(const item of masterData){
+        let result  = []
+        let selected = masterData.filter(item=>{
+            if(optionId === '1'){
+                return item.status === 'requested'
+            }
+            if(optionId === '2'){
+                return item.status === 'approved'
+            }
+            if(optionId === '3'){
+                return item.status === 'rejected'
+            }
+            return true;
+        });
+
+        for(const item of selected){
             if(length >=1){
                 if(compareArrays(item.category.slice(0,length),totalField(categorySetting,'id'))){
                     result.push(item)
@@ -233,7 +286,7 @@ function QuestionHistoryScreen() {
         }
 
         setCurrentDisplay(result)
-    },[masterData,categorySetting,search]);
+    },[masterData,categorySetting,search,optionId]);
 
     function openProduct(item){
         const { category:thisCategory, imageUrls } = item;
@@ -245,8 +298,10 @@ function QuestionHistoryScreen() {
 
     function openStatus(item){
         if(profileId !== 'cZ7XkJeZzNOrr5HEZKEPgAjtMrx2') return;
-        setStatus_Modal(true)
-        setCurrentQuestion(item);
+        setStatus_Modal(true);
+        const { category:thisCategory } = item;
+        const category = currentCategory.flatMap(a=>a.value).filter(b=>thisCategory.includes(b.id));
+        setCurrentQuestion({...item, category });
     };
 
 
@@ -282,7 +337,7 @@ function QuestionHistoryScreen() {
         <OneButton {...{ text:'จัดการหมวดหมู่', submit:openCategory, variant:'dark' }} />
         <br/>
         <SearchAndBottom {...{ placeholder:'ค้นหาด้วยชื่อคำถาม', search, setSearch, download:false, exportToXlsx:()=>{openProduct(initialQuestion)}, text:'เพิ่มคำถาม/คำตอบ' }} />
-        
+        <SlideOptions {...{ value, handleChange, options, show:true }} />
         <CategoryControl {...{ warehouseCategory:currentCategory, categorySetting, setCategorySetting }} />
         <h5>ทั้งหมด {currentDisplay.length}/{masterData.length} คำถาม</h5>
         {currentDisplay.length>0
