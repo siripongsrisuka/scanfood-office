@@ -14,12 +14,12 @@ import {
   PolarRadiusAxis,
 } from 'recharts';
 import { Modal_Cancel, Modal_Customer, Modal_FlatlistSearchShop, Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput, Modal_So, Modal_Qrcode, Modal_DatePicker } from "../modal";
-import { db } from "../db/firestore";
+import { db, prepareFirebaseImage } from "../db/firestore";
 import { OneButton, SlideOptions } from "../components";
 import { scanfoodAPI } from "../Utility/api";
 import { stringDateTimeReceipt, stringFullDate, stringReceiptNumber, stringYMDHMS3, yearMonth } from "../Utility/dateTime";
 import initialCustomer from "../configs/initialCustomer";
-import { colors, initialProcess } from "../configs";
+import { colors, initialProcess, initialSo } from "../configs";
 import { fetchCustomer, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fetchSoftware, fetchSuccessCases, fetchWaste, formatCurrency, formatTime, isGodIt, toastSuccess, wait } from "../Utility/function";
 import initialShopType from "../configs/initialShopType";
 import initialCancelId from "../configs/initialCancelId";
@@ -49,11 +49,10 @@ const customerOptions = [
     { id:'3', name:'แก้ไขโปรไฟล์'},
     { id:'4', name:'ผูกบัญชีร้านค้า'},
     { id:'5', name:'ย้ายไปถังขยะ'},
-    { id:'6', name:'เปิดบิลเคสขอใบกำกับภาษี'},
-    { id:'7', name:'ซื้อทดลองใช้ 1 เดือน'},
 ];
 
 const processMap = {
+    'manual':{ name:'รออนุมัติ', color:'#FF914d'},
     'request':{ name:'รอชำระ', color:'#FFE871'},
     'success':{ name:'เสร็จสมบูรณ์', color:'#0D8266'},
     'paid':{ name:'ชำระเงินแล้ว', color:'#5DC3FF'},
@@ -66,18 +65,6 @@ const paymentOptions = [
     { id:'3', name:'รายละเอียด' },
     { id:'4', name:'ยกเลิกออเดอร์' },
 ]
-
-const initialSo = {
-    storeSize:20, 
-    software:[], 
-    requestDate:new Date(), 
-    requestBillDate:stringYMDHMS3(new Date()),
-    hardware:[], 
-    note:'', 
-    deliveryType:'normal',
-    customerId:'',
-    oneMonth:false, // ใช้ทดลอง 1 เดือน
-};
 
 const initialCancel = { cancelId:'', reason:'' };
 
@@ -103,7 +90,7 @@ const initialSoftware = {
     timestamp:'',
     imageId:'',
     net:'',
-    status:'order',//
+    status:'order',
     vat:false,
     email:'',
     tel:'',
@@ -319,10 +306,10 @@ function SaleScreen() {
                 break;
         };
     };
-    
+    console.log(currentSo)
     // 200%
     async function handleSo(payload){
-        const { oneMonth, requestDate } = currentSo;
+        const { oneMonth, requestDate, manualPaidImage, manualPaid } = currentSo;
         setSo_Modal(false)
 
         if(!shopId && oneMonth) return alert('ยังไม่มี shopId');
@@ -333,6 +320,11 @@ function SaleScreen() {
             const amount = isGodIt(profileId)
                 ?1 // payload.net
                 :payload.net
+            let imageUrl = manualPaidImage;
+            if(manualPaidImage && manualPaid){
+                imageUrl = await prepareFirebaseImage(manualPaidImage,'/saleEvident/','evident')
+            };
+
             const timestamp = new Date();
             const { qrCode, paymentData } = await db.runTransaction(async (transaction) => {
 
@@ -368,20 +360,26 @@ function SaleScreen() {
                 } else {
                     newValue = [...value,{ month: thisMonth, run: 1, id:'so' }]
                 };
+                let chargeId = '';
+                let qrCode = '';
+                if(!manualPaid){
+                    const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,{ 
+                        channelType:'posxpay',
+                        shopId:`sale:${autoPaymentRef.id}`,
+                        amount,
+                        serial:'WQRN002405000023',
+                        token:process.env.REACT_APP_API_TOKEN,
+                        ref2:'auto'
+                    });
 
-                const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,{ 
-                    channelType:'posxpay',
-                    shopId:`sale:${autoPaymentRef.id}`,
-                    amount,
-                    serial:'WQRN002405000023',
-                    token:process.env.REACT_APP_API_TOKEN,
-                    ref2:'auto'
-                });
-                const { 
-                    referenceId,
-                    chargeId,
-                    qrCode,
-                } = data?.data;
+                    const { 
+                        chargeId:thisChargeId,
+                        qrCode:thisQrCode,
+                    } = data?.data;
+                    chargeId = thisChargeId;
+                    qrCode = thisQrCode;
+                }
+
 
                 transaction.update(docNumberRef, { value:newValue });
                 const paymentData = {
@@ -396,13 +394,14 @@ function SaleScreen() {
                     billDate:stringYMDHMS3(timestamp),
                     profileId,
                     profileName,
-                    process:'request', // request, cancel, success, paid
+                    process:manualPaid?"manual":"request", // request, cancel, success, paid
                     team,
                     customerId,
                     name,
                     id:autoPaymentRef.id,
                     requestDate, 
                     requestBillDate:stringYMDHMS3(requestDate),
+                    manualPaidImage:imageUrl,
                 };
                 transaction.set(autoPaymentRef,paymentData)
                 return {
@@ -411,10 +410,14 @@ function SaleScreen() {
                 }
             });
 
-            
-            setQrcode(qrCode);
-            setAmount(amount);
-            setQrcode_Modal(true);
+            if(manualPaid){
+                toastSuccess('สร้างบิลสำเร็จ รอชำระเงิน');
+            } else {
+                setQrcode(qrCode);
+                setAmount(amount);
+                setQrcode_Modal(true);
+            }
+
             setPayments(prev=>[paymentData,...prev]);
         } catch (error) {
             alert(error);
@@ -422,81 +425,6 @@ function SaleScreen() {
             setLoading(false);
         }
     };
-
-    async function handleSoWithoutQR(payload){
-        setSo_Modal(false)
-        setLoading(true);
-        
-        try {
-   
-            const timestamp = new Date();
-             await db.runTransaction(async (transaction) => {
-
-                const docNumberRef = db.collection("admin").doc('documentNumber');
-                const autoPaymentRef = db.collection('autoPayment').doc();
-                const docNumberDoc = await transaction.get(docNumberRef);
-
-                const { value } = docNumberDoc.data();
-                const thisCurrentSo = value.find(a=>a.id==='so')
-                let newValue = [];
-                const thisMonth = timestamp.getMonth() + 1;
-                let receiptNumber = `SO${stringReceiptNumber(1)}`;
-                if(thisCurrentSo){
-                    const { month, run } = thisCurrentSo;
-                    let newRun = run + 1;
-                    receiptNumber = `SO${stringReceiptNumber(newRun)}`;
-                    
-                    if (thisMonth !== month) {
-                        newRun = 1;
-                        receiptNumber = `SO${stringReceiptNumber(newRun)}`;
-                        newValue = value.map(a=>{
-                        return a.id==='so'
-                            ?{ month: thisMonth, run: newRun, id:'so' }
-                            :a
-                        })
-                    } else {
-                    newValue = value.map(a=>{
-                        return a.id==='so'
-                            ?{ month, run: newRun, id:'so' }
-                            :a
-                    })
-                    }
-                } else {
-                    newValue = [...value,{ month: thisMonth, run: 1, id:'so' }]
-                };
-
-
-                transaction.update(docNumberRef, { value:newValue });
-                const paymentData = {
-                    ...currentSo,
-                    ...payload,
-                    orderNumber:receiptNumber,
-                    createdAt:timestamp,
-                    chargeId:'',
-                    qrCode,
-                    shopId,
-                    shopName,
-                    billDate:stringYMDHMS3(timestamp),
-                    profileId,
-                    profileName,
-                    process:'manual', // manual, request, cancel, success, paid
-                    team,
-                    customerId,
-                    name,
-                    id:autoPaymentRef.id,
-                    requestDate:new Date(), 
-                    requestBillDate:stringYMDHMS3(new Date()),
-                };
-                transaction.set(autoPaymentRef,paymentData)
-               
-            });
-            
-        } catch (error) {
-            alert(error);
-        } finally {
-            setLoading(false);
-        }
-    }
 
     async function handleConnect(item){
         setConnect_Modal(false);

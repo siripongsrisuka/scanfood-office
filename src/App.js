@@ -37,6 +37,7 @@ import {
   OneMonthShopScreen,
   EmailKbankScreen,
   EmailTaxScreen,
+  ManualPaidScreen,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -107,7 +108,7 @@ function App() {
             <Route path='importItemFranchise' element={<ImportItemFranchiseScreen/>} />
             <Route path='importBomFranchise' element={<ImportBomFranchiseScreen/>} />
             <Route path='importMarketPlaceFranchise' element={<ImportMarketPlaceFranchise/>} />
-            <Route path='questionSetting' element={<QuestionScreen/>} />
+            <Route path='question' element={<QuestionScreen/>} />
             <Route path='diagnosis' element={<DiagnosisScreen/>} />
             <Route path='transferOwner' element={<TransferOwnerScreen/>} />
             <Route path='extraDay' element={<ExtraDayScreen/>} />
@@ -117,6 +118,7 @@ function App() {
             <Route path='oneMonthShop' element={<OneMonthShopScreen/>} />
             <Route path='emailKbank' element={<EmailKbankScreen/>} />
             <Route path='emailTax' element={<EmailTaxScreen/>} />
+            <Route path='manualPaid' element={<ManualPaidScreen/>} />
             
           </Route>
       </Routes>

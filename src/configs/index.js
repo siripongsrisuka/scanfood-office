@@ -27,9 +27,11 @@ import initialTeam from "./initialTeam";
 import initialWarehouse from "./initialWarehouse";
 import initialExtraDay from "./initialExtraDay";
 import initialQuestion from "./initialQuestion";
+import initialSo from "./initialSo";
 
 
 export {
+  initialSo,
   initialQuestion,
     initialExtraDay,
     initialWarehouse,

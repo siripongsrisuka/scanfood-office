@@ -4,6 +4,10 @@ import { toast } from 'react-toastify';
 import { db } from '../db/firestore';
 import initialCustomer from '../configs/initialCustomer';
 
+export function isApprover (profileId){
+  return ['cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'].includes(profileId)
+}
+
 export function isGodIt (profileId){
   return ['xL8vqnyJ8OfkVpHJBPJvEei2D3B3','cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'].includes(profileId)
 }

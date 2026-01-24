@@ -5,7 +5,7 @@ import {
 import { CategoryControl, OneButton, SearchAndBottom, SlideOptions } from "../components";
 import { Modal_CategorySetting, Modal_FlatListTwoColumn, Modal_Loading, Modal_Question2 } from "../modal";
 import { db, prepareFirebaseImage, webImageDelete } from "../db/firestore";
-import { compareArrays, formatTime, searchFilterFunction, toastSuccess, totalField } from "../Utility/function";
+import { compareArrays, formatTime, isApprover, searchFilterFunction, toastSuccess, totalField } from "../Utility/function";
 import { initialQuestion } from "../configs";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { useSelector } from "react-redux";
@@ -115,7 +115,7 @@ function QuestionHistoryScreen() {
                 category = [...aboveId,id]
             };
             if(id){
-                if((status === 'approved' || status === 'rejected') && profileId !== 'cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'){
+                if((status === 'approved' || status === 'rejected') && !isApprover(profileId)){
                     alert('ไม่สามารถแก้ไขคำถามที่อนุมัติหรือปฏิเสธแล้วได้')
                     setLoading(false);
                     return;
@@ -171,7 +171,7 @@ function QuestionHistoryScreen() {
     // 200%
     async function deleteQuestion(id){
         const { status } = currentQuestion;
-        if((status === 'approved' || status === 'rejected') && profileId !== 'cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'){
+        if((status === 'approved' || status === 'rejected') && !isApprover(profileId)) {
             alert('ไม่สามารถลบคำถามที่อนุมัติหรือปฏิเสธแล้วได้')
             return;
         }
@@ -252,7 +252,7 @@ function QuestionHistoryScreen() {
     };
 
     function openCategory(){
-        if(profileId !== 'cZ7XkJeZzNOrr5HEZKEPgAjtMrx2') return alert('คุณไม่มีสิทธิ์จัดการหมวดหมู่');
+        if(!isApprover(profileId)) return alert('คุณไม่มีสิทธิ์จัดการหมวดหมู่');
         setEditCategory_Modal(true)
     };
 
@@ -297,7 +297,7 @@ function QuestionHistoryScreen() {
     };
 
     function openStatus(item){
-        if(profileId !== 'cZ7XkJeZzNOrr5HEZKEPgAjtMrx2') return;
+        if(!isApprover(profileId)) return alert('คุณไม่มีสิทธิ์จัดการสถานะ');
         setStatus_Modal(true);
         const { category:thisCategory } = item;
         const category = currentCategory.flatMap(a=>a.value).filter(b=>thisCategory.includes(b.id));

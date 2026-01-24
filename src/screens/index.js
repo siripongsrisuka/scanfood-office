@@ -36,8 +36,10 @@ import CustomerProfileScreen from "./CustomerProfileScreen";
 import OneMonthShopScreen from "./OneMonthShopScreen";
 import EmailKbankScreen from "./EmailKbankScreen";
 import EmailTaxScreen from "./EmailTaxScreen";
+import ManualPaidScreen from "./ManualPaidScreen";
 
 export {
+    ManualPaidScreen,
     EmailKbankScreen,
     EmailTaxScreen,
     OneMonthShopScreen,

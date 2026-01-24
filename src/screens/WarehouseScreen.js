@@ -5,7 +5,7 @@ import {
 import { db } from "../db/firestore";
 import { SearchAndBottom } from "../components";
 import { Modal_Inbound, Modal_Loading, Modal_Stock } from "../modal";
-import { searchFilterFunction, toastSuccess } from "../Utility/function";
+import { isApprover, searchFilterFunction, toastSuccess } from "../Utility/function";
 import { useDispatch, useSelector } from "react-redux";
 import { updateNormalWarehouse } from "../redux/warehouseSlice";
 import { initialWarehouse } from "../configs";
@@ -52,7 +52,7 @@ function WarehouseScreen() {
 
     // 200%
     function openEquipment(item){
-        if(profileId!=='cZ7XkJeZzNOrr5HEZKEPgAjtMrx2')return;
+        if(!isApprover(profileId))return;
         setCurrent(item)
         setEquipment_Modal(true)
     };

@@ -67,6 +67,13 @@ export default [
       id:'306'
     },
 
+    {
+      topic: '3.7 ชำระเงินแบบ Manual',
+      icon: 'bi-speedometer',
+      to: 'manualPaid',
+      id:'307'
+    },
+
 
     
 
@@ -76,7 +83,7 @@ export default [
       {
         topic: '4.1 How to เอาตัวรอด',
         icon: 'bi-speedometer',
-        to: 'questionSetting',
+        to: 'question',
         id:'401'
       },
       {

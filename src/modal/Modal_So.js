@@ -4,16 +4,17 @@ import {
   Modal,
   Row,
   Col,
-  Form
+  Form,
+  Image
 } from "react-bootstrap";
 import { formatCurrency, formatCurrency2, summary } from "../Utility/function";
 import { MdRadioButtonUnchecked, MdRadioButtonChecked } from 'react-icons/md'; // replace with correct MaterialCommunityIcons mapping
 import { colors } from "../configs";
-import { Card, FloatingArea, FooterButton, OneButton } from "../components";
+import { Card, FloatingArea, FooterButton, OneButton, RootImage } from "../components";
 import DatePicker from "react-datepicker";
 import { SlCalender } from "react-icons/sl";
 import { Button } from "rsuite";
-const { white, dark, theme3, five, one, nine, softWhite, green } = colors;
+const { white, dark, theme3, five, one, nine, softWhite, green, six } = colors;
 
 function Modal_So({
   backdrop=true, // true/false/static
@@ -26,9 +27,12 @@ function Modal_So({
   setCurrent,
   submit,
   hardwares,
-  disabled
+  disabled,
+  manualChecked=false
 }) {
-    const { storeSize, software, requestDate = '', hardware, note = '', deliveryType = 'normal', oneMonth = false } = current;
+    const fileInputRef = useRef(null);
+    
+    const { storeSize, software, requestDate = '', hardware, note = '', deliveryType = 'normal', oneMonth = false, manualPaid, manualPaidImage } = current;
     
     const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => (
         <div  style={{ borderRadius:20 }} onClick={onClick} ref={ref}>
@@ -67,6 +71,8 @@ function Modal_So({
   function handleSubmit(){
     if(software.length===0 && hardware.length === 0 && !oneMonth) return alert('เลือกอย่างน้อย 1 รายการ');
 
+    if(manualPaid && !manualPaidImage) return alert('กรุณาแนบสลิปการชำระเงิน');
+
     submit({
         extraCharge,
         softwarePrice,
@@ -74,7 +80,14 @@ function Modal_So({
         deliveryFee,
         net
     })
-  }
+  };
+
+    function handleManualPaidChange(action){
+        // action = approcved / rejected
+        const ok = window.confirm(`คุณแน่ใจที่จะ${action==='approved'?'อนุมัติ':'ปฏิเสธ'}แพ็กเกจนี้หรือไม่?`);
+        if(!ok) return;
+        submit({...current, action })
+    }
 
 
 
@@ -133,7 +146,27 @@ function Modal_So({
             default:
                 break;
         }
-    }
+    };
+
+    const handleButtonClick = () => {
+        fileInputRef.current.click();
+    };
+
+    const handleImageChange = (e) => {
+        const file = e.target.files[0]; // Get the selected file
+
+        if (file) {
+
+        // Create a FileReader to read the file
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            // setImage(reader.result); // Set the image data as the result of FileReader
+            setCurrent(prev=>({...prev,manualPaidImage:reader.result}))
+        };
+
+        reader.readAsDataURL(file); // Convert file to a base64 string
+        }
+    };
 
 
   return (
@@ -308,15 +341,61 @@ function Modal_So({
                 onChange={(event)=>{setCurrent({...current,note:event.target.value})}}
             />
         </Card>
+         <Card title='รูปแบบการชำระเงิน' maxWidth={'95vw'} accentColor={six}  >
+            <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
+                <div style={{ marginBottom: 12, fontWeight: 'bold' }}>
+                    <h2>1. รูปแบบการชำระเงิน</h2>
+                </div>
+                <Form.Select 
+                        aria-label="Default select example" 
+                        value={manualPaid} 
+                        onChange={(event)=>{
+                            event.preventDefault()
+                            setCurrent(prev=>({...prev, manualPaid:event.target.value==='true'}))
+                        }}
+                        style={{width:'180px'}}
+                    >
+                        <option value={false}>ชำระเงินอัตโนมัติ</option>
+                        <option value={true} >ชำระเงินแบบแนบสลิป</option>
+                </Form.Select>
+                {manualPaid
+                    ?<form >
+                        <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        style={{ display: 'none' }} // Hide the default file input
+                        />
+                        <Button onClick={handleButtonClick} variant="light">
+                        {manualPaidImage
+                            ?<Image style={styles.image} src={manualPaidImage} />
+                            :<RootImage style={styles.image} />
+                        }
+                        
+                        </Button>
+                    </form>
+                    :null
+                }
+            </div>
+            
+        </Card>
         
         
     
       </Modal.Body>
-        {disabled
+        {manualChecked
+            ?<Modal.Footer>
+                <OneButton {...{ text:'ปิด', submit:onHide, variant:'secondary' }} />
+                <OneButton {...{ text:'อนุมัติแพ็กเกจ', submit:()=>{handleManualPaidChange('approved')}, variant:'success' }} />
+                <OneButton {...{ text:'ปฏิเสธแพ็กเกจ', submit:()=>{handleManualPaidChange('rejected')}, variant:'danger' }} />
+            </Modal.Footer>
+            :disabled
             ?<Modal.Footer>
                 <OneButton {...{ text:'ปิด', submit:onHide, variant:'secondary' }} />
             </Modal.Footer>
             :<FooterButton {...{ onHide, submit:()=>{handleSubmit()}, rightText:'เปิดบิล' }} />
+        
         }
       
     </Modal>
