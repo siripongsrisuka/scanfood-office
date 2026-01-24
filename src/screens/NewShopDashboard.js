@@ -28,24 +28,27 @@ function NewShopDashboard() {
 
     useEffect(()=>{
         setTimeout(()=>{
-            fetchPagination()
+            fetchPagination(null)
         },500)
     },[]);
 
-    async function fetchPagination(){
+
+    async function fetchPagination(lastCreatedDate){
         setLoading(true)
         try {
             const { status, data } = await scanfoodAPI.post(
                 "/office/shop/",
                 {
-                    lastCreatedDate
+                    lastCreatedDate:lastCreatedDate?formatTime(lastCreatedDate):null,
                 }
             );
             const { 
                 results,
                 newLastCreatedDate,
-                hasMore
+                hasMore,
+                thisTime:thisLastCreatedDate
             } = data;
+            
             setLastCreatedDate(newLastCreatedDate);
             setMasterData([...masterData,...results]);
             if(!hasMore){
@@ -66,7 +69,7 @@ function NewShopDashboard() {
         let wantedElement = (newPage+1)*rowsPerPage
         if(wantedElement>masterData.length){
             if(masterData.length<allElement){
-                fetchPagination()
+                fetchPagination(lastCreatedDate)
                 setPage(newPage)
                 goToTop()
             } else {
@@ -94,15 +97,15 @@ function NewShopDashboard() {
     };
 
 
-  useEffect(()=>{
-    let thisDay = new Date();
-    let fData = masterData;
 
-    if(search){
-      fData = searchFilterFunction(fData.map((item,index)=>{return({...item,no:index})}),search,'name')
-    } 
-      fData = fData.map((item,index)=>{return({...item,no:index+1})}).filter((item,index)=>{return(index >=(page*rowsPerPage) && index <= ((page+1)*rowsPerPage)-1)})
-      setCurrentDisplay(fData.map(({ vip, ...rest})=>{
+  useEffect(()=>{
+    const thisDay = new Date();
+    const searchedData = search
+      ?searchFilterFunction(masterData,search,'name')
+      :[...masterData];
+
+      const pageData = searchedData.map((item,index)=>{return({...item,no:index+1})}).filter((item,index)=>{return(index >=(page*rowsPerPage) && index <= ((page+1)*rowsPerPage)-1)})
+      setCurrentDisplay(pageData.map(({ vip, ...rest})=>{
         const qrcode = formatTime(findInArray(vip,'type','qrcode').expire)
         const qrcodeRemain = qrcode>thisDay?daysDifference(qrcode,thisDay):0
         const qrcodeColor = qrcodeRemain >30?white:one

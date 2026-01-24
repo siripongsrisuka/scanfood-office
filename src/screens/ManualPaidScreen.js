@@ -14,7 +14,7 @@ import { scanfoodAPI } from "../Utility/api";
 
 
 function ManualPaidScreen() {
-    const { profile:{ id: profileId,  }  } = useSelector( state => state.auth.profile );
+    const { profile:{ id: profileId,  }  } = useSelector( state => state.profile );
     const { warehouse } = useSelector(state=>state.warehouse);
     const [masterData, setMasterData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -32,13 +32,11 @@ function ManualPaidScreen() {
         });
         const sortedData = normalSort('createdAt', data);
         return sortedData
-   
     }
 
 
     useEffect(()=>{
         handleFetchAll();
-
     },[]);
 
     async function handleFetchAll(){
