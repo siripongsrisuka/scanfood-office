@@ -306,7 +306,6 @@ function SaleScreen() {
                 break;
         };
     };
-    console.log(currentSo)
     // 200%
     async function handleSo(payload){
         const { oneMonth, requestDate, manualPaidImage, manualPaid } = currentSo;

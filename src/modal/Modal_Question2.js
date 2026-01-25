@@ -25,7 +25,7 @@ function Modal_Question2({
   deleteItem,
   currentCategory
 }) {
-    const { id, question, answer, category = [], imageUrls = [], type = '' } = current;
+    const { id, question, answer, category = [], imageUrls = [], type = '', guideline } = current;
 
     const [category_Modal, setCategory_Modal] = useState(false) //category modal
     const [selectedCategory, setSelectedCategory] = useState([]);
@@ -111,6 +111,14 @@ function Modal_Question2({
             placeholder="คำตอบ"
             onChange={(event)=>{setCurrent({...current,answer:event.target.value})}}
             value={answer}
+            strict={true}
+            rows={8}
+        />
+        <InputArea
+            name='guildeline'
+            placeholder="คำแนะนำ"
+            onChange={(event)=>{setCurrent({...current,guideline:event.target.value})}}
+            value={guideline}
             strict={true}
             rows={8}
         />

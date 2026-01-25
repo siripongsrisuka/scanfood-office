@@ -10,4 +10,7 @@ export default {
     deliveryType:'normal',
     customerId:'',
     oneMonth:false, // ใช้ทดลอง 1 เดือน
+    manualPaidImage:'',
+    manualPaid:false
+
 };

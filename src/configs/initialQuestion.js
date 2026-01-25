@@ -12,5 +12,6 @@ export default {
     adminName:'',
     retweetCount:0, // จำนวนครั้งที่มีคนเจอปัญหานี้
     lastRetweet:[], // รายชื่อผู้ที่เจอปัญหานี้
-    imageUrls:[]
+    imageUrls:[],
+    guideline:'',
 }
