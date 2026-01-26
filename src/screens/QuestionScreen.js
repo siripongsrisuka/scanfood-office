@@ -21,6 +21,7 @@ function QuestionScreen() {
     const [masterData, setMasterData] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState(initialQuestion);
     const [question_Modal, setQuestion_Modal] = useState(false);
+    const [resultLength, setResultLength] = useState(0);
 
     function openQuestionModal(item){
         setCurrentQuestion(item);
@@ -123,7 +124,9 @@ function QuestionScreen() {
             } else {
                 result.push(item)
             }
-        }
+        };
+        setResultLength(result.length)
+
         if(search){
             result = searchMultiFunction(result,search,['question','answer'])
         }
@@ -153,7 +156,7 @@ function QuestionScreen() {
         <SearchControl {...{ placeholder:'ค้นหาด้วยชื่อ', search, setSearch }} />
         
         <CategoryControl {...{ warehouseCategory:category, categorySetting, setCategorySetting }} />
-        <h5>ทั้งหมด {currentDisplay.length}/{masterData.length} คำถาม</h5>
+        <h5>ทั้งหมด {currentDisplay.length}/{resultLength} คำถาม</h5>
        <Table striped bordered hover responsive  variant="light" style={{marginTop:'1rem'}}  >
                 <thead  >
                 <tr>
