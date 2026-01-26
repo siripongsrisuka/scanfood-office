@@ -38,6 +38,8 @@ import {
   EmailKbankScreen,
   EmailTaxScreen,
   ManualPaidScreen,
+  PackageHistoryScreen,
+  HardwareHistoryScreen,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -119,6 +121,8 @@ function App() {
             <Route path='emailKbank' element={<EmailKbankScreen/>} />
             <Route path='emailTax' element={<EmailTaxScreen/>} />
             <Route path='manualPaid' element={<ManualPaidScreen/>} />
+            <Route path='packageHistory' element={<PackageHistoryScreen/>} />
+            <Route path='hardwareHistory' element={<HardwareHistoryScreen/>} />
             
           </Route>
       </Routes>

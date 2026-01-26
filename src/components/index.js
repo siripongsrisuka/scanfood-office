@@ -28,12 +28,16 @@ import SlideOptions from "./SlideOptions";
 import TimeControlInbound from "./TimeControlInbound";
 import AreaFloating from "./AreaFloating";
 import TimeControlHardwareOrder from "./TimeControlHardwareOrder";
+import TimeControlPackage from "./TimeControlPackage";
+import TimeControlHardware from "./TimeControlHardware";
 
 
 export {
+    TimeControlHardware,
     TimeControlExtra,
     TimeControlHardwareOrder,
     AreaFloating,
+    TimeControlPackage,
     TimeControlInbound,
     SlideOptions,
     initialColors,

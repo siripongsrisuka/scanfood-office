@@ -38,20 +38,31 @@ function StaffScreen() {
 
   
 
-    async function fetchHumanResource(){
-        let res = []
-        setLoading(true);
-        for(const item of humanRight){
-            await db.collection('profile').doc(item.id).get().then((doc)=>{
-                if(doc.exists){
-                    const { email, name, imageId, tel  } = doc.data();
-                    res.push({...item,email,name,imageId,tel})
-                }
-            }).catch((err)=>{res.push(item)})   
+async function fetchHumanResource() {
+  setLoading(true);
+
+  try {
+    const promises = humanRight.map(async (item) => {
+      try {
+        const doc = await db.collection("profile").doc(item.id).get();
+
+        if (doc.exists) {
+          const { name, imageId, tel } = doc.data();
+          return { ...item, name, imageId, tel };
         }
-        setCurrentHumans(res);
-        setLoading(false);
-    }
+
+        return item; // fallback if doc not found
+      } catch (err) {
+        return item; // fallback if error
+      }
+    });
+
+    const res = await Promise.all(promises);
+    setCurrentHumans(res);
+  } finally {
+    setLoading(false);
+  }
+}
 
     useEffect(()=>{
       fetchHumanResource();
@@ -74,7 +85,8 @@ function StaffScreen() {
               :item
           )
           :[...currentHumans,current]
-        const updatedField = { humanRight:newHuman, humanResource:newHuman.map(a=>a.id) };
+          const cleanData = newHuman.map(({ id, name, rights, team = '', saleManagerTeam = '', imageId }) =>({ id, name, rights, team, saleManagerTeam, imageId }))
+        const updatedField = { humanRight:cleanData, humanResource:cleanData.map(a=>a.id) };
         setLoading(true);
         try {
           const officeRef = db.collection('admin').doc('office');

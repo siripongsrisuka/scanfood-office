@@ -160,6 +160,23 @@ function SoftwareHistory() {
         XLSX.writeFile(workbook, fileName);
       };
 
+    async function ternToBillDate(){
+        setLoading(true);
+        try {
+            const batch = db.batch();
+            masterData.forEach(item=>{
+                const docRef = db.collection('packageOrder').doc(item.id);
+                batch.update(docRef, { billDate: stringYMDHMS3(item.timestamp) })
+            })
+            await batch.commit();
+            alert('อัปเดตสำเร็จ')
+        } catch (error) {
+            alert(error)
+        } finally {
+            setLoading(false);
+        }
+    }
+
   return (
     <div style={{padding:10}} >
         
@@ -173,6 +190,7 @@ function SoftwareHistory() {
         />
         <div style={{position:'sticky', top:0, backgroundColor:'white' }} >
             <h1>ประวัติ Software</h1>
+            {/* <button variant="secondary" onClick={ternToBillDate} style={{ marginBottom:10 }} >อัปเดต billDate</button> */}
             <TimeContainer
                 search={fetchData}
                 startDate={startDate}

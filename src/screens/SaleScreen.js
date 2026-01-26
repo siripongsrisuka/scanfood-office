@@ -393,6 +393,8 @@ function SaleScreen() {
                     billDate:stringYMDHMS3(timestamp),
                     profileId,
                     profileName,
+                    saleId:profileId,
+                    saleName:profileName,
                     process:manualPaid?"manual":"request", // request, cancel, success, paid
                     team,
                     customerId,

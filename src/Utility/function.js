@@ -6,7 +6,12 @@ import initialCustomer from '../configs/initialCustomer';
 
 export function isApprover (profileId){
   return ['cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'].includes(profileId)
-}
+};
+
+export function isApproverPen(profileId){
+  if(['cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'].includes(profileId)) return <i class="bi bi-pen"></i>
+  return ''
+};
 
 export function isGodIt (profileId){
   return ['xL8vqnyJ8OfkVpHJBPJvEei2D3B3','cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'].includes(profileId)

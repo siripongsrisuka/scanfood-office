@@ -9,6 +9,7 @@ import ImportMarketPlaceFranchise from "./ImportMarketPlaceFranchise";
 import CloneScreen from "./CloneScreen";
 import TransferOwnerScreen from "./TransferOwnerScreen";
 import ExtraDayScreen from "./ExtraDayScreen";
+import PackageHistoryScreen from "./PackageHistoryScreen";
 
 
 import SoftwareHistory from "./SoftwareHistory";
@@ -37,8 +38,11 @@ import OneMonthShopScreen from "./OneMonthShopScreen";
 import EmailKbankScreen from "./EmailKbankScreen";
 import EmailTaxScreen from "./EmailTaxScreen";
 import ManualPaidScreen from "./ManualPaidScreen";
+import HardwareHistoryScreen from "./HardwareHistoryScreen";
 
 export {
+    HardwareHistoryScreen,
+    PackageHistoryScreen,
     ManualPaidScreen,
     EmailKbankScreen,
     EmailTaxScreen,

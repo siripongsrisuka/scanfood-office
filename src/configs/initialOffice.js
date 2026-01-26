@@ -10,6 +10,20 @@ export default [
       id:'100'
     },
     {
+      topic: '1.2 Package History',
+      icon: 'bi-speedometer',
+      to:'packageHistory',
+      id:'100'
+    },
+    {
+      topic: '1.3 Hardware History',
+      icon: 'bi-speedometer',
+      to:'hardwareHistory',
+      id:'100'
+    },
+
+    
+    {
       label: '2. Marketing',
     },
     {
@@ -72,6 +86,18 @@ export default [
       icon: 'bi-speedometer',
       to: 'manualPaid',
       id:'307'
+    },
+    {
+      topic: '3.8 Package History',
+      icon: 'bi-speedometer',
+      to:'packageHistory',
+      id:'308'
+    },
+    {
+      topic: '3.9 Hardware History',
+      icon: 'bi-speedometer',
+      to:'hardwareHistory',
+      id:'309'
     },
 
 
@@ -231,31 +257,24 @@ export default [
       to: 'emailTax',
       id:'702'
     },
- 
-    // {
-    //   topic: '4.4 เพิ่มโต๊ะ',
-    //   icon: 'bi-speedometer',
-    //   to: 'upgrade',
-    //   id:'128'
-    // },
-    // {
-    //   topic: '4.5 ประวัติเพิ่มโต๊ะ',
-    //   icon: 'bi-speedometer',
-    //   to: 'upgradeHistory',
-    //   id:'128'
-    // },
-
-    // {
-    //   topic: '4.6 ประวัติ License',
-    //   icon: 'bi-speedometer',
-    //   to: 'softwareHistory',
-    //   id:'128'
-    // },
-  
-
-
-
-    
+    {
+      topic: '7.3 ส่งอีเมล เครื่องปริ้น',
+      icon: 'bi-speedometer',
+      to: 'emailTax',
+      id:'703'
+    },
+    {
+      topic: '7.4 เพิ่มโต๊ะ',
+      icon: 'bi-speedometer',
+      to: 'upgrade',
+      id:'704'
+    },
+    {
+      topic: '7.5 ประวัติเพิ่มโต๊ะ',
+      icon: 'bi-speedometer',
+      to: 'upgradeHistory',
+      id:'705'
+    },
    
     {
         label: '8. พนักงาน',

@@ -19,6 +19,8 @@ import inboundReducer from './inboundSlice';
 import warehouseReducer from './warehouseSlice';
 import hardwareOrderReducer from './hardwareOrderSlice';
 import extraReducer from './extraSlice';
+import packageReducer from './packageSlice';
+import hardwareReducer from './hardwareSlice';
 
 
   const rootPersistConfig = {
@@ -69,6 +71,8 @@ import extraReducer from './extraSlice';
     warehouse:warehouseReducer,
     hardwareOrder:hardwareOrderReducer,
     extra:extraReducer,
+    package:packageReducer,
+    hardware:hardwareReducer
     // care:careReducer,
 
   })
