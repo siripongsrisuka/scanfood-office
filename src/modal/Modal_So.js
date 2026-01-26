@@ -14,6 +14,7 @@ import { Card, FloatingArea, FooterButton, OneButton, RootImage } from "../compo
 import DatePicker from "react-datepicker";
 import { SlCalender } from "react-icons/sl";
 import { Button } from "rsuite";
+import { useSelector } from "react-redux";
 const { white, dark, theme3, five, one, nine, softWhite, green, six } = colors;
 
 function Modal_So({
@@ -30,9 +31,12 @@ function Modal_So({
   disabled,
   manualChecked=false
 }) {
+    const { profile:{ admin }} = useSelector(state=>state.profile);
     const fileInputRef = useRef(null);
     
-    const { storeSize, software, requestDate = '', hardware, note = '', deliveryType = 'normal', oneMonth = false, manualPaid, manualPaidImage } = current;
+    const { storeSize, software, requestDate = '', hardware, note = '', 
+        deliveryType = 'normal', oneMonth = false, manualPaid, manualPaidImage,
+    marketplaceFranchiseEnable } = current;
     
     const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => (
         <div  style={{ borderRadius:20 }} onClick={onClick} ref={ref}>
@@ -40,8 +44,7 @@ function Modal_So({
         </div>
     ));
 
-  
-  const { display, extraCharge, softwarePrice, net, hardwarePrice, deliveryFee } = useMemo(()=>{
+  const { display, extraCharge, softwarePrice, net, hardwarePrice, deliveryFee, marketplaceFee } = useMemo(()=>{
     const thisSize = storeSize>100?100:storeSize;
     const display = licenses.map(({ name, price, color })=>({ name, ...price.find(b=>b.table===thisSize && b.save!==0), color }));
     const softwarePrice = oneMonth?1000:summary(software,'price')
@@ -54,8 +57,10 @@ function Modal_So({
     const deliveryFee = deliveryType ==='normal' && hardwarePrice >0 && hardwarePrice <4000
         ?100
         :0
-
-    const net = extraCharge + softwarePrice + hardwarePrice + deliveryFee;
+    const marketplaceFee = marketplaceFranchiseEnable
+        ?3000
+        :0
+    const net = extraCharge + softwarePrice + hardwarePrice + deliveryFee + marketplaceFee;
 
       return {
           display,
@@ -63,13 +68,14 @@ function Modal_So({
           softwarePrice,
           net,
           hardwarePrice,
-          deliveryFee
+          deliveryFee,
+          marketplaceFee
       }
-  },[licenses,storeSize,software,hardware,deliveryType,oneMonth]);
+  },[licenses,storeSize,software,hardware,deliveryType,oneMonth,marketplaceFranchiseEnable]);
 
 
   function handleSubmit(){
-    if(software.length===0 && hardware.length === 0 && !oneMonth) return alert('เลือกอย่างน้อย 1 รายการ');
+    if(software.length===0 && hardware.length === 0 && !oneMonth && !marketplaceFranchiseEnable) return alert('เลือกอย่างน้อย 1 รายการ');
 
     if(manualPaid && !manualPaidImage) return alert('กรุณาแนบสลิปการชำระเงิน');
 
@@ -78,6 +84,7 @@ function Modal_So({
         softwarePrice,
         hardwarePrice,
         deliveryFee,
+        marketplaceFee,
         net
     })
   };
@@ -341,7 +348,7 @@ function Modal_So({
                 onChange={(event)=>{setCurrent({...current,note:event.target.value})}}
             />
         </Card>
-         <Card title='รูปแบบการชำระเงิน' maxWidth={'95vw'} accentColor={six}  >
+        <Card title='รูปแบบการชำระเงิน' maxWidth={'95vw'} accentColor={six}  >
             <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
                 <div style={{ marginBottom: 12, fontWeight: 'bold' }}>
                     <h2>1. รูปแบบการชำระเงิน</h2>
@@ -378,8 +385,27 @@ function Modal_So({
                     :null
                 }
             </div>
-            
         </Card>
+        {admin &&
+            <Card title='marketplace' maxWidth={'95vw'} accentColor={'#D9D9D9'}  >
+            <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
+                <div style={{ marginBottom: 12, fontWeight: 'bold' }}>
+                    <h2>1. marketplace</h2>
+                </div>
+                <Form.Select 
+                        aria-label="Default select example" 
+                        value={marketplaceFranchiseEnable} 
+                        onChange={(event)=>{
+                            event.preventDefault()
+                            setCurrent(prev=>({...prev, marketplaceFranchiseEnable:event.target.value==='true'}))
+                        }}
+                        style={{width:'180px'}}
+                    >
+                        <option value={false}>ปิดใช้งาน</option>
+                        <option value={true} >เปิดใช้งาน</option>
+                </Form.Select>
+            </div>
+        </Card>}
         
         
     

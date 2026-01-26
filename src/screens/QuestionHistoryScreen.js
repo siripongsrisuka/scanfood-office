@@ -25,8 +25,9 @@ function QuestionHistoryScreen() {
     const [masterData, setMasterData] = useState([]);
     const [oldImageUrls, setOldImageUrls] = useState([]);
     const [status_Modal, setStatus_Modal] = useState(false);
-    const [option, setOption] = useState({id:'1',name:'request', value:'1' });
-    const { id:optionId, name:optinName, value } = option;
+    const [option, setOption] = useState({id:'1',name:'request', value:'1', length:0 });
+    const { id:optionId, name:optinName, value, length } = option;
+    const [resultLength, setResultLength] = useState(0);
 
     const thisOptions = [
         {id:'1',name:'requested', value:'1'},
@@ -284,7 +285,7 @@ function QuestionHistoryScreen() {
         if(search){
             result = searchFilterFunction(result,search,'question')
         }
-
+        setResultLength(selected.length)
         setCurrentDisplay(result)
     },[masterData,categorySetting,search,optionId]);
 
@@ -339,7 +340,7 @@ function QuestionHistoryScreen() {
         <SearchAndBottom {...{ placeholder:'ค้นหาด้วยชื่อคำถาม', search, setSearch, download:false, exportToXlsx:()=>{openProduct(initialQuestion)}, text:'เพิ่มคำถาม/คำตอบ' }} />
         <SlideOptions {...{ value, handleChange, options, show:true }} />
         <CategoryControl {...{ warehouseCategory:currentCategory, categorySetting, setCategorySetting }} />
-        <h5>ทั้งหมด {currentDisplay.length}/{masterData.length} คำถาม</h5>
+        <h5>ทั้งหมด {currentDisplay.length}/{resultLength} คำถาม</h5>
         {currentDisplay.length>0
             ?<Table striped bordered hover responsive  variant="light" style={{marginTop:'1rem'}}  >
                 <thead  >

@@ -15,6 +15,9 @@ import {
   OverlayTrigger,
   Tooltip
 } from "react-bootstrap";
+import { db } from "../db/firestore";
+import { Modal_OneInput } from "../modal";
+import { OneButton } from "../components";
 
 const initialCustomerProfile = {
     code:'', // s00001
@@ -23,6 +26,7 @@ const initialCustomerProfile = {
     shops:[], 
     hardware:[], // อุปกรณ์ที่ซื้อจากเรา
     notes:[],
+    createdBy:'',
 
 };
 
@@ -66,12 +70,85 @@ const initialShop = {
 function CustomerProfileScreen() {
     const [search, setSearch] = useState('');
     const [currentCustomer, setCurrentCustomer] = useState(initialCustomerProfile);
+    const [customer_Modal, setCustomer_Modal] = useState(false);
+    const [code, setCode] = useState('');
+    const { profile:{ id:profileId, name:profileName } } = useSelector(state=>state.profile);
+    const [loading, setLoading] = useState(false);
+    const [existCustomer, setExistCustomer] = useState([]);
+    
+
+    async function handleCustomer(){
+      setCustomer_Modal(false);
+      if(!code) return alert('กรุณาใส่รหัสลูกค้า');
+      setLoading(true);
+      try {
+        const customerRef = db.collection('customerProfile').doc(code);
+        const customerDoc = await customerRef.get();
+        if(!customerDoc.exists) return alert('ไม่พบรหัสลูกค้านี้ในระบบ');
+        const customerData = customerDoc.data();
+        setCurrentCustomer({...customerData, id:customerDoc.id});
+      } catch (error) {
+        alert(error)
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    async function addNewCustomer(){
+      const payload = {
+        lineName:'',
+        createdAt:new Date(),
+        shops:[],
+        hardware:[], // อุปกรณ์ที่ซื้อจากเรา
+        notes:[],
+        createdBy:profileId,
+        createdName:profileName,
+      };
+      setLoading(true);
+      try {
+        const query = await db.collection('customerProfile')
+          .where('createdBy','==',profileId)
+          .where()
+          .limit(1)
+          .get();
+        const numberRef = db.collection('admin').doc('customerProfileNumber');
+        await db.runTransaction(async (transaction) => {
+          const numberDoc = await transaction.get(numberRef);
+ 
+          let { code } = numberDoc.data();
+          code += 1;
+          const newCode = `s${String(code).padStart(5,'0')}`;
+
+          transaction.update(numberRef, { code, timestamp:new Date() });
+
+          const customerRef = db.collection('customerProfile').doc(newCode);
+          transaction.set(customerRef, payload);
+          setExistCustomer()
+          setCurrentCustomer({ ...payload, id:newCode });
+        });
+      } catch (error) {
+        alert(error)
+      } finally {
+        setLoading(false);
+      }
+    }
     
 
 
   return (
     <div style={styles.container} >
         <h1>ข้อมูลลูกค้า</h1>
+        <Modal_OneInput  
+            show={customer_Modal}
+            header={`ใส่รหัสลูกค้า`}
+            onHide={()=>{setCustomer_Modal(false)}}
+            value={code}
+            onClick={handleCustomer}
+            placeholder='ใส่รหัสลูกค้า'
+            onChange={(value)=>{setCode(value)}}
+        />
+        <OneButton {...{ text: "ค้นหา", submit: ()=>{setCustomer_Modal(true);setCode('')} }} />
+        <OneButton {...{ text: "เพิ่มลูกค้าใหม่", submit: addNewCustomer }} />
 
     </div>
   );

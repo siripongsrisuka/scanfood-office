@@ -5,7 +5,7 @@ import {
 import { CategoryControl, SearchControl } from "../components";
 import { Modal_Loading, Modal_Question } from "../modal";
 import { db } from "../db/firestore";
-import { compareArrays, formatTime, searchFilterFunction, toastSuccess, totalField } from "../Utility/function";
+import { compareArrays, formatTime, searchFilterFunction, searchMultiFunction, toastSuccess, totalField } from "../Utility/function";
 import { useSelector } from "react-redux";
 import { normalSort } from "../Utility/sort";
 import { initialQuestion } from "../configs";
@@ -125,7 +125,7 @@ function QuestionScreen() {
             }
         }
         if(search){
-            result = searchFilterFunction(result,search,'q')
+            result = searchMultiFunction(result,search,['question','answer'])
         }
 
         setCurrentDisplay(result);
