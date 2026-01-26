@@ -59,9 +59,12 @@ function QuestionScreen() {
         return arraySorted;
     };
 
-    async function reTweet(id){
-        const ok = window.confirm('คุณแน่ใจหรือไม่ที่จะดันการเจอปัญหานี้?');
-        if(!ok) return;
+    async function reTweet(id,copy = false){
+        if(!copy){
+            const ok = window.confirm('คุณแน่ใจหรือไม่ที่จะดันการเจอปัญหานี้?');
+            if(!ok) return;
+        }
+
 
         setLoading(true);
         try {
@@ -129,6 +132,13 @@ function QuestionScreen() {
     },[masterData,categorySetting,search]);
 
 
+    async function copyAndRetweet(item){
+        setQuestion_Modal(false);
+        navigator.clipboard.writeText(item.guideline);
+        reTweet(item.id,true);
+
+    }
+
   return (
     <div style={styles.container} >
         <h1>คำถาม/ปัญหาที่พบบ่อย</h1>
@@ -136,6 +146,7 @@ function QuestionScreen() {
             show={question_Modal}
             onHide={() => setQuestion_Modal(false)}
             current={currentQuestion}
+            submit={copyAndRetweet}
         />
         <Modal_Loading show={loading} />
 

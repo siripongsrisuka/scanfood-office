@@ -7,7 +7,8 @@ function FloatingText({
     name='name',
     placeholder="Put here...",
     onChange,
-    value
+    value,
+    disabled=false
 }) {
 
   return (
@@ -17,6 +18,7 @@ function FloatingText({
           type="text"
           onChange={onChange}
           value={value}
+          disabled={disabled}
       />
       <label>{placeholder}</label>
   </Form.Floating>

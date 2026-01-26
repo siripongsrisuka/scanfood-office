@@ -7,7 +7,10 @@ function FloatingArea({
     name='name',
     placeholder="Put here...",
     onChange,
-    value
+    value,
+    disabled=false,
+    height='100px',
+    onClick=()=>{}
 }) {
 
   return (
@@ -18,7 +21,9 @@ function FloatingArea({
         onChange={onChange}
         value={value}
         name={name}
-        style={{width:'100%',height:'100px'}}
+        style={{width:'100%',height }}
+        disabled={disabled}
+        onClick={onClick}
     />
         <label >{placeholder}</label>
     </Form.Floating>

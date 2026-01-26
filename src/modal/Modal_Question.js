@@ -13,8 +13,15 @@ function Modal_Question({
   onHide,
   centered=true,
   current,
+  submit
 }) {
-    const { question, answer, imageUrls = [] } = current;
+    const { question, answer, imageUrls = [], guideline } = current;
+
+    function handleSubmit(){
+        const ok = window.confirm('คุณแน่ใจหรือไม่ที่จะคัดลอกและดันการเจอปัญหานี้?');
+        if(!ok) return;
+        submit(current);
+    }
 
   return (
     <Modal
@@ -34,12 +41,23 @@ function Modal_Question({
             text="คำถามที่พบบ่อย (FAQ)"
             placeholder="คำถามที่พบบ่อย (FAQ)"
             value={question}
+            disabled={true}
         />
         <FloatingArea
             name="คำตอบ"
             placeholder="คำตอบ"
             value={answer}
+            disabled={true} 
+            height='150px'
         />
+        {guideline && <div style={{ border:'1px solid black', padding:10 , borderRadius:5 }} onClick={handleSubmit} >
+          {guideline.split('\n').map((line, index) => (
+            <React.Fragment key={index}>
+              {line}
+              <br />
+            </React.Fragment>
+          ))}
+          </div>}
         <Row>
             {imageUrls.map((url,index)=>(
                 <Col key={index} xs={12} sm={6} md={4} lg={3} style={{marginBottom:10}}>
