@@ -260,7 +260,7 @@ export default [
     {
       topic: '7.3 ส่งอีเมล เครื่องปริ้น',
       icon: 'bi-speedometer',
-      to: 'emailTax',
+      to: 'emailPrinter',
       id:'703'
     },
     {

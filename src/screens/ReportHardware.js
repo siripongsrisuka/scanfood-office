@@ -32,7 +32,7 @@ function ReportHardware() {
 
     // 200%
     useEffect(()=>{
-        let result = displayHardwareOrders;
+        let result = displayHardwareOrders.filter(a=>['sent','success'].includes(a.status));
         if(search){
           result = searchMultiFunction(result,search,['createdName'])
         }
@@ -58,12 +58,13 @@ function ReportHardware() {
                     <th style={styles.container3} >วันเวลา</th>
                     <th style={styles.container3} >รายละเอียด</th>
                     <th style={styles.container3} >เซล</th>
+                    <th style={styles.container3} >สถานะ</th>
 
                 </tr>
             </thead>
             <tbody  >
             {currentDisplay.map((item, index) => {
-                const { timestamp,  product = [], profileName, orderNumber, shopName } = item;
+                const { timestamp,  product = [], profileName, orderNumber, shopName, status } = item;
                 return <tr  key={index} >
                             <td style={styles.container4}>{index+1}.</td>
                             <td style={styles.container4}>{orderNumber}</td>
@@ -75,6 +76,7 @@ function ReportHardware() {
                               ))}
                             </td>
                             <td style={styles.container4}>{profileName}</td>
+                            <td style={styles.container4}>{status}</td>
                         </tr>
             })}
             </tbody>

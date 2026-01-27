@@ -100,13 +100,12 @@ const initialSoftware = {
 };
 
 function SaleScreen() {
-    const { profile:{ id:thisProfileId, name:profileName, team = "A", saleManagerTeam = '' } } = useSelector(state=>state.profile);
+    const { profile:{ id:thisProfileId, name:thisName, team:thisTeam = "A", saleManagerTeam:thisSaleManagerTeam = '', chat_id:thisChat_id = '' } } = useSelector(state=>state.profile);
     const { office:{ humanRight } } = useSelector(state=>state.office);
     const { warehouse } = useSelector(state=>state.warehouse);
-    const [currentProfile, setCurrentProfile] = useState({ id:thisProfileId, name:'' });
-    const { id:profileId } = currentProfile;
+    const [currentProfile, setCurrentProfile] = useState({ id:thisProfileId, name:thisName, team:thisTeam, saleManagerTeam: thisSaleManagerTeam, chat_id: thisChat_id });
+    const { id:profileId, name:profileName, team, saleManagerTeam, chat_id } = currentProfile;
     const [profile_Modal, setProfile_Modal] = useState(false);
-
 
     function openProfile(){
         setProfile_Modal(true);
@@ -403,6 +402,7 @@ function SaleScreen() {
                     requestDate, 
                     requestBillDate:stringYMDHMS3(requestDate),
                     manualPaidImage:imageUrl,
+                    chat_id
                 };
                 transaction.set(autoPaymentRef,paymentData)
                 return {

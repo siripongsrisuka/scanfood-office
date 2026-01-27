@@ -40,6 +40,7 @@ import {
   ManualPaidScreen,
   PackageHistoryScreen,
   HardwareHistoryScreen,
+  EmailPrinterScreen,
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -123,6 +124,7 @@ function App() {
             <Route path='manualPaid' element={<ManualPaidScreen/>} />
             <Route path='packageHistory' element={<PackageHistoryScreen/>} />
             <Route path='hardwareHistory' element={<HardwareHistoryScreen/>} />
+            <Route path='emailPrinter' element={<EmailPrinterScreen/>} />
             
           </Route>
       </Routes>

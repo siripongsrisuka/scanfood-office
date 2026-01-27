@@ -39,8 +39,10 @@ import EmailKbankScreen from "./EmailKbankScreen";
 import EmailTaxScreen from "./EmailTaxScreen";
 import ManualPaidScreen from "./ManualPaidScreen";
 import HardwareHistoryScreen from "./HardwareHistoryScreen";
+import EmailPrinterScreen from "./EmailPrinterScreen";
 
 export {
+    EmailPrinterScreen,
     HardwareHistoryScreen,
     PackageHistoryScreen,
     ManualPaidScreen,
