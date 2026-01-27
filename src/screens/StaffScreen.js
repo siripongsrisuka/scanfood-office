@@ -85,7 +85,7 @@ async function fetchHumanResource() {
               :item
           )
           :[...currentHumans,current]
-          const cleanData = newHuman.map(({ id, name, rights, team = '', saleManagerTeam = '', imageId }) =>({ id, name, rights, team, saleManagerTeam, imageId }))
+        const cleanData = newHuman.map(({ id, name, rights, team = '', saleManagerTeam = '', imageId, chat_id = '', admin = false }) =>({ id, name, rights, team, saleManagerTeam, imageId, chat_id, admin }))
         const updatedField = { humanRight:cleanData, humanResource:cleanData.map(a=>a.id) };
         setLoading(true);
         try {
