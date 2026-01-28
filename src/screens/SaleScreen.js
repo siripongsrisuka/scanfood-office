@@ -305,6 +305,22 @@ function SaleScreen() {
                 break;
         };
     };
+
+    async function send({ chat_id, orderNumber, saleName, shopName, process }){
+        const { status, data } = await scanfoodAPI.post(
+            "/telegram/office/send/",
+            {
+                "channelType":"manualApprove",
+                "chat_id":chat_id,
+                orderNumber, 
+                saleName, 
+                shopName, 
+                process
+            }
+        );
+        return data
+    }
+
     // 200%
     async function handleSo(payload){
         const { oneMonth, requestDate, manualPaidImage, manualPaid } = currentSo;
@@ -322,12 +338,12 @@ function SaleScreen() {
             if(manualPaidImage && manualPaid){
                 imageUrl = await prepareFirebaseImage(manualPaidImage,'/saleEvident/','evident')
             };
-
+            let autoPaymentRef = null;
             const timestamp = new Date();
             const { qrCode, paymentData } = await db.runTransaction(async (transaction) => {
 
                 const docNumberRef = db.collection("admin").doc('documentNumber');
-                const autoPaymentRef = db.collection('autoPayment').doc();
+                autoPaymentRef = db.collection('autoPayment').doc();
                 const docNumberDoc = await transaction.get(docNumberRef);
 
                 const { value } = docNumberDoc.data();
@@ -402,7 +418,8 @@ function SaleScreen() {
                     requestDate, 
                     requestBillDate:stringYMDHMS3(requestDate),
                     manualPaidImage:imageUrl,
-                    chat_id
+                    chat_id,
+                    chat_id_saleManager:-1003891934173 
                 };
                 transaction.set(autoPaymentRef,paymentData)
                 return {
@@ -411,7 +428,21 @@ function SaleScreen() {
                 }
             });
 
+            
+
+
+
             if(manualPaid){
+                const [ data1, data2 ] = await Promise.all([
+                    send({...paymentData, chat_id }),
+                    send({...paymentData, chat_id:paymentData.chat_id_saleManager }),
+                ])
+                const { message_id } = data1
+                const { message_id:message_id_saleManager } = data2
+                await db.collection('autoPayment').doc(autoPaymentRef.id).update({
+                    message_id,
+                    message_id_saleManager
+                });
                 toastSuccess('สร้างบิลสำเร็จ รอชำระเงิน');
             } else {
                 setQrcode(qrCode);

@@ -58,6 +58,7 @@ function ManualPaidScreen() {
     async function handleSo(payload){
         setSo_Modal(false);
         setLoading(true);
+        const { message_id, message_id_saleManager, chat_id, chat_id_saleManager } = currentSo;
         try {
             const { id, action = 'approved' } = payload;
             if(action === 'approved'){
@@ -72,18 +73,45 @@ function ManualPaidScreen() {
                 toastSuccess('อนุมัติแพ็กเกจเรียบร้อย');
                 setMasterData(prev=>prev.filter(i=>i.id !== id));
 
-                return;
-            }
-            if(action === 'rejected'){
-                await db.collection('autoPayment').doc(id).update({
+            } else { //rejected
+                  await db.collection('autoPayment').doc(id).update({
                     process: 'cancel',
                     
                 });
                 toastSuccess('ปฏิเสธแพ็กเกจเรียบร้อย');
                 setMasterData(prev=>prev.filter(i=>i.id !== id));
-
-                return;
             }
+            const { status, data } = await scanfoodAPI.post(
+                "/telegram/office/delete/",
+                {
+                    "channelType":"warehouse",
+                    "chat_id":chat_id_saleManager,
+                    "message_id": message_id_saleManager,
+                }
+                
+            );
+            await db.collection("telegramDeleteQueue").add({
+                chat_id,
+                message_id:message_id,
+                deleteAt: Date.now() + 2 * 1000 // 2 วินาที
+                // deleteAt: Date.now() + 12 * 60 * 60 * 1000
+            });
+            const { status:status2, data:data2 } = await scanfoodAPI.post(
+                "/telegram/office/reply/",
+                {
+                    "channelType":"manualApprove",
+                    "chat_id":chat_id,
+                    "message_id": message_id,
+                    "process":action,
+                }
+            );
+            const { message_id:xxx } = data2;
+            await db.collection("telegramDeleteQueue").add({
+                chat_id,
+                message_id:xxx,
+                deleteAt: Date.now() + 2 * 1000 // 2 วินาที
+                // deleteAt: Date.now() + 12 * 60 * 60 * 1000
+            });
         } catch (error) {
             alert(error);
         } finally {
