@@ -106,8 +106,8 @@ function WarehouseJobScreen() {
     async function handleStatus(item){
         setStatus_Modal(false);
         setLoading(true);
-        const { id:orderId } = current;
-        const { status:thisStatus, link = '' } = item;
+        const { id:orderId, link } = current;
+        const { status:thisStatus } = item;
         try {
             const telegram = await db.runTransaction( async (transaction)=>{
                 const orderRef = db.collection('hardwareOrder').doc(orderId);
@@ -126,6 +126,15 @@ function WarehouseJobScreen() {
             let newReplyId = '';
             let newReplyIdWarehouse = '';
             if(chat_id && message_id){
+          
+                if(thisStatus === 'sent'){
+                    await db.collection("telegramDeleteQueue").add({
+                      chat_id,
+                      message_id,
+                      deleteAt: Date.now() + 2 * 1000 // 2 วินาที
+                      // deleteAt: Date.now() + 12 * 60 * 60 * 1000
+                    });
+                } 
                 const { status, data } = await scanfoodAPI.post(
                     "/telegram/office/reply/",
                     {
@@ -138,6 +147,15 @@ function WarehouseJobScreen() {
                 );
                 const { message_id:xxx } = data;
                 newReplyId = xxx;
+                if(thisStatus === 'sent'){
+                    await db.collection("telegramDeleteQueue").add({
+                      chat_id,
+                      message_id:xxx,
+                      deleteAt: Date.now() + 2 * 1000 // 2 วินาที
+                      // deleteAt: Date.now() + 12 * 60 * 60 * 1000
+                    });
+                }
+            
             }
             if(chat_id_warehouse && message_id_warehouse){
                 if(thisStatus === 'sent'){
@@ -194,7 +212,9 @@ function WarehouseJobScreen() {
             setMasterData(prev=>prev.map(item=>
                 item.id === orderId
                     ?{
-                        ...item,status:thisStatus
+                        ...item,status:thisStatus,
+                        reply_message_id: newReplyId,
+                        reply_message_id_warehouse: newReplyIdWarehouse
                     }
                     :item
             ))
@@ -257,7 +277,7 @@ function WarehouseJobScreen() {
                 const { message_id:xxx } = data;
                 newReplyIdWarehouse = xxx;
             }
-                const orderRef = db.collection('hardwareOrder').doc(orderId);
+            const orderRef = db.collection('hardwareOrder').doc(orderId);
             await orderRef.update({
                 reply_message_id: newReplyId,
                 reply_message_id_warehouse: newReplyIdWarehouse
@@ -286,7 +306,9 @@ function WarehouseJobScreen() {
             setMasterData(prev=>prev.map(item=>
                 item.id === orderId
                     ?{
-                        ...item,link
+                        ...item,link,
+                        reply_message_id: newReplyId,
+                        reply_message_id_warehouse: newReplyIdWarehouse
                     }
                     :item
             ));

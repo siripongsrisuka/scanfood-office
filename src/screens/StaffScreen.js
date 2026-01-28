@@ -67,13 +67,15 @@ async function fetchHumanResource() {
     useEffect(()=>{
       fetchHumanResource();
     },[humanRight]);
-
  
     // 200%
     async function manageHuman(){
-        setHuman_Modal(false)
         const rightIds = new Set(sideBar.map(a=>a.id))
-        const { id, rights } = current;
+        const { id, rights, chat_id } = current;
+        const duplicateChatId = currentHumans.find(a=>a.chat_id === chat_id && a.id !== id);
+        if(duplicateChatId) return alert('มี chat_id นี้ในระบบแล้ว กรุณาเปลี่ยนใหม่');
+        setHuman_Modal(false)
+
         const findHuman = currentHumans.find(a=>a.id===id);
         const newHuman = findHuman
           ?currentHumans.map(item=>
@@ -85,7 +87,7 @@ async function fetchHumanResource() {
               :item
           )
           :[...currentHumans,current]
-        const cleanData = newHuman.map(({ id, name, rights, team = '', saleManagerTeam = '', imageId, chat_id = '', admin = false }) =>({ id, name, rights, team, saleManagerTeam, imageId, chat_id, admin }))
+        const cleanData = newHuman.map(({ id, name, rights, team = '', saleManagerTeam = '', imageId, chat_id = '', admin = false }) =>({ id, name, rights, team, saleManagerTeam, imageId, chat_id:chat_id?Number(chat_id):'', admin }))
         const updatedField = { humanRight:cleanData, humanResource:cleanData.map(a=>a.id) };
         setLoading(true);
         try {

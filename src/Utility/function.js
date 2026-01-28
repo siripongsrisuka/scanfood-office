@@ -31,7 +31,7 @@ export   async function fetchLicense(){
 export   async function fetchHardware(profileId){
     const query = await db.collection('hardwareOrder')
         .where('profileId','==',profileId)
-        .where('status','==','prepare')
+        .where('status','in',['prepare','packed'])
         .get();
     
     const results = query.docs.map(doc=>{

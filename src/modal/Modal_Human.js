@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Row,
   Col,
@@ -10,6 +10,7 @@ import { colors, initialAlert, initialTeam } from "../configs";
 import Switch from "react-switch";
 import Modal_Alert from "./Modal_Alert";
 import { DeleteButton, FooterButton } from "../components";
+import { useSelector } from "react-redux";
 
 const { softWhite, softGray, white } = colors;
 
@@ -26,10 +27,14 @@ function Modal_Human({
   deleteItem,
   sideBar
 }) {
-  
-    const { id, rights, name, team ='', saleManagerTeam ='' } = current;
+    const { office:{ telegram, humanRight } } = useSelector((state)=> state.office);
+    const { id, rights, name, team ='', saleManagerTeam ='', chat_id = '' } = current;
     const [alert_Modal, setAlert_Modal] = useState(initialAlert);
     const { status, content, onClick, variant } = alert_Modal;
+    const existTelegram = useMemo(()=>{
+      const usedChatIds = humanRight.filter(a=>a.id !== id).map(a=>a.chat_id);
+      return telegram.filter(a=>!usedChatIds.includes(a.id))
+    },[chat_id, telegram, humanRight])
 
     function manageRights(id,status){
         setCurrent(prev=>({
@@ -81,7 +86,7 @@ function Modal_Human({
             >
               <option value='' disabled >ทีม sale</option>
               {initialTeam.map((item,index)=>{
-                return <option key={index} value={item} >{item}</option>
+                return <option key={index} value={item} >ทีม sale:{item}</option>
               })}
               
             </Form.Select>
@@ -93,7 +98,19 @@ function Modal_Human({
             >
               <option value='' disabled >หัวหน้าทีม Sale</option>
               {initialTeam.map((item,index)=>{
-                return <option key={index} value={item} >{item}</option>
+                return <option key={index} value={item} >หัวหน้าทีม Sale:{item}</option>
+              })}
+              
+            </Form.Select>
+            <Form.Select 
+                aria-label="Default select example" 
+                value={chat_id} 
+                onChange={(event)=>{setCurrent(prev=>({...prev,chat_id:event.target.value}))}}
+                style={{marginTop:'1rem',marginBottom:'1rem',width:'100%'}}
+            >
+              <option value='' disabled >telegram</option>
+              {existTelegram.map((item,index)=>{
+                return <option key={index} value={item.id} >telegram:{item.title}</option>
               })}
               
             </Form.Select>
