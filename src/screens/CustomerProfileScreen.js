@@ -18,6 +18,8 @@ import {
 import { db } from "../db/firestore";
 import { Modal_OneInput } from "../modal";
 import { OneButton } from "../components";
+import { stringDateTimeReceipt } from "../Utility/dateTime";
+import { formatTime } from "../Utility/function";
 
 const initialCustomerProfile = {
     code:'', // s00001
@@ -27,7 +29,7 @@ const initialCustomerProfile = {
     hardware:[], // อุปกรณ์ที่ซื้อจากเรา
     notes:[],
     createdBy:'',
-
+    shopCount:0,
 };
 
 const initialShop = {
@@ -75,7 +77,33 @@ function CustomerProfileScreen() {
     const { profile:{ id:profileId, name:profileName } } = useSelector(state=>state.profile);
     const [loading, setLoading] = useState(false);
     const [existCustomer, setExistCustomer] = useState([]);
+    const [masterData, setMasterData] = useState([]); // ลูกค้าที่ยังไม่ผูก shop
+
+    useEffect(()=>{
+      fetchCustomerData();
+    },[]);
     
+    async function fetchCustomerData(){
+      setLoading(true);
+      try {
+        const snapshot = await db.collection('customerProfile')
+          .where('shopCount','==',0)
+          .get();
+        const data = snapshot.docs.map(doc=>{
+          const { createdAt, ...rest } = doc.data();
+          return({
+            ...rest,
+            createdAt:formatTime(createdAt),
+            id:doc.id
+          })
+        });
+        setMasterData(data);
+      } catch (error) {
+        alert(error)
+      } finally {
+        setLoading(false);
+      }
+    }
 
     async function handleCustomer(){
       setCustomer_Modal(false);
@@ -96,21 +124,14 @@ function CustomerProfileScreen() {
 
     async function addNewCustomer(){
       const payload = {
-        lineName:'',
-        createdAt:new Date(),
-        shops:[],
-        hardware:[], // อุปกรณ์ที่ซื้อจากเรา
-        notes:[],
+        ...initialCustomerProfile,
         createdBy:profileId,
         createdName:profileName,
+        createdAt:new Date(),
       };
       setLoading(true);
       try {
-        const query = await db.collection('customerProfile')
-          .where('createdBy','==',profileId)
-          .where()
-          .limit(1)
-          .get();
+   
         const numberRef = db.collection('admin').doc('customerProfileNumber');
         await db.runTransaction(async (transaction) => {
           const numberDoc = await transaction.get(numberRef);
@@ -118,13 +139,12 @@ function CustomerProfileScreen() {
           let { code } = numberDoc.data();
           code += 1;
           const newCode = `s${String(code).padStart(5,'0')}`;
-
+          payload.code = newCode;
           transaction.update(numberRef, { code, timestamp:new Date() });
 
           const customerRef = db.collection('customerProfile').doc(newCode);
           transaction.set(customerRef, payload);
-          setExistCustomer()
-          setCurrentCustomer({ ...payload, id:newCode });
+          setMasterData(prev=>[...prev,{ ...payload, id:newCode }])
         });
       } catch (error) {
         alert(error)
@@ -149,7 +169,21 @@ function CustomerProfileScreen() {
         />
         <OneButton {...{ text: "ค้นหา", submit: ()=>{setCustomer_Modal(true);setCode('')} }} />
         <OneButton {...{ text: "เพิ่มลูกค้าใหม่", submit: addNewCustomer }} />
-
+        <Row>
+          {masterData.map((item,index)=>{
+            const { code, lineName, createdAt, createdName } = item;
+            return <Col xs='12' sm='6' md='4'  key={index} >
+                      <Card style={{ margin:10, cursor:'pointer' }} onClick={()=>{setCurrentCustomer(item)}}>
+                        <Card.Body>
+                          <Card.Title>{lineName || '-'}</Card.Title>
+                          <Card.Subtitle className="mb-2 text-muted">รหัส: {code}</Card.Subtitle>
+                          <Card.Text>สร้างเมื่อ: {stringDateTimeReceipt(createdAt)}</Card.Text>
+                          <Card.Text>สร้างโดย: {createdName || '-'}</Card.Text>
+                        </Card.Body>
+                      </Card>
+                    </Col>
+          })}
+        </Row>
     </div>
   );
 };
