@@ -5,8 +5,8 @@ export async function telegramDeleteQueue({ chat_id, message_id }){
   await db.collection("telegramDeleteQueue").add({
       chat_id,
       message_id:message_id,
-      deleteAt: Date.now() + 2 * 1000 // 2 วินาที
-      // deleteAt: Date.now() + 12 * 60 * 60 * 1000
+    //   deleteAt: Date.now() + 2 * 1000 // 2 วินาที
+      deleteAt: Date.now() + 12 * 60 * 60 * 1000
   });
 }
 
