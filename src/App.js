@@ -26,7 +26,6 @@ import {
   WarehouseSettingScreen,
   WarehouseArrangeScreen,
   ReportInbound,
-  WarehouseJobHistory,
   ReportHardware,
   NewShopDashboard,
   TransferOwnerScreen,
@@ -105,7 +104,6 @@ function App() {
             <Route path='warehouseSetting' element={<WarehouseSettingScreen/>} />
             <Route path='hardwareArrange' element={<WarehouseArrangeScreen/>} />
             <Route path='reportInbound' element={<ReportInbound/>} />
-            <Route path='warehouseJobHistory' element={<WarehouseJobHistory/>} />
             <Route path='reportHardware' element={<ReportHardware/>} />
             <Route path='newShop' element={<NewShopDashboard/>} />
             <Route path='importItemFranchise' element={<ImportItemFranchiseScreen/>} />

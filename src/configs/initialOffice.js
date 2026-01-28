@@ -137,6 +137,7 @@ export default [
       topic: '5.2 ประวัติงาน',
       icon: 'bi-speedometer',
       to: 'reportHardware',
+      // to: 'reportHardware',
       id:'502'
     },
     {

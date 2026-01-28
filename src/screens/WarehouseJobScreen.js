@@ -195,6 +195,7 @@ function WarehouseJobScreen() {
     function openLink(item){
         setCurrent(item)
         setLink_Modal(true)
+        setLink(item.link || '')
     };
 
 

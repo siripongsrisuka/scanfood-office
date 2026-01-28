@@ -7,6 +7,8 @@ import { SearchControl, TimeControlHardwareOrder } from "../components";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import TablePagination from '@mui/material/TablePagination';
 import { goToTop, searchMultiFunction } from "../Utility/function";
+import { Modal_WarehouseImage } from "../modal";
+import { db, prepareFirebaseImage } from "../db/firestore";
 
 
 function ReportHardware() {
@@ -18,6 +20,9 @@ function ReportHardware() {
     const [rowsPerPage, setRowsPerPage] = useState(50);
     const [resultLength, setResultLength] = useState(0);
     const [search, setSearch] = useState('');
+    const [oldImageUrls, setOldImageUrls] = useState(null);
+    const [image_Modal, setImage_Modal] = useState(false);
+    
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage); // start form 0
@@ -42,9 +47,12 @@ function ReportHardware() {
 
     },[page,rowsPerPage,displayHardwareOrders,search]);
 
+
+
   return (
     <div style={styles.container} >
         <h1>ประวัติงาน</h1>
+  
         <TimeControlHardwareOrder  />
         <SearchControl {...{ placeholder:'ค้นหาด้วยผู้รับ', search, setSearch }} />
         <br/>
@@ -59,12 +67,14 @@ function ReportHardware() {
                     <th style={styles.container3} >รายละเอียด</th>
                     <th style={styles.container3} >เซล</th>
                     <th style={styles.container3} >สถานะ</th>
-
+                    <th style={styles.container3} >ลิงก์</th>
+                    <th style={styles.container3} >รูปภาพ</th>
+                    <th style={styles.container3} >หมายเหตุ</th>
                 </tr>
             </thead>
             <tbody  >
             {currentDisplay.map((item, index) => {
-                const { timestamp,  product = [], profileName, orderNumber, shopName, status } = item;
+                const { timestamp,  product = [], profileName, orderNumber, shopName, status, link, imageUrls = [], comment = '' } = item;
                 return <tr  key={index} >
                             <td style={styles.container4}>{index+1}.</td>
                             <td style={styles.container4}>{orderNumber}</td>
@@ -77,6 +87,13 @@ function ReportHardware() {
                             </td>
                             <td style={styles.container4}>{profileName}</td>
                             <td style={styles.container4}>{status}</td>
+                            <td style={{ width:'20%', maxWidth:'300px' }}  >
+                              <p style={{ maxWidth:'300px', wordWrap: 'break-word' }} >{link}</p>
+                            </td>
+                            <td   style={styles.container4}>
+                                {imageUrls.map((a,i)=><img key={i} src={a} alt="img" width={50} style={{ marginRight:5 }} />)}
+                            </td>
+                            <td  style={styles.container4} >{comment}</td>
                         </tr>
             })}
             </tbody>
@@ -101,7 +118,7 @@ const styles = {
     width:'5%', minWidth:'70px', textAlign:'center'
   },
   container3 : {
-    width:'20%', minWidth:'150px', textAlign:'center'
+    width:'20%', minWidth:'150px', textAlign:'center', maxWidth:'200px'
   },
   container4 : {
     textAlign:'center'

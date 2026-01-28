@@ -28,7 +28,6 @@ import WarehouseJobScreen from "./WarehouseJobScreen";
 import WarehouseSettingScreen from "./WarehouseSettingScreen";
 import WarehouseArrangeScreen from "./WarehouseArrangeScreen";
 import ReportInbound from "./ReportInbound";
-import WarehouseJobHistory from "./WarehouseJobHistory";
 import ReportHardware from "./ReportHardware";
 import NewShopDashboard from "./NewShopDashboard";
 import ExtraDayHistory from "./ExtraDayHistory";
@@ -56,7 +55,6 @@ export {
     TransferOwnerScreen,
     NewShopDashboard,
     ReportHardware,
-    WarehouseJobHistory,
     ReportInbound,
     WarehouseArrangeScreen,
     WarehouseSettingScreen,
