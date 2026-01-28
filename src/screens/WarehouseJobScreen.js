@@ -9,6 +9,7 @@ import { formatTime, searchMultiFunction, toastSuccess } from "../Utility/functi
 import { normalSort } from "../Utility/sort";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { scanfoodAPI } from "../Utility/api";
+import { telegramDelete, telegramDeleteQueue } from "../Utility/telegram";
 
 
 const deliveryOptions = {
@@ -112,11 +113,6 @@ function WarehouseJobScreen() {
                 const orderDoc = await transaction.get(orderRef);
                 const { status:currentStatus } = orderDoc.data();
                 if(['success','cancel'].includes(currentStatus)) throw new Error(`สถานะ : ${currentStatus} แก้ไขไม่ได้`);
-                // if(status ==='sent'){
-                //     transaction.update(orderRef,{ status, billDate:stringYMDHMS3(new Date()) });
-                // } else {
-                //     transaction.update(orderRef,{ status });
-                // }
                 transaction.update(orderRef,{ status:thisStatus });
                 return orderDoc.data()
             });
@@ -125,14 +121,7 @@ function WarehouseJobScreen() {
             let newReplyIdWarehouse = '';
             if(chat_id && message_id){
           
-                if(thisStatus === 'sent'){
-                    await db.collection("telegramDeleteQueue").add({
-                      chat_id,
-                      message_id,
-                      deleteAt: Date.now() + 2 * 1000 // 2 วินาที
-                      // deleteAt: Date.now() + 12 * 60 * 60 * 1000
-                    });
-                } 
+               
                 const { status, data } = await scanfoodAPI.post(
                     "/telegram/office/reply/",
                     {
@@ -145,26 +134,19 @@ function WarehouseJobScreen() {
                 );
                 const { message_id:xxx } = data;
                 newReplyId = xxx;
-                if(thisStatus === 'sent'){
-                    await db.collection("telegramDeleteQueue").add({
-                      chat_id,
-                      message_id:xxx,
-                      deleteAt: Date.now() + 2 * 1000 // 2 วินาที
-                      // deleteAt: Date.now() + 12 * 60 * 60 * 1000
-                    });
-                }
+                 if(thisStatus === 'sent'){
+                    // ลบต้นฉบับ
+                    await telegramDeleteQueue({ chat_id, message_id });
+                    // ลบ reply ล่าสุด
+                    await telegramDeleteQueue({ chat_id, message_id:xxx });
+                    
+                } 
             
             }
             if(chat_id_warehouse && message_id_warehouse){
                 if(thisStatus === 'sent'){
-                    const { status, data } = await scanfoodAPI.post(
-                    "/telegram/office/delete/",
-                    {
-                        "channelType":"warehouse",
-                        "chat_id":chat_id_warehouse,
-                        "message_id": message_id_warehouse,
-                    }
-                    );
+                    await telegramDelete({ chat_id: chat_id_warehouse, message_id: message_id_warehouse });
+               
                 } else {
                     const { status, data } = await scanfoodAPI.post(
                         "/telegram/office/reply/",
@@ -187,24 +169,10 @@ function WarehouseJobScreen() {
                 reply_message_id_warehouse: newReplyIdWarehouse
             });
             if(reply_message_id){
-                const { status, data } = await scanfoodAPI.post(
-                    "/telegram/office/delete/",
-                    {
-                        "channelType":"warehouse",
-                        "chat_id":chat_id,
-                        "message_id": reply_message_id,
-                    }
-                );
+                await telegramDelete({ chat_id, message_id: reply_message_id });
             }
             if(reply_message_id_warehouse){
-                const { status, data } = await scanfoodAPI.post(
-                    "/telegram/office/delete/",
-                    {
-                        "channelType":"warehouse",
-                        "chat_id":chat_id_warehouse,
-                        "message_id": reply_message_id_warehouse,
-                    }
-                );
+                await telegramDelete({ chat_id: chat_id_warehouse, message_id: reply_message_id_warehouse });
             }
             toastSuccess('อัปเดตสถานะสำเร็จ');
             setMasterData(prev=>prev.map(item=>
@@ -281,24 +249,10 @@ function WarehouseJobScreen() {
                 reply_message_id_warehouse: newReplyIdWarehouse
             });
             if(reply_message_id){
-                const { status, data } = await scanfoodAPI.post(
-                    "/telegram/office/delete/",
-                    {
-                        "channelType":"warehouse",
-                        "chat_id":chat_id,
-                        "message_id": reply_message_id,
-                    }
-                );
+                await telegramDelete({ chat_id, message_id: reply_message_id });
             }
             if(reply_message_id_warehouse){
-                const { status, data } = await scanfoodAPI.post(
-                    "/telegram/office/delete/",
-                    {
-                        "channelType":"warehouse",
-                        "chat_id":chat_id_warehouse,
-                        "message_id": reply_message_id_warehouse,
-                    }
-                );
+                await telegramDelete({ chat_id: chat_id_warehouse, message_id: reply_message_id_warehouse });
             }
             toastSuccess('อัปเดตลิงค์สำเร็จ');
             setMasterData(prev=>prev.map(item=>

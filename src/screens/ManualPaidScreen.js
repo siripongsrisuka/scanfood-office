@@ -11,6 +11,7 @@ import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { OneButton } from "../components";
 import { initialSo } from "../configs";
 import { scanfoodAPI } from "../Utility/api";
+import { telegramDelete, telegramDeleteQueue } from "../Utility/telegram";
 
 
 function ManualPaidScreen() {
@@ -81,21 +82,10 @@ function ManualPaidScreen() {
                 toastSuccess('ปฏิเสธแพ็กเกจเรียบร้อย');
                 setMasterData(prev=>prev.filter(i=>i.id !== id));
             }
-            const { status, data } = await scanfoodAPI.post(
-                "/telegram/office/delete/",
-                {
-                    "channelType":"warehouse",
-                    "chat_id":chat_id_saleManager,
-                    "message_id": message_id_saleManager,
-                }
-                
-            );
-            await db.collection("telegramDeleteQueue").add({
-                chat_id,
-                message_id:message_id,
-                deleteAt: Date.now() + 2 * 1000 // 2 วินาที
-                // deleteAt: Date.now() + 12 * 60 * 60 * 1000
-            });
+        
+            await telegramDelete({ chat_id: chat_id_saleManager, message_id:message_id_saleManager});
+            await telegramDeleteQueue({ chat_id, message_id});
+        
             const { status:status2, data:data2 } = await scanfoodAPI.post(
                 "/telegram/office/reply/",
                 {
@@ -106,12 +96,8 @@ function ManualPaidScreen() {
                 }
             );
             const { message_id:xxx } = data2;
-            await db.collection("telegramDeleteQueue").add({
-                chat_id,
-                message_id:xxx,
-                deleteAt: Date.now() + 2 * 1000 // 2 วินาที
-                // deleteAt: Date.now() + 12 * 60 * 60 * 1000
-            });
+            await telegramDeleteQueue({ chat_id, message_id:xxx });
+        
         } catch (error) {
             alert(error);
         } finally {

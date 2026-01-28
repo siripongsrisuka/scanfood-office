@@ -11,11 +11,12 @@ import { db } from "../db/firestore";
 import { reverseSort } from "../Utility/sort";
 import { scanfoodAPI } from "../Utility/api";
 import { initialExtraDay } from "../configs";
+import { replyExtraDay, sendExtraDay, telegramDelete, telegramDeleteQueue } from "../Utility/telegram";
 
 
 function ExtraDayScreen() {
     const [extraDay_Modal, setExtraDay_Modal] = useState(false);
-    const { profile:{ id:profileId, name:profileName, saleManagerTeam } } = useSelector(state=>state.profile);
+    const { profile:{ id:profileId, name:profileName, saleManagerTeam, chat_id } } = useSelector(state=>state.profile);
     const [masterData, setMasterData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [currentDisplay, setCurrentDisplay] = useState([]) // จำนวนที่แสดงในหนึ่งหน้า
@@ -66,9 +67,14 @@ function ExtraDayScreen() {
                 profileId,
                 profileName,
                 status:'pending',
-                billDate:stringYMDHMS3(new Date())
+                billDate:stringYMDHMS3(new Date()),
+                chat_id,
+                chat_id_saleManager:-1003211008949
             }
-            await extraDayRef.set(payload)
+            await extraDayRef.set(payload);
+            const message_id = await sendExtraDay({...payload, chat_id });
+            const message_id_saleManager = await sendExtraDay({...payload, chat_id:payload.chat_id_saleManager });
+            await extraDayRef.update({ message_id, message_id_saleManager });
             setMasterData(prev=>[...prev,payload])
             toastSuccess('ยื่นคำขอวันใช้งานสำเร็จ')
         } catch (error) {
@@ -82,12 +88,17 @@ function ExtraDayScreen() {
 
     async function approvedExtraDay(item){
         const { shopId, days, id } = item;
+        const { chat_id, chat_id_saleManager, message_id_saleManager, message_id } = current;
         setLoading(true);
         try {
             const { status, data } = await scanfoodAPI.post(
                 "/office/extraDay/",
                 item
             );
+            const reply_message_id = await replyExtraDay({ chat_id, message_id, status:'approved' });
+            await telegramDelete({ chat_id:chat_id_saleManager, message_id:message_id_saleManager });
+            await telegramDeleteQueue({ chat_id, message_id:reply_message_id });
+            await telegramDeleteQueue({ chat_id, message_id });
             setMasterData(prev=>prev.filter(a=>a.id!==id) );
             toastSuccess('อนุมัติวันใช้งานสำเร็จ');
 
@@ -101,11 +112,16 @@ function ExtraDayScreen() {
     async function handleRejectExtraDay(item){
         setLoading(true);
         try {
+            const { chat_id, chat_id_saleManager, message_id_saleManager, message_id } = current;
             const extraDayRef = db.collection('extraDay').doc(item.id);
             await extraDayRef.update({
                 status:'rejected',
                 rejectedAt:new Date(),
             });
+            const reply_message_id = await replyExtraDay({ chat_id, message_id, status:'rejected' });
+            await telegramDelete({ chat_id:chat_id_saleManager, message_id:message_id_saleManager });
+            await telegramDeleteQueue({ chat_id, message_id:reply_message_id });
+            await telegramDeleteQueue({ chat_id, message_id });
             setMasterData(prev=>prev.filter(a=>a.id!==item.id) );
             toastSuccess('ปฏิเสธคำขอวันใช้งานสำเร็จ');
         } catch (error) {
