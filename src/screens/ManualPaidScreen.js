@@ -4,7 +4,7 @@ import {
   Table,
 } from "react-bootstrap";
 import { db } from "../db/firestore";
-import { fetchLicense, formatTime, isApprover, toastSuccess } from "../Utility/function";
+import { fetchLicense, formatTime, toastSuccess } from "../Utility/function";
 import { normalSort } from "../Utility/sort";
 import { Modal_Loading, Modal_So } from "../modal";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
@@ -14,7 +14,7 @@ import { scanfoodAPI } from "../Utility/api";
 
 
 function ManualPaidScreen() {
-    const { profile:{ id: profileId,  }  } = useSelector( state => state.profile );
+    const { profile:{ admin  }  } = useSelector( state => state.profile );
     const { warehouse } = useSelector(state=>state.warehouse);
     const [masterData, setMasterData] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -92,7 +92,7 @@ function ManualPaidScreen() {
     };
 
     function openSoModal(item){
-        if(!isApprover(profileId)){
+        if(!admin){
             alert('คุณไม่มีสิทธิ์อนุมัติแพ็กเกจ');
             return;
         }

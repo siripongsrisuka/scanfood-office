@@ -7,11 +7,9 @@ import { CategoryRender, SearchControl } from "../components";
 import {  Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput, Modal_WarehouseImage } from "../modal";
 import { formatTime, searchMultiFunction, toastSuccess } from "../Utility/function";
 import { normalSort } from "../Utility/sort";
-import { stringDateTimeReceipt, stringYMDHMS3 } from "../Utility/dateTime";
-import { colors, initialWarehouse } from "../configs";
+import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { scanfoodAPI } from "../Utility/api";
 
-const { white } = colors;
 
 const deliveryOptions = {
     'normal':'DHL',
