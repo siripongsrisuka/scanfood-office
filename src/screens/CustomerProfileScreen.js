@@ -15,21 +15,25 @@ import {
   OverlayTrigger,
   Tooltip
 } from "react-bootstrap";
-import { db } from "../db/firestore";
-import { Modal_OneInput } from "../modal";
+import { db, prepareFirebaseImage, webImageDelete } from "../db/firestore";
+import { Modal_Note, Modal_OneInput } from "../modal";
 import { OneButton } from "../components";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { formatTime } from "../Utility/function";
+import { colors, initialNote } from "../configs";
+import { v4 as uuidv4 } from 'uuid';
 
 const initialCustomerProfile = {
     code:'', // s00001
-    lineName:'',
     createdAt:new Date(),
     shops:[], 
     hardware:[], // อุปกรณ์ที่ซื้อจากเรา
     notes:[],
     createdBy:'',
     shopCount:0,
+    updatedAt:new Date(),
+    updatedBy:'',
+    updatedName:'',
 };
 
 const initialShop = {
@@ -67,44 +71,27 @@ const initialShop = {
         router:'',
 
     }
-}
+};
+
+const { softWhite, darkGray } = colors;
 
 function CustomerProfileScreen() {
+    const { office:{ humanRight = [] } } = useSelector(state=>state.office);
     const [search, setSearch] = useState('');
     const [currentCustomer, setCurrentCustomer] = useState(initialCustomerProfile);
+    const { code:thisCode, createdAt, createdName, id:customerId, notes = [] } = currentCustomer;
     const [customer_Modal, setCustomer_Modal] = useState(false);
     const [code, setCode] = useState('');
     const { profile:{ id:profileId, name:profileName } } = useSelector(state=>state.profile);
     const [loading, setLoading] = useState(false);
-    const [existCustomer, setExistCustomer] = useState([]);
     const [masterData, setMasterData] = useState([]); // ลูกค้าที่ยังไม่ผูก shop
+    const [currentNote, setCurrentNote] = useState(initialNote);
+    const { modifiedBy, modifiedName, modifiedAt, content, id:noteId, imageUrls = [] } = currentNote;
+    const [note_Modal, setNote_Modal] = useState(false);
+    const humanMaps = new Map(humanRight.map(a=>[a.id,a]));
+    const [oldImageUrls, setOldImageUrls] = useState(null);
 
-    useEffect(()=>{
-      fetchCustomerData();
-    },[]);
-    
-    async function fetchCustomerData(){
-      setLoading(true);
-      try {
-        const snapshot = await db.collection('customerProfile')
-          .where('shopCount','==',0)
-          .get();
-        const data = snapshot.docs.map(doc=>{
-          const { createdAt, ...rest } = doc.data();
-          return({
-            ...rest,
-            createdAt:formatTime(createdAt),
-            id:doc.id
-          })
-        });
-        setMasterData(data);
-      } catch (error) {
-        alert(error)
-      } finally {
-        setLoading(false);
-      }
-    }
-
+    // 200%
     async function handleCustomer(){
       setCustomer_Modal(false);
       if(!code) return alert('กรุณาใส่รหัสลูกค้า');
@@ -113,8 +100,17 @@ function CustomerProfileScreen() {
         const customerRef = db.collection('customerProfile').doc(code);
         const customerDoc = await customerRef.get();
         if(!customerDoc.exists) return alert('ไม่พบรหัสลูกค้านี้ในระบบ');
-        const customerData = customerDoc.data();
-        setCurrentCustomer({...customerData, id:customerDoc.id});
+        const { createdAt, updatedAt, notes, ...rest } = customerDoc.data();
+        setCurrentCustomer({
+          createdAt:formatTime(createdAt),
+          updatedAt:formatTime(updatedAt),
+          ...rest, 
+          id:customerDoc.id,
+          notes:notes.map(note=>({
+            ...note,
+            modifiedAt:formatTime(note.modifiedAt),
+          })),
+        });
       } catch (error) {
         alert(error)
       } finally {
@@ -123,6 +119,8 @@ function CustomerProfileScreen() {
     };
 
     async function addNewCustomer(){
+      const ok = window.confirm('ต้องการเพิ่มลูกค้าใหม่ใช่หรือไม่ ?');
+      if(!ok) return;
       const payload = {
         ...initialCustomerProfile,
         createdBy:profileId,
@@ -144,20 +142,103 @@ function CustomerProfileScreen() {
 
           const customerRef = db.collection('customerProfile').doc(newCode);
           transaction.set(customerRef, payload);
-          setMasterData(prev=>[...prev,{ ...payload, id:newCode }])
+          setCurrentCustomer({...payload, id:newCode});
         });
       } catch (error) {
         alert(error)
       } finally {
         setLoading(false);
       }
+    };
+
+  function openNoteModal(item){
+    if(item.id && item.modifiedBy !== profileId){
+      return alert('คุณไม่มีสิทธิ์แก้ไขหมายเหตุนี้');
     }
-    
+    setNote_Modal(true);
+    setCurrentNote({...initialNote,...item});
+    setOldImageUrls(item.imageUrls || []);
+  };
+
+  async function saveNote(){
+    setNote_Modal(false);
+    if(!content) return alert('กรุณาใส่หมายเหตุ');
+   
+    setLoading(true);
+    try {
+      let images = imageUrls.filter(a=>!a?.startsWith('http')) || []
+      if (images.length > 0) {
+          images = await Promise.all(
+              images.map(item => prepareFirebaseImage(item, '/note/', 'office'))
+          );
+      }
+      const existingImages = imageUrls.filter(a=>a.startsWith('http')) || []
+      images = [...existingImages,...images]
+
+      const deleteImages = oldImageUrls.filter(a=>a.startsWith('http') && !images.includes(a)) || []
+      for(const img of deleteImages){
+          await webImageDelete(img);
+      }
+      const payload = {
+        ...currentNote,
+        modifiedBy:profileId,
+        modifiedName:profileName,
+        modifiedAt:new Date(),
+        imageUrls:images
+      };
+      const customerData = await db.runTransaction(async (transaction) => {
+        const customerRef = db.collection('customerProfile').doc(customerId);
+        const customerDoc = await transaction.get(customerRef);
+        if(!customerDoc.exists) throw 'ไม่พบรหัสลูกค้านี้ในระบบ';
+        const { notes } = customerDoc.data();
+        const modifiedNotes = notes.map(note=>({
+          ...note,
+          modifiedAt:note.modifiedAt && formatTime(note.modifiedAt),
+        }));
+        const updatedNotes = currentNote.id
+          ? modifiedNotes.map(note=>note.id===currentNote.id ? payload : note)
+          : [...modifiedNotes, { ...payload, id:uuidv4() }];
+        transaction.update(customerRef, { notes:updatedNotes, updatedAt:new Date(), updatedBy:profileId, updatedName:profileName });
+        return { ...customerDoc.data(), notes:updatedNotes };
+      });
+      const { createdAt, updatedAt, ...rest } = customerData;
+      setCurrentCustomer(prev=>({
+        ...prev,
+        ...rest,
+        updatedAt:new Date(),
+        updatedBy:profileId,
+        updatedName:profileName,
+      }));
+    } catch (error) {
+      alert(error)
+    } finally {
+      setLoading(false);
+      setCurrentNote(initialNote);
+    }
+  }
+
 
 
   return (
     <div style={styles.container} >
         <h1>ข้อมูลลูกค้า</h1>
+        <Modal_Note
+            show={note_Modal}
+            onHide={()=>{setNote_Modal(false)}}
+            current={currentNote}
+            setCurrent={setCurrentNote}
+            submit={saveNote}
+        />
+        {/* <Modal_OneInput  
+            show={note_Modal}
+            header={`ใส่โน๊ตลูกค้า`}
+            onHide={()=>{setNote_Modal(false)}}
+            value={content}
+            onClick={saveNote}
+            placeholder='ใส่โน๊ตลูกค้า'
+            onChange={(value)=>{setCurrentNote(prev=>({ ...prev, content:value }))}}
+            area={true}
+        /> */}
         <Modal_OneInput  
             show={customer_Modal}
             header={`ใส่รหัสลูกค้า`}
@@ -169,21 +250,51 @@ function CustomerProfileScreen() {
         />
         <OneButton {...{ text: "ค้นหา", submit: ()=>{setCustomer_Modal(true);setCode('')} }} />
         <OneButton {...{ text: "เพิ่มลูกค้าใหม่", submit: addNewCustomer }} />
-        <Row>
-          {masterData.map((item,index)=>{
-            const { code, lineName, createdAt, createdName } = item;
-            return <Col xs='12' sm='6' md='4'  key={index} >
-                      <Card style={{ margin:10, cursor:'pointer' }} onClick={()=>{setCurrentCustomer(item)}}>
-                        <Card.Body>
-                          <Card.Title>{lineName || '-'}</Card.Title>
-                          <Card.Subtitle className="mb-2 text-muted">รหัส: {code}</Card.Subtitle>
-                          <Card.Text>สร้างเมื่อ: {stringDateTimeReceipt(createdAt)}</Card.Text>
-                          <Card.Text>สร้างโดย: {createdName || '-'}</Card.Text>
-                        </Card.Body>
-                      </Card>
-                    </Col>
-          })}
-        </Row>
+        {customerId
+          ?<div>
+            <h3>Code : {thisCode}</h3>
+            <h5>สร้างเมื่อ: {stringDateTimeReceipt(createdAt)}</h5>
+            <h5>สร้างโดย: {createdName || '-'}</h5>
+            <OneButton {...{ text:'+ เพิ่มโน๊ต', submit: ()=>{openNoteModal({})}, variant:'success' }} />
+            {notes.map((item)=>{
+                  const { content, modifiedBy, modifiedName, modifiedAt, id, imageUrls } = item;
+                  const name = humanMaps.get(modifiedBy)?.name || modifiedName;
+                  return <div key={id} style={{ border:`1px solid ${softWhite}`, margin:'10px 0px', padding:10, borderRadius:10 }} >
+                      <p>
+                        {content.split('\n').map((line, index) => (
+                          <React.Fragment key={index}>
+                              &emsp;&nbsp;{line}
+                              <br />
+                          </React.Fragment>
+                        ))}
+                      </p>
+                      {imageUrls && imageUrls.length > 0
+                        ? <div style={{ display: "flex", flexWrap: "wrap", marginTop: 10 }}>
+                            {imageUrls.map((img, index) => (
+                              <div key={index} style={{ margin: 10 }} >
+                                <img
+                                  src={img}
+                                  alt={`note-upload-${index}`}
+                                  style={{ width: 150, height: 150, objectFit:'contain' }}
+                                />
+                              </div>
+                            ))}
+                          </div>
+                        : null
+                      }
+                      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }} >
+                          <h6 style={{ color:darkGray }} >{stringDateTimeReceipt(modifiedAt)} {name} </h6>
+                          <div>
+                              <i style={{ cursor:'pointer' }} onClick={()=>{openNoteModal(item)}} class="bi bi-pencil"></i>&emsp;
+                          </div>
+                      </div>
+                  </div>
+              })}
+          </div>
+          :null
+        }
+        
+      
     </div>
   );
 };

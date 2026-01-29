@@ -30,9 +30,11 @@ import Modal_Stock from "./Modal_Stock";
 import Modal_Inbound from "./Modal_Inbound";
 import Modal_Email from "./Modal_Email";
 import Modal_WarehouseImage from "./Modal_WarehouseImage";
+import Modal_Note from "./Modal_Note";
 
 
 export { 
+    Modal_Note,
     Modal_WarehouseImage,
     Modal_Email,
     Modal_Question,
