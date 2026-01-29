@@ -16,7 +16,7 @@ import {
   Tooltip
 } from "react-bootstrap";
 import { db, prepareFirebaseImage, webImageDelete } from "../db/firestore";
-import { Modal_Note, Modal_OneInput } from "../modal";
+import { Modal_Loading, Modal_Note, Modal_OneInput, Modal_Shop } from "../modal";
 import { OneButton } from "../components";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { formatTime } from "../Utility/function";
@@ -41,20 +41,11 @@ const initialShop = {
     storeSize:'',
     package:'',
     notes:[],
-    paymentGateway:[], // kbank, posxpay, beam
-    ethernetSystem:{
-        cashiers:[
-            {
-                name:'',
-                equipment:'', // pos, tablet
-                network:'', // lan, wifi
-                host:true, // true = server , false = client
-                printer:'', // lan, wifi, usb, bluetooth, inner
-                printerName:'', // ชื่อเครื่องปริ้นท์
-                printerMode:'', // text, picture
-            }
-        ],
-        kitchens:[
+    paymentGateway:[], // kbank, posxpay, beam, creditOrcode
+    cashiersPos:[
+     
+    ],
+    kitchens:[
             {
                 name:'',
                 equipment:'', // pos, tablet
@@ -67,10 +58,8 @@ const initialShop = {
                 note:'', // หมายเหตุ เช่น เครื่องนี้ ช่องเสียบแลนไม่ค่อยดี
 
             }
-        ],
-        router:'',
-
-    }
+    ],
+    router:'',
 };
 
 const { softWhite, darkGray } = colors;
@@ -90,6 +79,8 @@ function CustomerProfileScreen() {
     const [note_Modal, setNote_Modal] = useState(false);
     const humanMaps = new Map(humanRight.map(a=>[a.id,a]));
     const [oldImageUrls, setOldImageUrls] = useState(null);
+    const [currentShop, setCurrentShop] = useState(initialShop);
+    const [shop_Modal, setShop_Modal] = useState(false);
 
     // 200%
     async function handleCustomer(){
@@ -215,6 +206,15 @@ function CustomerProfileScreen() {
       setLoading(false);
       setCurrentNote(initialNote);
     }
+  };
+
+  function openShop(item){
+    setCurrentShop({...initialShop,...item});
+    setShop_Modal(true);
+  };
+
+  function saveShop(){
+    setShop_Modal(false);
   }
 
 
@@ -222,6 +222,14 @@ function CustomerProfileScreen() {
   return (
     <div style={styles.container} >
         <h1>ข้อมูลลูกค้า</h1>
+        <Modal_Loading show={loading} />
+        <Modal_Shop
+          show={shop_Modal}
+          onHide={()=>{setShop_Modal(false)}}
+          current={currentShop}
+          setCurrent={setCurrentShop}
+          submit={saveShop}
+        />
         <Modal_Note
             show={note_Modal}
             onHide={()=>{setNote_Modal(false)}}
@@ -250,16 +258,24 @@ function CustomerProfileScreen() {
         />
         <OneButton {...{ text: "ค้นหา", submit: ()=>{setCustomer_Modal(true);setCode('')} }} />
         <OneButton {...{ text: "เพิ่มลูกค้าใหม่", submit: addNewCustomer }} />
+        <OneButton {...{ text: "เพิ่มร้านใหม่", submit: ()=>{openShop({})} }} />
         {customerId
           ?<div>
             <h3>Code : {thisCode}</h3>
             <h5>สร้างเมื่อ: {stringDateTimeReceipt(createdAt)}</h5>
             <h5>สร้างโดย: {createdName || '-'}</h5>
             <OneButton {...{ text:'+ เพิ่มโน๊ต', submit: ()=>{openNoteModal({})}, variant:'success' }} />
+            <OneButton {...{ text:'+ ร้าน', submit: ()=>{openNoteModal({})}, variant:'success' }} />
             {notes.map((item)=>{
                   const { content, modifiedBy, modifiedName, modifiedAt, id, imageUrls } = item;
                   const name = humanMaps.get(modifiedBy)?.name || modifiedName;
-                  return <div key={id} style={{ border:`1px solid ${softWhite}`, margin:'10px 0px', padding:10, borderRadius:10 }} >
+                  return <div key={id} style={{ border:`1px solid ${softWhite}`, margin:'10px 0px', padding:10, borderRadius:10, backgroundColor:softWhite }} >
+                      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }} >
+                          <h6 style={{ color:darkGray }} >{stringDateTimeReceipt(modifiedAt)} {name} </h6>
+                          <div>
+                              <i style={{ cursor:'pointer' }} onClick={()=>{openNoteModal(item)}} class="bi bi-pencil"></i>&emsp;
+                          </div>
+                      </div>
                       <p>
                         {content.split('\n').map((line, index) => (
                           <React.Fragment key={index}>
@@ -282,12 +298,7 @@ function CustomerProfileScreen() {
                           </div>
                         : null
                       }
-                      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }} >
-                          <h6 style={{ color:darkGray }} >{stringDateTimeReceipt(modifiedAt)} {name} </h6>
-                          <div>
-                              <i style={{ cursor:'pointer' }} onClick={()=>{openNoteModal(item)}} class="bi bi-pencil"></i>&emsp;
-                          </div>
-                      </div>
+                      
                   </div>
               })}
           </div>

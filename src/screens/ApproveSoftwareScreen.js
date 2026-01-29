@@ -10,7 +10,7 @@ import { pushByIdFilter } from "../api/onesignal";
 import { Modal_ApproveSoftware, Modal_Loading } from "../modal";
 import { reverseSort } from "../Utility/sort";
 import { NumberYMD, plusDays, stringDateTimeReceipt, stringFullDate } from "../Utility/dateTime";
-import { Card } from "../components";
+import { CardComponent } from "../components";
 import { colors } from "../configs";
 
 const { five } = colors;
@@ -198,10 +198,10 @@ function ApproveSoftwareScreen() {
             />
             <Modal_Loading show={loading} />
             <div style={{ position:'sticky',top:0 }} >
-                <Card>
+                <CardComponent>
                     <h4>รอตรวจสอบ {length} รายการ</h4>
                     <h4>{formatCurrency(net)} บาท </h4>
-                </Card>
+                </CardComponent>
             </div>
             <Table  bordered   variant="light"   >
                 <thead  >

@@ -16,6 +16,7 @@ import {
   Tooltip
 } from "react-bootstrap";
 import { sendWarehouse, telegramDelete } from "../Utility/telegram";
+import { db } from "../db/firestore";
 
 function getWeeksOfCurrentYearIncludeCurrent() {
   const result = [];
@@ -67,10 +68,20 @@ console.log(weeks);
 
 
 
+  async function test(){
+    await db.runTransaction( async (transaction)=>{
+      const adminRef = db.collection('admin').doc('package');
+      const adminDoc = await transaction.get(adminRef);
+      const { value } = adminDoc.data();
+      transaction.update(adminRef, { value: [...value,value[4]] })
+    })
+    alert('done')
+  }
 
   return (
     <div style={styles.container} >
       <h1>Performance</h1>
+      <Button onClick={test} >test</Button>
       <Button onClick={()=>{sendWarehouse({ chat_id:"-1003891934173" })}} >sendWarehouse</Button>
       <Button onClick={()=>{telegramDelete({ chat_id:"-1003891934173", message_id:12 })}} >delete</Button>
       <Table striped bordered hover responsive  variant="light"   >

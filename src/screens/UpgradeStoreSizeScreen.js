@@ -7,7 +7,7 @@ import { colors, initialShop, initialStoreSize } from "../configs";
 import { MdRadioButtonUnchecked, MdRadioButtonChecked } from 'react-icons/md'; // replace with correct MaterialCommunityIcons mapping
 import { db } from "../db/firestore";
 import { diffDaysFloor, formatCurrency, formatTime, isGodIt, summary, toastSuccess } from "../Utility/function";
-import { Card, OneButton } from "../components";
+import { CardComponent, OneButton } from "../components";
 import { stringFullDate, stringReceiptNumber, stringYMDHMS3 } from "../Utility/dateTime";
 import { scanfoodAPI } from "../Utility/api";
 import { useSelector } from "react-redux";
@@ -196,7 +196,7 @@ function UpgradeStoreSizeScreen() {
             onClick={handleShop}
         />
         <OneButton {...{ text:'ค้นหาร้านค้า', submit:()=>{setSearch_Modal(true)} }} />
-        <Card title={name} >
+        <CardComponent title={name} >
             <h4>ขนาดโต๊ะ : {storeSize}</h4>
             {vipPrice.map((a,i)=>{
                 return  <div key={i} style={{ display:'flex', justifyContent:'flex-start'}} >
@@ -204,7 +204,7 @@ function UpgradeStoreSizeScreen() {
                             <h6  >: {stringFullDate(a.expire)}({a.price})</h6>
                         </div>
             })}
-        </Card>
+        </CardComponent>
         <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
             <div style={{ marginBottom: 12, fontWeight: 'bold' }}>
                 <h2>ขนาดร้าน</h2>

@@ -7,7 +7,7 @@ import { Modal_FlatlistSearchShop, Modal_Loading } from "../modal";
 import { v4 as uuidv4 } from 'uuid';
 import { findInArray, toastSuccess } from "../Utility/function";
 import firebase from 'firebase/app';
-import { Card, OneButton } from "../components";
+import { CardComponent, OneButton } from "../components";
 import { stringFullDate } from "../Utility/dateTime";
 
 const { theme3 } = colors;
@@ -190,11 +190,11 @@ const ImportBomShopScreen = () => {
         </Row>
         {shopId
             ?<React.Fragment>
-            <Card title="ข้อมูลร้าน">
+            <CardComponent title="ข้อมูลร้าน">
                 <h5>ร้าน : {name}</h5>
                 <h6>วันที่สมัคร : {stringFullDate(createdDate)}</h6>
-            </Card>
-            <Card title="ข้อมูลวัตถุดิบ" maxWidth={'none'} >
+            </CardComponent>
+            <CardComponent title="ข้อมูลวัตถุดิบ" maxWidth={'none'} >
                 <Table striped bordered hover responsive  variant="light"   >
                     <thead  >
                         <tr>
@@ -222,7 +222,7 @@ const ImportBomShopScreen = () => {
                         })}
                     </tbody>
                 </Table>
-            </Card>
+            </CardComponent>
             </React.Fragment>
             :null
         }

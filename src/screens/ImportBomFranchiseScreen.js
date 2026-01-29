@@ -8,7 +8,7 @@ import { Modal_FlatlistSearchFranchise, Modal_Loading } from "../modal";
 import { v4 as uuidv4 } from 'uuid';
 import { minusDays, plusSecond } from "../Utility/dateTime";
 import { findInArray, toastSuccess } from "../Utility/function";
-import { Card, OneButton } from "../components";
+import { CardComponent, OneButton } from "../components";
 
 
 const initialShop = { id:'', name:'', bomCategory:[] };
@@ -194,10 +194,10 @@ const ImportBomFranchiseScreen = () => {
         </Row>
         {franchiseId
             ?<React.Fragment>
-            <Card title="ข้อมูลแฟรนไชส์">
+            <CardComponent title="ข้อมูลแฟรนไชส์">
                 <h5>แฟรนไชส์ : {name}</h5>
-            </Card>
-            <Card title="ข้อมูลวัตถุดิบ" maxWidth={'none'} >
+            </CardComponent>
+            <CardComponent title="ข้อมูลวัตถุดิบ" maxWidth={'none'} >
                 <Table striped bordered hover responsive  variant="light"   >
                     <thead  >
                         <tr>
@@ -225,7 +225,7 @@ const ImportBomFranchiseScreen = () => {
                         })}
                     </tbody>
                 </Table>
-            </Card>
+            </CardComponent>
             </React.Fragment>
             :null
         }

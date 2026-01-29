@@ -21,7 +21,7 @@ import Download from "./Download";
 import CategoryControl from "./CategoryControl";
 import SearchAndBottom from "./SearchAndBottom";
 import CategoryRender from "./CategoryRender";
-import Card from "./Card";
+import CardComponent from "./CardComponent";
 import TimeControlUpgrade from "./TimeControlUpgrade";
 import initialColors from "../configs/initialColors";
 import SlideOptions from "./SlideOptions";
@@ -42,7 +42,7 @@ export {
     SlideOptions,
     initialColors,
     TimeControlUpgrade,
-    Card,
+    CardComponent,
     CategoryRender,
     SearchAndBottom,
     CategoryControl,

@@ -10,7 +10,7 @@ import {
 import { formatCurrency, formatCurrency2, summary } from "../Utility/function";
 import { MdRadioButtonUnchecked, MdRadioButtonChecked } from 'react-icons/md'; // replace with correct MaterialCommunityIcons mapping
 import { colors } from "../configs";
-import { Card, FloatingArea, FooterButton, OneButton, RootImage } from "../components";
+import { CardComponent, FloatingArea, FooterButton, OneButton, RootImage } from "../components";
 import DatePicker from "react-datepicker";
 import { SlCalender } from "react-icons/sl";
 import { Button } from "rsuite";
@@ -189,7 +189,7 @@ function Modal_So({
         <h2><b>เปิดบิล : {formatCurrency(net)}</b></h2>
       </Modal.Header>
       <Modal.Body  >
-        <Card title='Software' maxWidth={'95vw'} accentColor={nine} >
+        <CardComponent title='Software' maxWidth={'95vw'} accentColor={nine} >
             <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
                 <div style={{ marginBottom: 12, fontWeight: 'bold' }}>
                     <h2>1. ขนาดร้าน : {storeSize}โต๊ะ <span style={{ color:five }}  >{extraCharge>0?`+ ${formatCurrency(extraCharge)}`:''}</span>
@@ -285,8 +285,8 @@ function Modal_So({
                 </Form.Select>
             </div>
             
-        </Card>
-        <Card title='Hardware' maxWidth={'95vw'} accentColor={one}  >
+        </CardComponent>
+        <CardComponent title='Hardware' maxWidth={'95vw'} accentColor={one}  >
             <h2>1. เลือกอุปกรณ์</h2>
             <Row>
                 {hardwares.map((item,index)=>{
@@ -347,8 +347,8 @@ function Modal_So({
                 value={note}
                 onChange={(event)=>{setCurrent({...current,note:event.target.value})}}
             />
-        </Card>
-        <Card title='รูปแบบการชำระเงิน' maxWidth={'95vw'} accentColor={six}  >
+        </CardComponent>
+        <CardComponent title='รูปแบบการชำระเงิน' maxWidth={'95vw'} accentColor={six}  >
             <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
                 <div style={{ marginBottom: 12, fontWeight: 'bold' }}>
                     <h2>1. รูปแบบการชำระเงิน</h2>
@@ -385,9 +385,9 @@ function Modal_So({
                     :null
                 }
             </div>
-        </Card>
+        </CardComponent>
         {admin &&
-            <Card title='marketplace' maxWidth={'95vw'} accentColor={'#D9D9D9'}  >
+            <CardComponent title='marketplace' maxWidth={'95vw'} accentColor={'#D9D9D9'}  >
             <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
                 <div style={{ marginBottom: 12, fontWeight: 'bold' }}>
                     <h2>1. marketplace</h2>
@@ -405,7 +405,7 @@ function Modal_So({
                         <option value={true} >เปิดใช้งาน</option>
                 </Form.Select>
             </div>
-        </Card>}
+        </CardComponent>}
         
         
     

@@ -1,6 +1,6 @@
 import React from "react";
 
-const Card = ({ children, title, accentColor = "rgba(0,0,0,0.5)", maxWidth = 480 }) => {
+const CardComponent = ({ children, title, accentColor = "rgba(0,0,0,0.5)", maxWidth = 480 }) => {
   return (
     <div style={{...styles.card, maxWidth }}>
       {title && (
@@ -36,4 +36,4 @@ const styles = {
 };
 
 
-export default React.memo(Card);
+export default React.memo(CardComponent);

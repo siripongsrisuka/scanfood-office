@@ -8,7 +8,7 @@ import { db } from "../db/firestore";
 import { Modal_FlatlistSearchShop, Modal_Loading } from "../modal";
 import { daysBetween, findInArray, formatTime, toastSuccess } from "../Utility/function";
 import { NumberYMD, plusDays } from "../Utility/dateTime";
-import { Card, OneButton } from "../components";
+import { CardComponent, OneButton } from "../components";
 import { colors } from "../configs";
 
 const { nine } = colors;
@@ -103,7 +103,7 @@ function TransferExpireScreen() {
         <Row>
           <Col sm='12' md='6' >
           {original.id && 
-            <Card title="ร้านต้นทาง"  maxWidth={'95vw'}  >
+            <CardComponent title="ร้านต้นทาง"  maxWidth={'95vw'}  >
                 <h4>{original.name}</h4>
                 {original.vip.map(a=>{
                     const thisTime = formatTime(a.expire)
@@ -111,12 +111,12 @@ function TransferExpireScreen() {
                         ?<p>{a.type} : {daysBetween(today,thisTime)} วัน</p>
                         :<p>{a.type} : หมดอายุ</p>
                 })}
-            </Card>
+            </CardComponent>
           }
           </Col>
           <Col sm='12' md='6' >
             {copy.id &&
-              <Card title="ร้านปลายทาง"  maxWidth={'95vw'} accentColor={nine} >
+              <CardComponent title="ร้านปลายทาง"  maxWidth={'95vw'} accentColor={nine} >
                   <h4>{copy.name}</h4>
                   {copy.vip.map(a=>{
                       const thisTime = formatTime(a.expire)
@@ -124,7 +124,7 @@ function TransferExpireScreen() {
                           ?<p>{a.type} : {daysBetween(today,thisTime)} วัน</p>
                           :<p>{a.type} : หมดอายุ</p>
                   })}
-              </Card>
+              </CardComponent>
             }
           </Col>
         </Row>

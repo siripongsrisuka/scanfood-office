@@ -187,11 +187,14 @@ function NewShopDashboard() {
                   </thead>
                   <tbody  >
                     {currentDisplay.map((item, index) => {
-                      const { no, createdDate, name, info, qrcodeColor, qrcodeRemain } = item;
+                      const { no, createdDate, name, info, qrcodeColor, qrcodeRemain, tel } = item;
                       return <tr  style={{cursor: 'pointer'}} key={index}  >
                                 <td onClick={()=>{manageInfo(item)}} style={styles.text3}>{no}.</td>
                                 <td onClick={()=>{manageInfo(item)}} style={styles.text3} >{stringFullDate(createdDate)}</td>
-                                <td onClick={()=>{manageInfo(item)}} >{name}</td>
+                                <td onClick={()=>{manageInfo(item)}} >
+                                  {name}
+                                  <p>เบอร์โทรร้าน : {tel}</p>
+                                </td>
                                 <td onClick={()=>{manageInfo(item)}} style={styles.text3}>{info.name}</td>
                                 <td onClick={()=>{manageInfo(item)}} style={styles.text3}>{info.tel}</td>
                                 <td onClick={()=>{manageInfo(item)}} style={{ textAlign:'center', backgroundColor:qrcodeColor }}>{qrcodeRemain}</td>
