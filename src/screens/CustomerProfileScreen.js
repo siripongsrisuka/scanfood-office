@@ -44,6 +44,9 @@ const initialShop = {
 
 const { softWhite, darkGray } = colors;
 
+const TextComponent = ({ text1, text2 }) => <h6><span style={{ color: '#523c2fff' }} >{text1}</span> {text2}</h6>
+const TextComponent2 = ({ text1, text2 }) => <h6 style={{ color: '#0D8266' }} ><span style={{ color: '#523c2fff' }} >{text1}</span> {text2}</h6>
+
 function CustomerProfileScreen() {
     const { office:{ humanRight = [] } } = useSelector(state=>state.office);
     const [currentCustomer, setCurrentCustomer] = useState(initialCustomerProfile);
@@ -314,29 +317,29 @@ function CustomerProfileScreen() {
               return <Row onClick={()=>{openShop(shop)}} key={index} style={{ border:`1px solid ${softWhite}`, margin:'10px 0px', padding:10, borderRadius:10, backgroundColor:softWhite }} >
                       <Col sm='12' md='6' lg='4'  >
                         <Card  style={{ padding: '1rem', marginTop: 10, minHeight:'400px' }}>
-                            <h6>ร้าน : {shopName}</h6>
-                            <h6>โต๊ะ : {storeSize}</h6>
-                            <h6>package : {features.join(', ')}</h6>
-                            <h6>ประเภทร้าน : {shopTypeOptionMap.get(shopType)?.label || '-'}</h6>
-                            <h6>paymentGateway : {paymentGateway.join(', ')}</h6>
-                            <h6>router :{routerSystemMap.get(router)?.label || '-'}</h6>
+                            <TextComponent text1="ชื่อร้าน :" text2={shopName} />
+                            <TextComponent text1="ขนาดร้าน :" text2={storeSize} />
+                            <TextComponent text1="package : " text2={features.join(', ')} />
+                            <TextComponent text1="ประเภทร้าน : " text2={shopTypeOptionMap.get(shopType)?.label || '-'} />
+                            <TextComponent text1="paymentGateway : " text2={paymentGateway.join(', ')} />
+                            <TextComponent text1="router :" text2={routerSystemMap.get(router)?.label || '-'} />
                         </Card>
                       </Col>
                       {cashiersPos.map((cashier,index2)=>{
                         const { equipment, printerMode, hostedSystem, networkSystem, distance, host, innerPrinter, printer, printerPattern, note } = cashier;
                         return <Col sm='12' md='6' lg='4' key={index2} >
                                   <Card  style={{ padding: '1rem', marginTop: 10, minHeight:'400px' }}>
-
-                                      <h6 style={{ backgroundColor:'#C0CDFF', padding:5}} >เครื่องคิดเงิน {index2 + 1}</h6>
-                                      <h6>รุ่น : {cashierEquipmentMap.get(equipment)?.label || '-'}</h6>
-                                      <h6>ระบบเน็ตเวิร์ค : {networkSystemMap.get(networkSystem)?.label || '-'}</h6>
-                                      <h6>เครื่องแม่ : {host ? 'ใช่' : 'ไม่ใช่'}</h6>
-                                      <h6>ระบบโฮสท์ : {hostedSystemMap.get(hostedSystem)?.label || '-'}</h6>
-                                      <h6>ปริ้นเตอร์ในตัว : {innerPrinter ? 'มี' : 'ไม่มี'}</h6>
-                                      <h6>ยี่ห้อปริ้นเตอร์ : {printerMap.get(printer)?.label || '-'}</h6>
-                                      <h6>โหมดปริ้นเตอร์ : {printerModeMap.get(printerMode)?.label || '-'}</h6>
-                                      <h6>รูปแบบการปริ้น : {printPatternMap.get(printerPattern)?.label || '-'}</h6>
-                                      <h6>หมายเหตุ : {note || '-'}</h6>
+                                      <h6 style={{ backgroundColor: '#C0CDFF', padding:5 }} >เครื่องคิดเงิน {index2 + 1}</h6>
+                                      <TextComponent text1="รุ่น : " text2={cashierEquipmentMap.get(equipment)?.label || '-'} />
+                                      <TextComponent text1="ระบบเน็ตเวิร์ค : " text2={networkSystemMap.get(networkSystem)?.label || '-'} />
+                                      <TextComponent text1="เครื่องแม่ : " text2={host ? 'ใช่' : 'ไม่ใช่'} />
+                                      <TextComponent text1="ระบบโฮสท์ : " text2={hostedSystemMap.get(hostedSystem)?.label || '-'} />
+                                      <TextComponent text1="ปริ้นเตอร์ในตัว : " text2={innerPrinter ? 'มี' : 'ไม่มี'} />
+                                      <TextComponent text1="ยี่ห้อปริ้นเตอร์ : " text2={printerMap.get(printer)?.label || '-'} />
+                                      <TextComponent text1="โหมดปริ้นเตอร์ : " text2={printerModeMap.get(printerMode)?.label || '-'} />
+                                      <TextComponent text1="รูปแบบการปริ้น : " text2={printPatternMap.get(printerPattern)?.label || '-'} />
+                                      <TextComponent2 text1="หมายเหตุ : " text2={note || '-'} />
+                               
                                   </Card>
                                 </Col>
                       })}
@@ -344,14 +347,14 @@ function CustomerProfileScreen() {
                         const { printer, printerPattern, name, printerMode, distance, ipAddress, note } = kitchenPrinter;
                         return <Col sm='12' md='6' lg='4' key={index3} >
                                   <Card  style={{ padding: '1rem', marginTop: 10, minHeight:'400px' }}>
-                                      <h6 style={{ backgroundColor:'#FA8D94', padding:5}} >ปริ้นเตอร์ครัว {index3 + 1}</h6>
-                                      <h6>{name}</h6>
-                                      <h6>ยี่ห้อ : {printerMap.get(printer)?.label || '-'}</h6>
-                                      <h6>โหมดปริ้นเตอร์ : {printerModeMap.get(printerMode)?.label || '-'}</h6>
-                                      <h6>รูปแบบการปริ้น : {printPatternMap.get(printerPattern)?.label || '-'}</h6>
-                                      <h6>ระยะห่างจากเราเตอร์ : {distanceOptionMap.get(distance)?.label || '-'}</h6>
-                                      <h6>IP Address : {ipAddress || '-'}</h6>
-                                      <h6>หมายเหตุ : {note || '-'}</h6>
+                                      <h6 style={{ backgroundColor: '#FA8D94', padding:5 }} >ปริ้นเตอร์ครัว {index3 + 1}</h6>
+                                      <TextComponent text1="ชื่อ : " text2={name} />
+                                      <TextComponent text1="ยี่ห้อ : " text2={printerMap.get(printer)?.label || '-'} />
+                                      <TextComponent text1="โหมดปริ้นเตอร์ : " text2={printerModeMap.get(printerMode)?.label || '-'} />
+                                      <TextComponent text1="รูปแบบการปริ้น : " text2={printPatternMap.get(printerPattern)?.label || '-'} />
+                                      <TextComponent text1="ระยะห่างจากเราเตอร์ : " text2={distanceOptionMap.get(distance)?.label || '-'} />
+                                      <TextComponent text1="IP Address : " text2={ipAddress || '-'} />
+                                      <TextComponent2 text1="หมายเหตุ : " text2={note || '-'} />
                                   </Card>
                                 </Col>
                       })}
@@ -359,12 +362,13 @@ function CustomerProfileScreen() {
                     </Row>
             })}
               
-              <Row>
+              <Row style={{ border:`1px solid ${softWhite}`, margin:'10px 0px', padding:10, borderRadius:10, backgroundColor:softWhite }} >
+                <h5>note</h5>
                 {notes.map((item)=>{
                   const { content, modifiedBy, modifiedName, modifiedAt, id, imageUrls } = item;
                   const name = humanMaps.get(modifiedBy)?.name || modifiedName;
                   return <Col sm='12' md='6' lg='4' key={id} >
-                            <div key={id} style={{ border:`1px solid ${softWhite}`, margin:'10px 0px', padding:10, borderRadius:10, backgroundColor:softWhite }} >
+                            <Card key={id} style={{ padding: '1rem', }}>
                               <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }} >
                                   <h6 style={{ color:darkGray }} >{stringDateTimeReceipt(modifiedAt)} {name} </h6>
                                   <div>
@@ -393,7 +397,7 @@ function CustomerProfileScreen() {
                                   </div>
                                 : null
                               }
-                          </div>
+                          </Card>
                         </Col>
                 })}
               </Row>
