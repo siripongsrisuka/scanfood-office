@@ -20,7 +20,6 @@ function Modal_Note({
     const { imageUrls = [], content = '' } = current;
 
     function confirm(){
-      if(imageUrls.length === 0) return alert('กรุณาใส่รูปภาพ');
       submit()
     };
 

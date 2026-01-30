@@ -28,9 +28,27 @@ import initialWarehouse from "./initialWarehouse";
 import initialExtraDay from "./initialExtraDay";
 import initialQuestion from "./initialQuestion";
 import initialSo from "./initialSo";
+import cashiersEquipment from "./cashiersEquipment";
+import networkSystems from "./networkSystems";
+import printerModes from "./printerModes";
+import routerSystems from "./routerSystems";
+import hostedSystems from "./hostedSystems";
+import printers from "./printers";
+import printPatterns from "./printPatterns";
+import distanceOptions from "./distanceOptions";
+import shopTypeOptions from "./shopTypeOptions";
 
 
 export {
+  shopTypeOptions,
+  distanceOptions,
+  printPatterns,
+  printers,
+  hostedSystems,
+  routerSystems,
+  printerModes,
+  networkSystems,
+  cashiersEquipment,
   initialSo,
   initialQuestion,
     initialExtraDay,

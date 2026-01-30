@@ -1,0 +1,14 @@
+export default [
+    { label: '🌟🌟🌟แท็บเล็ต Scanfood', id:'1' },
+    { label: '🌟🌟🌟Imin swan 2 จอ', id:'2' },
+    { label: '🌟🌟🌟Imin swan 1 จอ', id:'3' },
+    { label: '🌟🌟🌟Sunmi D3 Pro', id:'4' },
+    { label: '🌟🌟🌟Sunmi D2S', id:'5' },
+    { label: '🌟🌟🌟IPAD', id:'6' },
+    { label: '🌟🌟แท็บเล็ต', id:'7' },
+    { label: '🌟🌟D3mini', id:'8' },
+    { label: '🌟ocha', id:'9' },
+    { label: '🌟Sunmi t1', id:'10' },
+    { label: '🌟Sunmi t2', id:'11' },
+    { label: '🌟wongnai', id:'12' },
+];
