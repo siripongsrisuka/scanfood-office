@@ -42,7 +42,7 @@ const initialKitchenPrinter = {
     distance:'', // ระยะห่างจากเราเตอร์
 };
 
-const featuresOptions = ['qrCode','staff','premium','member','crm'];
+const featuresOptions = ['qrCode','staff','language','premium','member','crmPremium'];
 
 function Modal_Shop({
   backdrop=true, // true/false/static
@@ -54,7 +54,7 @@ function Modal_Shop({
   current,
   setCurrent,
 }) {
-    const { router, shopName, storeSize, paymentGateway = [], cashiersPos = [], kitchenPrinters = [], features = [], shopType = '', note = '' } = current;
+    const { router, shopName, storeSize, paymentGateway = [], cashiersPos = [], kitchenPrinters = [], features = [], shopType = '', note = '', ownerManager = '' } = current;
 
     function confirm(){
         const ok = window.confirm('คุณต้องการบันทึกร้านค้านี้ใช่หรือไม่?');
@@ -128,6 +128,12 @@ function Modal_Shop({
               name='shopName'
               placeholder="ชื่อร้านค้า"
               value={shopName}
+              onChange={handleChange}
+            />
+            <FloatingText
+              name='ownerManager'
+              placeholder="ชื่อเจ้าของ/ผู้จัดการ"
+              value={ownerManager}
               onChange={handleChange}
             />
             <FloatingText

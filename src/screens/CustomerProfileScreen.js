@@ -40,6 +40,7 @@ const initialShop = {
     ],
     router:'',
     note:'',
+    contact:'',
 };
 
 const { softWhite, darkGray } = colors;
@@ -313,16 +314,18 @@ function CustomerProfileScreen() {
             <OneButton {...{ text:'+ เพิ่มโน๊ต', submit: ()=>{openNoteModal({})}, variant:'success' }} />
             <OneButton {...{ text:'+ ร้าน', submit: ()=>{openShop({})}, variant:'success' }} />
             {shops.map((shop,index)=>{
-              const { shopName, storeSize, features, shopType, paymentGateway, router, cashiersPos, kitchenPrinters } = shop;
+              const { shopName, storeSize, features, shopType, paymentGateway, router, cashiersPos, kitchenPrinters, ownerManager, note = '' } = shop;
               return <Row onClick={()=>{openShop(shop)}} key={index} style={{ border:`1px solid ${softWhite}`, margin:'10px 0px', padding:10, borderRadius:10, backgroundColor:softWhite }} >
                       <Col sm='12' md='6' lg='4'  >
                         <Card  style={{ padding: '1rem', marginTop: 10, minHeight:'400px' }}>
                             <TextComponent text1="ชื่อร้าน :" text2={shopName} />
+                            <TextComponent2 text1="ชื่อเจ้าของ/ผู้จัดการ :" text2={ownerManager || '-'} />
                             <TextComponent text1="ขนาดร้าน :" text2={storeSize} />
                             <TextComponent text1="package : " text2={features.join(', ')} />
                             <TextComponent text1="ประเภทร้าน : " text2={shopTypeOptionMap.get(shopType)?.name || '-'} />
                             <TextComponent text1="paymentGateway : " text2={paymentGateway.join(', ')} />
                             <TextComponent text1="router :" text2={routerSystemMap.get(router)?.label || '-'} />
+                            <TextComponent2 text1="หมายเหตุ :" text2={note || '-'} />
                         </Card>
                       </Col>
                       {cashiersPos.map((cashier,index2)=>{
