@@ -10,7 +10,7 @@ import { Modal_Loading, Modal_Note, Modal_OneInput, Modal_Shop } from "../modal"
 import { OneButton } from "../components";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { formatTime } from "../Utility/function";
-import { cashiersEquipment, colors, distanceOptions, hostedSystems, initialNote, networkSystems, printerModes, printers, printPatterns, routerSystems, shopTypeOptions } from "../configs";
+import { cashiersEquipment, colors, distanceOptions, hostedSystems, initialNote, networkSystems, printerModes, printers, printPatterns, routerSystems, initialShopType } from "../configs";
 import { v4 as uuidv4 } from 'uuid';
 
 const initialCustomerProfile = {
@@ -31,7 +31,6 @@ const initialShop = {
     storeSize:'',
     features:[], // qrCode, member, point, coupon
     shopType:'', // restaurant, cafe, bakery, retail, grocery, other
-    notes:[],
     paymentGateway:[], // kbank, posxpay, beam, creditOrcode
     cashiersPos:[
      
@@ -40,6 +39,7 @@ const initialShop = {
           
     ],
     router:'',
+    note:'',
 };
 
 const { softWhite, darkGray } = colors;
@@ -95,7 +95,7 @@ function CustomerProfileScreen() {
     );
 
     const shopTypeOptionMap = useMemo(
-      ()=> new Map(shopTypeOptions.map(item=>[item.id, item])),[]
+      ()=> new Map(initialShopType.map(item=>[item.id, item])),[]
     );
 
 
@@ -320,7 +320,7 @@ function CustomerProfileScreen() {
                             <TextComponent text1="ชื่อร้าน :" text2={shopName} />
                             <TextComponent text1="ขนาดร้าน :" text2={storeSize} />
                             <TextComponent text1="package : " text2={features.join(', ')} />
-                            <TextComponent text1="ประเภทร้าน : " text2={shopTypeOptionMap.get(shopType)?.label || '-'} />
+                            <TextComponent text1="ประเภทร้าน : " text2={shopTypeOptionMap.get(shopType)?.name || '-'} />
                             <TextComponent text1="paymentGateway : " text2={paymentGateway.join(', ')} />
                             <TextComponent text1="router :" text2={routerSystemMap.get(router)?.label || '-'} />
                         </Card>

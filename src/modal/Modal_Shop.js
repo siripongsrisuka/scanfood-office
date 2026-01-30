@@ -14,6 +14,7 @@ import { cashiersEquipment, colors, initialAlert, networkSystems, printerModes,
     shopTypeOptions
  } from "../configs";
 import { v4 as uuidv4 } from 'uuid';
+import initialShopType from "../configs/initialShopType";
 
 const { dark } = colors
 
@@ -53,7 +54,7 @@ function Modal_Shop({
   current,
   setCurrent,
 }) {
-    const { router, shopName, storeSize, paymentGateway = [], cashiersPos = [], kitchenPrinters = [], features = [], shopType = '' } = current;
+    const { router, shopName, storeSize, paymentGateway = [], cashiersPos = [], kitchenPrinters = [], features = [], shopType = '', note = '' } = current;
 
     function confirm(){
         const ok = window.confirm('คุณต้องการบันทึกร้านค้านี้ใช่หรือไม่?');
@@ -129,6 +130,12 @@ function Modal_Shop({
               value={shopName}
               onChange={handleChange}
             />
+            <FloatingText
+              name='note'
+              placeholder="หมายเหตุ"
+              value={note}
+              onChange={handleChange}
+            />
             <h5>PaymentGateway</h5>
             {paymentGateways.map((gateway)=>(
                 <Form.Check 
@@ -175,9 +182,9 @@ function Modal_Shop({
                     }
                 >
                     <option value="" disabled>เลือกประเภทร้านค้า</option>
-                    {shopTypeOptions.map((item) => (
+                    {initialShopType.map((item) => (
                     <option key={item.id} value={item.id}>
-                        {item.label}
+                        {item.name}
                     </option>
                     ))}
                 </Form.Select>

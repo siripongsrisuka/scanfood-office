@@ -37,9 +37,10 @@ import printers from "./printers";
 import printPatterns from "./printPatterns";
 import distanceOptions from "./distanceOptions";
 import shopTypeOptions from "./shopTypeOptions";
-
+import initialShopType from "./initialShopType";
 
 export {
+  initialShopType,
   shopTypeOptions,
   distanceOptions,
   printPatterns,
