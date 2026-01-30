@@ -54,7 +54,7 @@ function Modal_Shop({
   current,
   setCurrent,
 }) {
-    const { router, shopName, storeSize, paymentGateway = [], cashiersPos = [], kitchenPrinters = [], features = [], shopType = '', note = '', ownerManager = '' } = current;
+    const { router, shopName, storeSize, paymentGateway = [], cashiersPos = [], kitchenPrinters = [], features = [], shopType = '', note = '', ownerManager = '', shopTel } = current;
 
     function confirm(){
         const ok = window.confirm('คุณต้องการบันทึกร้านค้านี้ใช่หรือไม่?');
@@ -134,6 +134,12 @@ function Modal_Shop({
               name='ownerManager'
               placeholder="ชื่อเจ้าของ/ผู้จัดการ"
               value={ownerManager}
+              onChange={handleChange}
+            />
+            <FloatingText
+              name='shopTel'
+              placeholder="เบอร์ที่ลงทะเบียนร้านค้า"
+              value={shopTel}
               onChange={handleChange}
             />
             <FloatingText

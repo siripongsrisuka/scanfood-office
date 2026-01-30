@@ -29,6 +29,7 @@ const initialCustomerProfile = {
 const initialShop = {
     shopName:'',
     storeSize:'',
+    shopTel:'0811546951',
     features:[], // qrCode, member, point, coupon
     shopType:'', // restaurant, cafe, bakery, retail, grocery, other
     paymentGateway:[], // kbank, posxpay, beam, creditOrcode
@@ -146,7 +147,7 @@ function CustomerProfileScreen() {
  
           let { code } = numberDoc.data();
           code += 1;
-          const newCode = `s${String(code).padStart(5,'0')}`;
+          const newCode = `S${String(code).padStart(5,'0')}`;
           payload.code = newCode;
           transaction.update(numberRef, { code, timestamp:new Date() });
 
@@ -314,12 +315,13 @@ function CustomerProfileScreen() {
             <OneButton {...{ text:'+ เพิ่มโน๊ต', submit: ()=>{openNoteModal({})}, variant:'success' }} />
             <OneButton {...{ text:'+ ร้าน', submit: ()=>{openShop({})}, variant:'success' }} />
             {shops.map((shop,index)=>{
-              const { shopName, storeSize, features, shopType, paymentGateway, router, cashiersPos, kitchenPrinters, ownerManager, note = '' } = shop;
+              const { shopName, storeSize, features, shopType, paymentGateway, router, cashiersPos, kitchenPrinters, ownerManager, note = '', shopTel } = shop;
               return <Row onClick={()=>{openShop(shop)}} key={index} style={{ border:`1px solid ${softWhite}`, margin:'10px 0px', padding:10, borderRadius:10, backgroundColor:softWhite }} >
                       <Col sm='12' md='6' lg='4'  >
                         <Card  style={{ padding: '1rem', marginTop: 10, minHeight:'400px' }}>
                             <TextComponent text1="ชื่อร้าน :" text2={shopName} />
-                            <TextComponent2 text1="ชื่อเจ้าของ/ผู้จัดการ :" text2={ownerManager || '-'} />
+                            <TextComponent text1="ชื่อเจ้าของ/ผู้จัดการ :" text2={ownerManager || '-'} />
+                            <TextComponent text1="เบอร์ที่ลงทะเบียน :" text2={shopTel || '-'} />
                             <TextComponent text1="ขนาดร้าน :" text2={storeSize} />
                             <TextComponent text1="package : " text2={features.join(', ')} />
                             <TextComponent text1="ประเภทร้าน : " text2={shopTypeOptionMap.get(shopType)?.name || '-'} />
