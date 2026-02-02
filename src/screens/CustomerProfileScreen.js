@@ -4,6 +4,7 @@ import {
   Row,
   Col,
   Card,
+  Button,
 } from "react-bootstrap";
 import { db, prepareFirebaseImage, webImageDelete } from "../db/firestore";
 import { Modal_Loading, Modal_Note, Modal_OneInput, Modal_Shop } from "../modal";
@@ -147,7 +148,7 @@ function CustomerProfileScreen() {
  
           let { code } = numberDoc.data();
           code += 1;
-          const newCode = `S${String(code).padStart(5,'0')}`;
+          const newCode = `${String(code).padStart(5,'0')}`;
           payload.code = newCode;
           transaction.update(numberRef, { code, timestamp:new Date() });
 
@@ -159,7 +160,7 @@ function CustomerProfileScreen() {
         alert(error)
       } finally {
         setLoading(false);
-      }
+      };
     };
 
   function openNoteModal(item){
@@ -273,7 +274,7 @@ function CustomerProfileScreen() {
       setLoading(false);
       setCurrentShop(initialShop);
     } 
-  }
+  };
 
 
 
