@@ -366,7 +366,8 @@ function WarehouseJobScreen() {
         </thead>
         <tbody  >
         {display.map((item, index) => {
-            const { orderNumber, status, timestamp, profileName, product, deliveryType = 'normal', note = '', link, imageUrls = [], comment = '' } = item;
+            const { orderNumber, status, timestamp, profileName, product, deliveryType = 'normal', 
+                note = '', link, imageUrls = [], comment = '', nameSername = '', address = '', tel = '' } = item;
             return <tr  style={{cursor: 'pointer'}} key={index}  >
                     <td  style={styles.text3}>
                         {stringDateTimeReceipt(timestamp)}<br/>
@@ -381,6 +382,14 @@ function WarehouseJobScreen() {
                     </td>
                     <td  style={styles.text3} >
                         {note}
+                        {nameSername || address || tel ?
+                            <>
+                            <hr />
+                            {nameSername}<br/>{address}<br/>{tel}
+                            </>
+                            :null
+                        }
+                        
                     </td>
                     <td  style={styles.container4} >{deliveryOptions[deliveryType]}</td>
                     

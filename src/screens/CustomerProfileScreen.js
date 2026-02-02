@@ -15,7 +15,7 @@ import { cashiersEquipment, colors, distanceOptions, hostedSystems, initialNote,
 import { v4 as uuidv4 } from 'uuid';
 
 const initialCustomerProfile = {
-    code:'', // s00001
+    code:'', // 00001
     createdAt:new Date(),
     shops:[], 
     hardware:[], // อุปกรณ์ที่ซื้อจากเรา
@@ -100,8 +100,6 @@ function CustomerProfileScreen() {
     const shopTypeOptionMap = useMemo(
       ()=> new Map(initialShopType.map(item=>[item.id, item])),[]
     );
-
-
 
     // 200%
     async function handleCustomer(){
@@ -274,7 +272,7 @@ function CustomerProfileScreen() {
       setLoading(false);
       setCurrentShop(initialShop);
     } 
-  };
+};
 
 
 
