@@ -61,36 +61,52 @@ function WarehouseScreen() {
         setInbound_Modal(false)
         setLoading(true);
         try {
-            const warehouseUpdates = await db.runTransaction(async (transaction) => {
-                let warehouseUpdates = [];
-                const inboundRef = db.collection('inbound').doc();
-                
-                for (const item of inboundItems) {
-                    const { id, qty } = item;
-                    const warehouseRef = db.collection('warehouse').doc(id);
-                    const doc = await transaction.get(warehouseRef);
-                    if (doc.exists) {
-                        const data = doc.data();
-                        const newStock = Number(data.stock || 0) + Number(qty);
-                        transaction.update(warehouseRef, { stock: newStock });
-                        warehouseUpdates.push({ id, stock: newStock });
-                    }
-                }
-                transaction.set(inboundRef, {
-                    items: inboundItems.map(item=>({
-                        id: item.id,
-                        name: item.name,
-                        qty: item.qty,
-                    })),
-                    note: note,
-                    createdAt: new Date(),
-                    timestamp: new Date(),
-                    billDate: stringYMDHMS3(new Date()),
-                    createdBy: profileId,
-                    createdName: profileName,
-                });
-                return warehouseUpdates;
-            });
+         const warehouseUpdates = await db.runTransaction(async (transaction) => {
+  const warehouseUpdates = [];
+  const inboundRef = db.collection('inbound').doc();
+
+  // ดึงเอกสาร warehouse ทั้งหมดพร้อมกัน
+  const stockDocs = await Promise.all(
+    inboundItems.map(item =>
+      transaction.get(db.collection('warehouse').doc(item.id))
+    )
+  );
+
+  // อัปเดต stock
+  for (let i = 0; i < inboundItems.length; i++) {
+    const { id, qty } = inboundItems[i];
+    const stockDoc = stockDocs[i];
+
+    if (stockDoc.exists) {
+      const { stock = 0 } = stockDoc.data();
+      const newStock = Number(stock) + Number(qty);
+
+      transaction.update(db.collection('warehouse').doc(id), {
+        stock: newStock,
+      });
+
+      warehouseUpdates.push({ id, stock: newStock });
+    }
+  }
+
+  // บันทึก inbound
+  transaction.set(inboundRef, {
+    items: inboundItems.map(item => ({
+      id: item.id,
+      name: item.name,
+      qty: item.qty,
+    })),
+    note: note,
+    createdAt: new Date(),
+    timestamp: new Date(),
+    billDate: stringYMDHMS3(new Date()),
+    createdBy: profileId,
+    createdName: profileName,
+  });
+
+  return warehouseUpdates;
+});
+
             warehouseUpdates.forEach(update => {
                 dispatch(updateNormalWarehouse({ id: update.id, updatedField: { stock: update.stock } }));
             });
