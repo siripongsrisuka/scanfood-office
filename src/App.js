@@ -40,6 +40,8 @@ import {
   PackageHistoryScreen,
   HardwareHistoryScreen,
   EmailPrinterScreen,
+  ETaxHistoryScreen,
+  ETaxScreen
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -47,7 +49,6 @@ import { firebaseAuth } from './db/firestore'
 import 'rsuite/dist/rsuite.min.css';
 import { ToastContainer } from 'react-toastify';
 import ApproveSoftwareScreen from "./screens/ApproveSoftwareScreen";
-import ETaxScreen from "./screens/ETaxScreen";
 
 
 function App() {
@@ -125,6 +126,7 @@ function App() {
             <Route path='hardwareHistory' element={<HardwareHistoryScreen/>} />
             <Route path='emailPrinter' element={<EmailPrinterScreen/>} />
             <Route path='eTax' element={<ETaxScreen/>} />
+            <Route path='eTaxHistory' element={<ETaxHistoryScreen/>} />
             
           </Route>
       </Routes>

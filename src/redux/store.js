@@ -21,6 +21,7 @@ import hardwareOrderReducer from './hardwareOrderSlice';
 import extraReducer from './extraSlice';
 import packageReducer from './packageSlice';
 import hardwareReducer from './hardwareSlice';
+import etaxReducer from './etaxSlice';
 
 
   const rootPersistConfig = {
@@ -72,7 +73,8 @@ import hardwareReducer from './hardwareSlice';
     hardwareOrder:hardwareOrderReducer,
     extra:extraReducer,
     package:packageReducer,
-    hardware:hardwareReducer
+    hardware:hardwareReducer,
+    etax:etaxReducer,
     // care:careReducer,
 
   })

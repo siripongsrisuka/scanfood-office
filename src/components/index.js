@@ -30,9 +30,11 @@ import AreaFloating from "./AreaFloating";
 import TimeControlHardwareOrder from "./TimeControlHardwareOrder";
 import TimeControlPackage from "./TimeControlPackage";
 import TimeControlHardware from "./TimeControlHardware";
+import TimeControlEtax from "./TimeControlEtax";
 
 
 export {
+    TimeControlEtax,
     TimeControlHardware,
     TimeControlExtra,
     TimeControlHardwareOrder,
