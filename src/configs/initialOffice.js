@@ -293,12 +293,12 @@ export default [
         topic: '9.1 E-tax',
         icon: 'bi-speedometer',
         to: 'eTax',
-        id:'723'
+        id:'901'
       },
       {
         topic: '9.2 ประวัติ E-tax',
         icon: 'bi-speedometer',
         to: 'eTaxHistory',
-        id:'723'
+        id:'902'
       },
   ]
