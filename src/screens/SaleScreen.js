@@ -402,7 +402,7 @@ function SaleScreen() {
                 }
 
 
-                transaction.update(docNumberRef, { value:newValue });
+                transaction.update(docNumberRef, { value:newValue, timestamp: new Date() });
                 const paymentData = {
                     ...currentSo,
                     ...payload,
@@ -428,9 +428,11 @@ function SaleScreen() {
                     chat_id,
                     chat_id_saleManager:-1003891934173, // หลุย 
                     chat_id_taxManager:-1003871427406, // ต้น
-                    taxProcess:'waiting', // waiting, sent, done
                     taxImageId:taxImageUrl,
                 };
+                if(taxEnable){
+                    paymentData.taxProcess = 'waiting';
+                }
                 transaction.set(autoPaymentRef,paymentData)
                 return {
                     qrCode,

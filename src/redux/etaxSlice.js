@@ -73,7 +73,7 @@ export const etaxSlice = createSlice({
     },
     updateEtax: (state, action) => {
         const { selectedDate } = action.payload
-        state.displayEtax = normalSort('timestamp',state.etax.filter(a=>[selectedDate].includes(a.billDate)))
+        state.displayEtax = normalSort('createdAt',state.etax.filter(a=>[selectedDate].includes(a.billDate)))
     }, 
     updateStartDate: (state, action) => {
       state.startDate = action.payload
@@ -96,7 +96,7 @@ export const etaxSlice = createSlice({
           state.etax.push(...data)
         }
         state.billDates.push(...billDate.filter(a=>a!==today))
-        state.displayEtax = normalSort('timestamp',state.etax.filter(a=>selectedDate.includes(a.billDate)))
+        state.displayEtax = normalSort('createdAt',state.etax.filter(a=>selectedDate.includes(a.billDate)))
         state.modal_Etax = false
     })
     builder.addCase(fetchEtax.rejected, state => {
