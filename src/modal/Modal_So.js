@@ -484,7 +484,7 @@ function Modal_So({
                             onClick={()=>{
                                 setCurrent(prev=>({...prev, hardCopyTaxEnable:!hardCopyTaxEnable}))
                             }}
-                            value='ขอใบกำกับภาษีแบบกระดาษ'
+                            value='ขอใบกำกับภาษีแบบกระดาษ(ใบจริง)'
                             disabled={false}
                         />
                         {hardCopyTaxEnable
