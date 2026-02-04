@@ -16,6 +16,7 @@ export default {
     taxEnable:false, // ใบกำกับภาษี
     etaxEnable:false, // ขอ E-Tax
     hardCopyTaxEnable:false, // ใบกำกับภาษีแบบกระดาษ
+    receiptEnable:false, // ใบเสร็จรับเงิน
     taxImageId:'', // รูปภาพใบกำกับภาษี
     taxAddress:'', // ที่อยู่สำหรับจัดส่งใบกำกับภาษี
     taxEmail:'', // อีเมลสำหรับจัดส่งใบกำกับภาษี

@@ -83,11 +83,11 @@ export async function replyExtraDay({ chat_id, message_id, status }){
     return result.data.result.message_id;
 };
 
-export async function sendEtax({ chat_id, orderNumber}){
+export async function sendEtax({ chat_id, orderNumber, etaxEnable, receiptEnable, hardCopyTaxEnable }){
     const body = {
         chat_id,
         parse_mode: "HTML",
-        text:`<b>ส่งแล้ว : Etax</b>
+        text:`<b>ส่งแล้ว : ${etaxEnable?'E-Tax':''}${hardCopyTaxEnable?'/เอกสารตัวจริง':''}${receiptEnable?'/ใบเสร็จรับเงิน':''}</b>
 เลขที่ออเดอร์ : ${orderNumber}`
       }
 

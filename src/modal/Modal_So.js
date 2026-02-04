@@ -44,6 +44,7 @@ function Modal_So({
     taxImageId = '',
     taxAddress = '',
     taxEmail = '',
+    receiptEnable = false
 } = current;
 
     
@@ -438,7 +439,7 @@ function Modal_So({
                         style={{width:'250px'}}
                     >
                         <option value={false}>ไม่ต้องการใบกำกับภาษี</option>
-                        <option value={true} >ต้องการใบกำกับภาษี</option>
+                        <option value={true} >ต้องการใบกำกับภาษี/ใบเสร็จรับเงิน</option>
                 </Form.Select>
                 {taxEnable
                     ?<React.Fragment>
@@ -460,6 +461,16 @@ function Modal_So({
                             </Button>
                         </form>
                         <MasterCheckBox
+                            status={receiptEnable}
+                            color={greenSanta}
+                            onClick={()=>{
+                                setCurrent(prev=>({...prev, receiptEnable:!receiptEnable}))
+                            }}
+                            value='ขอ ใบเสร็จรับเงิน'
+                            disabled={false}
+                        />
+                        <br/>
+                        <MasterCheckBox
                             status={etaxEnable}
                             color={greenSanta}
                             onClick={()=>{
@@ -469,7 +480,7 @@ function Modal_So({
                             disabled={false}
                         />
                         <br/>
-                        {etaxEnable
+                        {etaxEnable || receiptEnable
                             ?<FloatingText
                                 name="taxEmail"
                                 placeholder="อีเมลสำหรับจัดส่งใบกำกับภาษี"

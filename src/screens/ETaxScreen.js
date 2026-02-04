@@ -93,13 +93,13 @@ function ETaxScreen() {
           return soDoc.data()
         });
 
-        const { chat_id_taxManager, message_id_eTax, chat_id, orderNumber } = telegram;
+        const { chat_id_taxManager, message_id_eTax, chat_id, orderNumber, etaxEnable, receiptEnable, hardCopyTaxEnable } = telegram;
 
         if(message_id_eTax){
             await telegramDelete({ chat_id: chat_id_taxManager, message_id: message_id_eTax });
         }
         if(chat_id){
-            const reply_message_id = await sendEtax({ chat_id, orderNumber, status:'ส่งใบกำกับภาษีเรียบร้อย' });
+            const reply_message_id = await sendEtax({ chat_id, orderNumber, status:'ส่งใบกำกับภาษีเรียบร้อย', etaxEnable, receiptEnable, hardCopyTaxEnable });
             await telegramDeleteQueue({ chat_id, message_id: reply_message_id });
         }
         toastSuccess('เปลี่ยนสถานะเป็น ส่งใบกำกับภาษีเรียบร้อย');
