@@ -92,7 +92,7 @@ function Modal_So({
     if(taxEnable && !taxImageId) return alert('กรุณาแนบรูปภาพข้อมูลสำหรับออกใบกำกับภาษี');
     if(taxEnable && etaxEnable && !taxEmail) return alert('กรุณากรอกอีเมลสำหรับจัดส่งใบกำกับภาษี');
     if(taxEnable && hardCopyTaxEnable && !taxAddress) return alert('กรุณากรอกที่อยู่สำหรับจัดส่งใบกำกับภาษี');
-    if(taxEnable && !etaxEnable && !hardCopyTaxEnable) return alert('กรุณาเลือกอย่างน้อย 1 ประเภทใบกำกับภาษี');
+    if(taxEnable && !etaxEnable && !hardCopyTaxEnable && !receiptEnable) return alert('กรุณาเลือกอย่างน้อย 1 ประเภทใบกำกับภาษี');
 
     const ok = window.confirm('คุณแน่ใจที่จะเปิดบิลใช่หรือไม่?');
     if(!ok) return;
