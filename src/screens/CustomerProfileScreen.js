@@ -10,8 +10,8 @@ import { db, prepareFirebaseImage, webImageDelete } from "../db/firestore";
 import { Modal_Loading, Modal_Note, Modal_OneInput, Modal_Shop } from "../modal";
 import { OneButton } from "../components";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
-import { formatTime } from "../Utility/function";
-import { cashiersEquipment, colors, distanceOptions, hostedSystems, initialNote, networkSystems, printerModes, printers, printPatterns, routerSystems, initialShopType } from "../configs";
+import { formatTime, toastSuccess } from "../Utility/function";
+import { cashiersEquipment, colors, distanceOptions, hostedSystems, initialNote, networkSystems, printerModes, printers, printPatterns, routerSystems, initialShopType, paymentJourneys } from "../configs";
 import { v4 as uuidv4 } from 'uuid';
 
 const initialCustomerProfile = {
@@ -25,6 +25,7 @@ const initialCustomerProfile = {
     updatedAt:new Date(),
     updatedBy:'',
     updatedName:'',
+
 };
 
 const initialShop = {
@@ -43,6 +44,7 @@ const initialShop = {
     router:'',
     note:'',
     contact:'',
+    paymentJourney:'', // กินก่อนจ่าย จ่ายก่อนกิน ทั้งกินก่อนจ่ายและจ่ายก่อนกิน
 };
 
 const { softWhite, darkGray } = colors;
@@ -101,6 +103,10 @@ function CustomerProfileScreen() {
       ()=> new Map(initialShopType.map(item=>[item.id, item])),[]
     );
 
+    const paymentJourneyOptionMap = useMemo(
+      ()=> new Map(paymentJourneys.map(item=>[item.id, item])),[]
+    );
+
     // 200%
     async function handleCustomer(){
       setCustomer_Modal(false);
@@ -154,6 +160,7 @@ function CustomerProfileScreen() {
           transaction.set(customerRef, payload);
           setCurrentCustomer({...payload, id:newCode});
         });
+        toastSuccess('เพิ่มลูกค้าใหม่สำเร็จ');
       } catch (error) {
         alert(error)
       } finally {
@@ -266,6 +273,7 @@ function CustomerProfileScreen() {
           modifiedAt:formatTime(note.modifiedAt),
         })),
       }));
+      toastSuccess('บันทึกข้อมูลร้านสำเร็จ');
     } catch (error) {
       alert(error)
     } finally {
@@ -314,7 +322,7 @@ function CustomerProfileScreen() {
             <OneButton {...{ text:'+ เพิ่มโน๊ต', submit: ()=>{openNoteModal({})}, variant:'success' }} />
             <OneButton {...{ text:'+ ร้าน', submit: ()=>{openShop({})}, variant:'success' }} />
             {shops.map((shop,index)=>{
-              const { shopName, storeSize, features, shopType, paymentGateway, router, cashiersPos, kitchenPrinters, ownerManager, note = '', shopTel } = shop;
+              const { paymentJourney, shopName, storeSize, features, shopType, paymentGateway, router, cashiersPos, kitchenPrinters, ownerManager, note = '', shopTel } = shop;
               return <Row onClick={()=>{openShop(shop)}} key={index} style={{ border:`1px solid ${softWhite}`, margin:'10px 0px', padding:10, borderRadius:10, backgroundColor:softWhite }} >
                       <Col sm='12' md='6' lg='4'  >
                         <Card  style={{ padding: '1rem', marginTop: 10, minHeight:'400px' }}>
@@ -324,13 +332,14 @@ function CustomerProfileScreen() {
                             <TextComponent text1="ขนาดร้าน :" text2={storeSize} />
                             <TextComponent text1="package : " text2={features.join(', ')} />
                             <TextComponent text1="ประเภทร้าน : " text2={shopTypeOptionMap.get(shopType)?.name || '-'} />
+                            <TextComponent text1="รูปแบบการขาย : " text2={paymentJourneyOptionMap.get(paymentJourney)?.label || '-'} />
                             <TextComponent text1="paymentGateway : " text2={paymentGateway.join(', ')} />
                             <TextComponent text1="router :" text2={routerSystemMap.get(router)?.label || '-'} />
                             <TextComponent2 text1="หมายเหตุ :" text2={note || '-'} />
                         </Card>
                       </Col>
                       {cashiersPos.map((cashier,index2)=>{
-                        const { equipment, printerMode, hostedSystem, networkSystem, distance, host, innerPrinter, printer, printerPattern, note } = cashier;
+                        const { equipment, printerMode, hostedSystem, networkSystem, host, innerPrinter, printer, printerPattern, note } = cashier;
                         return <Col sm='12' md='6' lg='4' key={index2} >
                                   <Card  style={{ padding: '1rem', marginTop: 10, minHeight:'400px' }}>
                                       <h6 style={{ backgroundColor: '#C0CDFF', padding:5 }} >เครื่องคิดเงิน {index2 + 1}</h6>

@@ -38,8 +38,10 @@ import printPatterns from "./printPatterns";
 import distanceOptions from "./distanceOptions";
 import shopTypeOptions from "./shopTypeOptions";
 import initialShopType from "./initialShopType";
+import paymentJourneys from "./paymentJourneys";
 
 export {
+  paymentJourneys,
   initialShopType,
   shopTypeOptions,
   distanceOptions,

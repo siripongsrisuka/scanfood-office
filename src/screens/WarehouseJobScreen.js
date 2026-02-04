@@ -313,9 +313,8 @@ function WarehouseJobScreen() {
         } finally {
             setLoading(false);
         }
-        
     };
-    
+
 
   return (
     <div style={styles.container} >
@@ -345,6 +344,7 @@ function WarehouseJobScreen() {
         />
         <Modal_Loading show={loading} />
       <h1>งานคลัง</h1>
+     
       <SearchControl {...{ placeholder:'ค้นหาด้วยชื่อเซลหรือเลขที่ใบสั่งซื้อ', search, setSearch }} />
       <CategoryRender {...{ options, option:optionId, setOption }} />
       <h5>ทั้งหมด : {display.length} รายการ</h5>

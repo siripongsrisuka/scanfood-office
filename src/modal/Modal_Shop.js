@@ -11,7 +11,8 @@ import { CardComponent, FloatingText, FooterButton, OneButton } from "../compone
 import Modal_Alert from "./Modal_Alert";
 import { cashiersEquipment, colors, initialAlert, networkSystems, printerModes,
     routerSystems, hostedSystems, printers, printPatterns, distanceOptions,
-    shopTypeOptions
+    shopTypeOptions,
+    paymentJourneys
  } from "../configs";
 import { v4 as uuidv4 } from 'uuid';
 import initialShopType from "../configs/initialShopType";
@@ -54,7 +55,8 @@ function Modal_Shop({
   current,
   setCurrent,
 }) {
-    const { router, shopName, storeSize, paymentGateway = [], cashiersPos = [], kitchenPrinters = [], features = [], shopType = '', note = '', ownerManager = '', shopTel } = current;
+    const { router, shopName, storeSize, paymentGateway = [], cashiersPos = [], kitchenPrinters = [], features = [], 
+        shopType = '', note = '', ownerManager = '', shopTel, paymentJourney = '' } = current;
 
     function confirm(){
         const ok = window.confirm('คุณต้องการบันทึกร้านค้านี้ใช่หรือไม่?');
@@ -197,6 +199,25 @@ function Modal_Shop({
                     {initialShopType.map((item) => (
                     <option key={item.id} value={item.id}>
                         {item.name}
+                    </option>
+                    ))}
+                </Form.Select>
+            </FloatingLabel>
+            <FloatingLabel
+                controlId="floatingSelectPaymentJourney"
+                label="รูปแบบการขาย"
+                className="mb-3"
+            >
+                <Form.Select
+                    value={paymentJourney}
+                    onChange={(event) =>
+                    setCurrent(prev => ({ ...prev, paymentJourney: event.target.value }))
+                    }
+                >
+                    <option value="" disabled>เลือกรูปแบบการขาย</option>
+                    {paymentJourneys.map((item) => (
+                    <option key={item.id} value={item.id}>
+                        {item.label}
                     </option>
                     ))}
                 </Form.Select>
