@@ -10,6 +10,7 @@ import CloneScreen from "./CloneScreen";
 import TransferOwnerScreen from "./TransferOwnerScreen";
 import ExtraDayScreen from "./ExtraDayScreen";
 import PackageHistoryScreen from "./PackageHistoryScreen";
+import ETaxScreen from "./ETaxScreen";
 
 
 import SoftwareHistory from "./SoftwareHistory";

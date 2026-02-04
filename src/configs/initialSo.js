@@ -12,6 +12,12 @@ export default {
     oneMonth:false, // ใช้ทดลอง 1 เดือน
     manualPaidImage:'',
     manualPaid:false,
-    marketplaceFranchiseEnable:false
+    marketplaceFranchiseEnable:false,
+    taxEnable:false, // ใบกำกับภาษี
+    etaxEnable:false, // ขอ E-Tax
+    hardCopyTaxEnable:false, // ใบกำกับภาษีแบบกระดาษ
+    taxImageId:'', // รูปภาพใบกำกับภาษี
+    taxAddress:'', // ที่อยู่สำหรับจัดส่งใบกำกับภาษี
+    taxEmail:'', // อีเมลสำหรับจัดส่งใบกำกับภาษี
 
 };

@@ -81,6 +81,22 @@ export async function replyExtraDay({ chat_id, message_id, status }){
         }
       );
     return result.data.result.message_id;
-}
+};
+
+export async function sendEtax({ chat_id, orderNumber}){
+    const body = {
+        chat_id,
+        parse_mode: "HTML",
+        text:`<b>ส่งแล้ว : Etax</b>
+เลขที่ออเดอร์ : ${orderNumber}`
+      }
+
+    const result = await axios.post(
+    `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+    body
+    
+    );
+    return result.data.result.message_id;
+};
 
 

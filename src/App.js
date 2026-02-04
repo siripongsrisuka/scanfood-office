@@ -47,6 +47,7 @@ import { firebaseAuth } from './db/firestore'
 import 'rsuite/dist/rsuite.min.css';
 import { ToastContainer } from 'react-toastify';
 import ApproveSoftwareScreen from "./screens/ApproveSoftwareScreen";
+import ETaxScreen from "./screens/ETaxScreen";
 
 
 function App() {
@@ -123,6 +124,7 @@ function App() {
             <Route path='packageHistory' element={<PackageHistoryScreen/>} />
             <Route path='hardwareHistory' element={<HardwareHistoryScreen/>} />
             <Route path='emailPrinter' element={<EmailPrinterScreen/>} />
+            <Route path='eTax' element={<ETaxScreen/>} />
             
           </Route>
       </Routes>

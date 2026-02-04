@@ -23,6 +23,7 @@ import { colors, initialProcess, initialSo } from "../configs";
 import { fetchCustomer, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fetchSoftware, fetchSuccessCases, fetchWaste, formatCurrency, formatTime, isGodIt, toastSuccess, wait } from "../Utility/function";
 import initialShopType from "../configs/initialShopType";
 import initialCancelId from "../configs/initialCancelId";
+import { ta } from "date-fns/locale";
 const { softWhite, dark, softGray, greenSanta, white, blue } = colors;
 
 const data = [
@@ -323,7 +324,9 @@ function SaleScreen() {
 
     // 200%
     async function handleSo(payload){
-        const { oneMonth, requestDate, manualPaidImage, manualPaid } = currentSo;
+        const { oneMonth, requestDate, manualPaidImage, manualPaid,
+            taxEnable, taxImageId
+         } = currentSo;
         setSo_Modal(false)
 
         if(!shopId && oneMonth) return alert('ยังไม่มี shopId');
@@ -337,6 +340,10 @@ function SaleScreen() {
             let imageUrl = manualPaidImage;
             if(manualPaidImage && manualPaid){
                 imageUrl = await prepareFirebaseImage(manualPaidImage,'/saleEvident/','evident')
+            };
+            let taxImageUrl = taxImageId;
+            if(taxImageId && taxEnable){
+                taxImageUrl = await prepareFirebaseImage(taxImageId,'/taxImage/','tax')
             };
             let autoPaymentRef = null;
             const timestamp = new Date();
@@ -419,7 +426,10 @@ function SaleScreen() {
                     requestBillDate:stringYMDHMS3(requestDate),
                     manualPaidImage:imageUrl,
                     chat_id,
-                    chat_id_saleManager:-1003891934173 
+                    chat_id_saleManager:-1003891934173, // หลุย 
+                    chat_id_taxManager:-1003871427406, // ต้น
+                    taxProcess:'waiting', // waiting, sent, done
+                    taxImageId:taxImageUrl,
                 };
                 transaction.set(autoPaymentRef,paymentData)
                 return {

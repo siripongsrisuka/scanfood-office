@@ -286,4 +286,19 @@ export default [
         to: 'staff',
         id:'723'
       },
+        {
+        label: '9. บัญชี',
+      },
+      {
+        topic: '9.1 E-tax',
+        icon: 'bi-speedometer',
+        to: 'eTax',
+        id:'723'
+      },
+      {
+        topic: '9.2 ประวัติ E-tax',
+        icon: 'bi-speedometer',
+        to: 'eTaxHistory',
+        id:'723'
+      },
   ]

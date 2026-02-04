@@ -10,12 +10,12 @@ import {
 import { formatCurrency, formatCurrency2, summary } from "../Utility/function";
 import { MdRadioButtonUnchecked, MdRadioButtonChecked } from 'react-icons/md'; // replace with correct MaterialCommunityIcons mapping
 import { colors } from "../configs";
-import { CardComponent, FloatingArea, FooterButton, OneButton, RootImage } from "../components";
+import { CardComponent, FloatingArea, FloatingText, FooterButton, MasterCheckBox, OneButton, RootImage } from "../components";
 import DatePicker from "react-datepicker";
 import { SlCalender } from "react-icons/sl";
 import { Button } from "rsuite";
 import { useSelector } from "react-redux";
-const { white, dark, theme3, five, one, nine, softWhite, green, six } = colors;
+const { white, dark, theme3, five, one, nine, softWhite, green, six, greenSanta } = colors;
 
 function Modal_So({
   backdrop=true, // true/false/static
@@ -33,10 +33,19 @@ function Modal_So({
 }) {
     const { profile:{ admin }} = useSelector(state=>state.profile);
     const fileInputRef = useRef(null);
+    const taxImageIdRef = useRef(null);
     
     const { storeSize, software, requestDate = '', hardware, note = '', 
         deliveryType = 'normal', oneMonth = false, manualPaid, manualPaidImage,
-    marketplaceFranchiseEnable } = current;
+    marketplaceFranchiseEnable,
+    taxEnable = false,
+    etaxEnable = false,
+    hardCopyTaxEnable = false,
+    taxImageId = '',
+    taxAddress = '',
+    taxEmail = '',
+} = current;
+
     
     const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => (
         <div  style={{ borderRadius:20 }} onClick={onClick} ref={ref}>
@@ -78,6 +87,14 @@ function Modal_So({
     if(software.length===0 && hardware.length === 0 && !oneMonth && !marketplaceFranchiseEnable) return alert('เลือกอย่างน้อย 1 รายการ');
 
     if(manualPaid && !manualPaidImage) return alert('กรุณาแนบสลิปการชำระเงิน');
+
+    if(taxEnable && !taxImageId) return alert('กรุณาแนบรูปภาพข้อมูลสำหรับออกใบกำกับภาษี');
+    if(taxEnable && etaxEnable && !taxEmail) return alert('กรุณากรอกอีเมลสำหรับจัดส่งใบกำกับภาษี');
+    if(taxEnable && hardCopyTaxEnable && !taxAddress) return alert('กรุณากรอกที่อยู่สำหรับจัดส่งใบกำกับภาษี');
+    if(taxEnable && !etaxEnable && !hardCopyTaxEnable) return alert('กรุณาเลือกอย่างน้อย 1 ประเภทใบกำกับภาษี');
+
+    const ok = window.confirm('คุณแน่ใจที่จะเปิดบิลใช่หรือไม่?');
+    if(!ok) return;
 
     submit({
         extraCharge,
@@ -159,6 +176,10 @@ function Modal_So({
         fileInputRef.current.click();
     };
 
+    const handleButtonTaxClick = () => {
+        taxImageIdRef.current.click();
+    };
+
     const handleImageChange = (e) => {
         const file = e.target.files[0]; // Get the selected file
 
@@ -169,6 +190,22 @@ function Modal_So({
         reader.onloadend = async () => {
             // setImage(reader.result); // Set the image data as the result of FileReader
             setCurrent(prev=>({...prev,manualPaidImage:reader.result}))
+        };
+
+        reader.readAsDataURL(file); // Convert file to a base64 string
+        }
+    };
+
+    const handleTaxImageIdChange = (e) => {
+        const file = e.target.files[0]; // Get the selected file
+
+        if (file) {
+
+        // Create a FileReader to read the file
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            // setImage(reader.result); // Set the image data as the result of FileReader
+            setCurrent(prev=>({...prev,taxImageId:reader.result}))
         };
 
         reader.readAsDataURL(file); // Convert file to a base64 string
@@ -278,7 +315,7 @@ function Modal_So({
                                 setCurrent(prev=>({...prev, oneMonth:event.target.value==='true'}))
                             }
                         }}
-                        style={{width:'180px'}}
+                        style={{width:'250px'}}
                     >
                         <option value={false}>ไม่ใช่</option>
                         <option value={true} >ใช่</option>
@@ -333,7 +370,7 @@ function Modal_So({
                     event.preventDefault()
                         setCurrent(prev=>({...prev, deliveryType:event.target.value}))
                     }}
-                    style={{width:'180px'}}
+                    style={{width:'250px'}}
                 >
                     <option value="normal" >ปกติ(DHL)</option>
                     <option value="fast" >รวดเร็ว(ลาล่ามูฟ)</option>
@@ -360,7 +397,7 @@ function Modal_So({
                             event.preventDefault()
                             setCurrent(prev=>({...prev, manualPaid:event.target.value==='true'}))
                         }}
-                        style={{width:'180px'}}
+                        style={{width:'250px'}}
                     >
                         <option value={false}>ชำระเงินอัตโนมัติ</option>
                         <option value={true} >ชำระเงินแบบแนบสลิป</option>
@@ -386,6 +423,86 @@ function Modal_So({
                 }
             </div>
         </CardComponent>
+        <CardComponent title='ใบกำกับภาษี' maxWidth={'95vw'} accentColor={'#FA8900'}  >
+            <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
+                <div style={{ marginBottom: 12, fontWeight: 'bold' }}>
+                    <h2>1. ลูกค้าต้องการใบกำกับภาษีไหม?</h2>
+                </div>
+                <Form.Select 
+                        aria-label="Default select example" 
+                        value={taxEnable} 
+                        onChange={(event)=>{
+                            event.preventDefault()
+                            setCurrent(prev=>({...prev, taxEnable:event.target.value==='true'}))
+                        }}
+                        style={{width:'250px'}}
+                    >
+                        <option value={false}>ไม่ต้องการใบกำกับภาษี</option>
+                        <option value={true} >ต้องการใบกำกับภาษี</option>
+                </Form.Select>
+                {taxEnable
+                    ?<React.Fragment>
+                        <h6>แนบรูปภาพข้อมูลสำหรับออกใบกำกับภาษี</h6>
+                        <form >
+                            <input
+                            type="file"
+                            ref={taxImageIdRef}
+                            accept="image/*"
+                            onChange={handleTaxImageIdChange}
+                            style={{ display: 'none' }} // Hide the default file input
+                            />
+                            <Button onClick={handleButtonTaxClick} variant="light">
+                            {taxImageId
+                                ?<Image style={styles.image} src={taxImageId} />
+                                :<RootImage style={styles.image} />
+                            }
+                            
+                            </Button>
+                        </form>
+                        <MasterCheckBox
+                            status={etaxEnable}
+                            color={greenSanta}
+                            onClick={()=>{
+                                setCurrent(prev=>({...prev, etaxEnable:!etaxEnable}))
+                            }}
+                            value='ขอ E-Tax'
+                            disabled={false}
+                        />
+                        <br/>
+                        {etaxEnable
+                            ?<FloatingText
+                                name="taxEmail"
+                                placeholder="อีเมลสำหรับจัดส่งใบกำกับภาษี"
+                                value={taxEmail}
+                                onChange={(event)=>{setCurrent({...current,taxEmail:event.target.value})}}
+                            />
+                            :null
+                        }
+                        <MasterCheckBox
+                            status={hardCopyTaxEnable}
+                            color={greenSanta}
+                            onClick={()=>{
+                                setCurrent(prev=>({...prev, hardCopyTaxEnable:!hardCopyTaxEnable}))
+                            }}
+                            value='ขอใบกำกับภาษีแบบกระดาษ'
+                            disabled={false}
+                        />
+                        {hardCopyTaxEnable
+                            ?<FloatingArea
+                                name="taxAddress"
+                                placeholder="ที่อยู่สำหรับจัดส่งใบกำกับภาษี"
+                                value={taxAddress}
+                                onChange={(event)=>{setCurrent({...current,taxAddress:event.target.value})}}
+                            />
+                            :null
+                        }
+                 
+                     
+                    </React.Fragment>
+                    :null
+                }
+            </div>
+        </CardComponent>
         {admin &&
             <CardComponent title='marketplace' maxWidth={'95vw'} accentColor={'#D9D9D9'}  >
             <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
@@ -399,7 +516,7 @@ function Modal_So({
                             event.preventDefault()
                             setCurrent(prev=>({...prev, marketplaceFranchiseEnable:event.target.value==='true'}))
                         }}
-                        style={{width:'180px'}}
+                        style={{width:'250px'}}
                     >
                         <option value={false}>ปิดใช้งาน</option>
                         <option value={true} >เปิดใช้งาน</option>
@@ -434,6 +551,13 @@ const styles = {
   },
   container2 : {
       textAlign:'center', width:'13%', textAlign:'center',minWidth:'150px'
+  },
+  image : {
+      width: '300px',
+        objectFit:'contain',
+      borderRadius: 10,
+      border: '1px solid #ccc',
+      cursor: 'pointer'
   }
 };
 
