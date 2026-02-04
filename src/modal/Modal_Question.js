@@ -3,6 +3,7 @@ import {
   Modal,
   Row,
   Col,
+  Image
 } from "react-bootstrap";
 import { FloatingArea, FloatingText } from "../components";
 
@@ -61,7 +62,8 @@ function Modal_Question({
         <Row>
             {imageUrls.map((url,index)=>(
                 <Col key={index} xs={12} sm={6} md={4} lg={3} style={{marginBottom:10}}>
-                    <img src={url} alt="question" style={styles.image} />
+                    {/* <img src={url} alt="question" style={styles.image} /> */}
+                    <Image style={styles.image} src={url} />
                 </Col>
             ))}
         </Row>
@@ -72,7 +74,11 @@ function Modal_Question({
 
 const styles = {
     image : {
-      width:'100%',maxWidth:300,minWidth:150,height:undefined,aspectRatio:1 , objectFit: 'cover'
+      width: '250px',
+        objectFit:'contain',
+      borderRadius: 10,
+      border: '1px solid #ccc',
+      cursor: 'pointer'
     },
 }
 
