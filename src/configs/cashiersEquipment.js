@@ -7,6 +7,7 @@ export default [
     { label: '🌟🌟🌟IPAD', id:'6' },
     { label: '🌟🌟แท็บเล็ต', id:'7' },
     { label: '🌟🌟D3mini', id:'8' },
+    { label: '🌟🌟iminแบบจอนอน', id:'13' },
     { label: '🌟ocha', id:'9' },
     { label: '🌟Sunmi t1', id:'10' },
     { label: '🌟Sunmi t2', id:'11' },
