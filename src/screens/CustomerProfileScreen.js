@@ -4,7 +4,6 @@ import {
   Row,
   Col,
   Card,
-  Button,
 } from "react-bootstrap";
 import { db, prepareFirebaseImage, webImageDelete } from "../db/firestore";
 import { Modal_Loading, Modal_Note, Modal_OneInput, Modal_Shop } from "../modal";
@@ -340,7 +339,6 @@ function CustomerProfileScreen() {
                       </Col>
                       {cashiersPos.map((cashier,index2)=>{
                         const { equipment, printerMode, hostedSystem, network, host, innerPrinter, printer, printerPattern, note } = cashier;
-                        console.log('networkSystem'+network);
                         return <Col sm='12' md='6' lg='4' key={index2} >
                                   <Card  style={{ padding: '1rem', marginTop: 10, minHeight:'400px' }}>
                                       <h6 style={{ backgroundColor: '#C0CDFF', padding:5 }} >เครื่องคิดเงิน {index2 + 1}</h6>
@@ -349,9 +347,14 @@ function CustomerProfileScreen() {
                                       <TextComponent text1="เครื่องแม่ : " text2={host ? 'ใช่' : 'ไม่ใช่'} />
                                       <TextComponent text1="ระบบโฮสท์ : " text2={hostedSystemMap.get(hostedSystem)?.label || '-'} />
                                       <TextComponent text1="ปริ้นเตอร์ในตัว : " text2={innerPrinter ? 'มี' : 'ไม่มี'} />
-                                      <TextComponent text1="ยี่ห้อปริ้นเตอร์ : " text2={printerMap.get(printer)?.label || '-'} />
-                                      <TextComponent text1="โหมดปริ้นเตอร์ : " text2={printerModeMap.get(printerMode)?.label || '-'} />
-                                      <TextComponent text1="รูปแบบการปริ้น : " text2={printPatternMap.get(printerPattern)?.label || '-'} />
+                                      {innerPrinter
+                                        ?null
+                                        :<React.Fragment>
+                                          <TextComponent text1="ยี่ห้อปริ้นเตอร์ : " text2={printerMap.get(printer)?.label || '-'} />
+                                          <TextComponent text1="โหมดปริ้นเตอร์ : " text2={printerModeMap.get(printerMode)?.label || '-'} />
+                                          <TextComponent text1="รูปแบบการปริ้น : " text2={printPatternMap.get(printerPattern)?.label || '-'} />
+                                        </React.Fragment>
+                                      }
                                       <TextComponent2 text1="หมายเหตุ : " text2={note || '-'} />
                                
                                   </Card>
