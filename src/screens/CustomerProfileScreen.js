@@ -30,7 +30,7 @@ const initialCustomerProfile = {
 const initialShop = {
     shopName:'',
     storeSize:'',
-    shopTel:'0811546951',
+    shopTel:'',
     features:[], // qrCode, member, point, coupon
     shopType:'', // restaurant, cafe, bakery, retail, grocery, other
     paymentGateway:[], // kbank, posxpay, beam, creditOrcode

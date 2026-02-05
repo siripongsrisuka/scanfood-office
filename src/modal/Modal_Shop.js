@@ -416,18 +416,19 @@ function Modal_Shop({
                                         ))}
                                     </Form.Select>
                                     </FloatingLabel>
-                                    <FloatingText
-                                        name="note"
-                                        placeholder="หมายเหตุ"
-                                        value={cashier.note}
-                                        onChange={(e) => {
-                                            const newCashiers = [...cashiersPos];
-                                            newCashiers[index].note = e.target.value;
-                                            setCurrent(prev => ({ ...prev, cashiersPos: newCashiers }));
-                                        }}
-                                    />
+                                    
                                 </>
                                 )}
+                                <FloatingText
+                                    name="note"
+                                    placeholder="หมายเหตุ"
+                                    value={cashier.note}
+                                    onChange={(e) => {
+                                        const newCashiers = [...cashiersPos];
+                                        newCashiers[index].note = e.target.value;
+                                        setCurrent(prev => ({ ...prev, cashiersPos: newCashiers }));
+                                    }}
+                                />
                             </Card>
                         </Col>
                     ))}
