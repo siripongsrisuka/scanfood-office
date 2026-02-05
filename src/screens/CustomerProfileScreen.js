@@ -339,12 +339,13 @@ function CustomerProfileScreen() {
                         </Card>
                       </Col>
                       {cashiersPos.map((cashier,index2)=>{
-                        const { equipment, printerMode, hostedSystem, networkSystem, host, innerPrinter, printer, printerPattern, note } = cashier;
+                        const { equipment, printerMode, hostedSystem, network, host, innerPrinter, printer, printerPattern, note } = cashier;
+                        console.log('networkSystem'+network);
                         return <Col sm='12' md='6' lg='4' key={index2} >
                                   <Card  style={{ padding: '1rem', marginTop: 10, minHeight:'400px' }}>
                                       <h6 style={{ backgroundColor: '#C0CDFF', padding:5 }} >เครื่องคิดเงิน {index2 + 1}</h6>
                                       <TextComponent text1="รุ่น : " text2={cashierEquipmentMap.get(equipment)?.label || '-'} />
-                                      <TextComponent text1="ระบบเน็ตเวิร์ค : " text2={networkSystemMap.get(networkSystem)?.label || '-'} />
+                                      <TextComponent text1="ระบบเน็ตเวิร์ค : " text2={networkSystemMap.get(network)?.label || '-'} />
                                       <TextComponent text1="เครื่องแม่ : " text2={host ? 'ใช่' : 'ไม่ใช่'} />
                                       <TextComponent text1="ระบบโฮสท์ : " text2={hostedSystemMap.get(hostedSystem)?.label || '-'} />
                                       <TextComponent text1="ปริ้นเตอร์ในตัว : " text2={innerPrinter ? 'มี' : 'ไม่มี'} />
