@@ -35,6 +35,8 @@ function TransferExpireScreen() {
     async function handleTransfer(){ // 100%
       if(!original.id) return alert('เลือกร้านต้นทางก่อน');
       if(!copy.id) return alert('เลือกร้านปลายทางก่อน');
+      const ok = window.confirm(`คุณต้องการย้ายวันใช้งานจากร้าน ${original.name} ไปยังร้าน ${copy.name} ใช่หรือไม่?`)
+      if(!ok) return;
 
         const value = original.vip.filter(a=>formatTime(a.expire)>today).map(a=>({ packageType:a.type, day:daysBetween(today,formatTime(a.expire))}))
         const { id:shopId } = copy;

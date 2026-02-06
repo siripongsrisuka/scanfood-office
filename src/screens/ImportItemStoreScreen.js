@@ -151,7 +151,10 @@ const ImportItemStoreScreen = () => {
         if (products.length === 0) {
             return alert('กรุณาใส่ไฟล์ excel');
         }
-        if(!shopId) return alert('กรุณาใส่ร้านค้า')
+        if(!shopId) return alert('กรุณาใส่ร้านค้า');
+
+        const ok = window.confirm(`คุณต้องการเพิ่มสินค้าทั้งหมด ${products.length} รายการ ไปยังร้าน ${name} ใช่หรือไม่?`)
+        if(!ok) return;
     
         try {
             setLoading(true);

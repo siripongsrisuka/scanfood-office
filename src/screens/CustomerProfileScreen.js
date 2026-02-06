@@ -50,6 +50,8 @@ const { softWhite, darkGray } = colors;
 
 const TextComponent = ({ text1, text2 }) => <h6><span style={{ color: '#523c2fff' }} >{text1}</span> {text2}</h6>
 const TextComponent2 = ({ text1, text2 }) => <h6 style={{ color: '#0D8266' }} ><span style={{ color: '#523c2fff' }} >{text1}</span> {text2}</h6>
+const TextComponent3 = ({ text1, text2 }) => <h4><span style={{ color: '#523c2fff' }} >{text1}</span> {text2}</h4>
+
 
 function CustomerProfileScreen() {
     const { office:{ humanRight = [] } } = useSelector(state=>state.office);
@@ -325,7 +327,7 @@ function CustomerProfileScreen() {
               return <Row onClick={()=>{openShop(shop)}} key={index} style={{ border:`1px solid ${softWhite}`, margin:'10px 0px', padding:10, borderRadius:10, backgroundColor:softWhite }} >
                       <Col sm='12' md='6' lg='4'  >
                         <Card  style={{ padding: '1rem', marginTop: 10, minHeight:'400px' }}>
-                            <TextComponent text1="ชื่อร้าน :" text2={shopName} />
+                            <TextComponent3 text1="ชื่อร้าน :" text2={shopName} />
                             <TextComponent text1="ชื่อเจ้าของ/ผู้จัดการ :" text2={ownerManager || '-'} />
                             <TextComponent text1="เบอร์ที่ลงทะเบียน :" text2={shopTel || '-'} />
                             <TextComponent text1="ขนาดร้าน :" text2={storeSize} />

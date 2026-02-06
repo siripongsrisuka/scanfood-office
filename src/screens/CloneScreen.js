@@ -18,6 +18,8 @@ function CloneScreen() {
     const [type, setType] = useState('original')
 
     const handleClone = async () => {
+      const ok = window.confirm(`คุณต้องการ Clone ข้อมูลจากร้าน ${original.name} ไปยังร้าน ${copy.name} ใช่หรือไม่?`)
+      if(!ok) return;
       setLoading(true)
       try {
             const response = await scanfoodAPI.post(
@@ -28,9 +30,12 @@ function CloneScreen() {
               }
             );
             toastSuccess('Clone ร้านค้าสำเร็จ');
-            setLoading(false)
       } catch (error) {
         console.log(error)
+      } finally {
+        setLoading(false);
+        setOriginal({ id:'', name:''});
+        setCopy({ id:'', name:'' });
       }
       };
     

@@ -152,7 +152,10 @@ const ImportItemFranchiseScreen = () => {
     async function addProductsToDatabase() {
         if (products.length === 0) {
             return alert('กรุณาใส่ไฟล์ excel');
-        }
+        };
+
+        const ok = window.confirm(`คุณต้องการเพิ่มสินค้าทั้งหมด ${products.length} รายการ ไปยังร้าน ${name} ใช่หรือไม่?`)
+        if(!ok) return;
     
         try {
 
