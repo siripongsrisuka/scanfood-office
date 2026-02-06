@@ -37,9 +37,9 @@ function ChangeTableScreen() {
                 const shopDoc = await transaction.get(shopRef);
                 const { packageArray = [], smartTable = [] } = shopDoc.data();
                 if(packageArray.length>0) throw new Error('ไม่สามารถเปลี่ยนจำนวนโต๊ะได้ เนื่องจากมีการจ่ายเงินเข้ามาแล้ว');
-                if(smartTable.length>storeSize) throw new Error(`ไม่สามารถเปลี่ยนจำนวนโต๊ะได้ เนื่องจากมีการสร้างโต๊ะเกินจำนวนโต๊ะใหม่ที่เลือก`);
+                if(smartTable.length>Number(storeSize)) throw new Error(`ไม่สามารถเปลี่ยนจำนวนโต๊ะได้ เนื่องจากมีการสร้างโต๊ะเกินจำนวนโต๊ะใหม่ที่เลือก`);
                 transaction.update(shopRef, {
-                    storeSize,
+                    storeSize:Number(storeSize),
                 });
             });
             toastSuccess('เปลี่ยนจำนวนโต๊ะสำเร็จ');
