@@ -41,8 +41,10 @@ import EmailTaxScreen from "./EmailTaxScreen";
 import ManualPaidScreen from "./ManualPaidScreen";
 import HardwareHistoryScreen from "./HardwareHistoryScreen";
 import EmailPrinterScreen from "./EmailPrinterScreen";
+import ChangeTableScreen from "./ChangeTableScreen";
 
 export {
+    ChangeTableScreen,
     ETaxHistoryScreen,
     ETaxScreen,
     EmailPrinterScreen,

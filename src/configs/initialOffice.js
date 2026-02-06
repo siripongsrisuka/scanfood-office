@@ -222,7 +222,13 @@ export default [
       to: 'transferOwner',
       id:'128'
     },
- 
+
+    {
+      topic: '6.10 เปลี่ยนโต๊ะ',
+      icon: 'bi-speedometer',
+      to: 'changeTable',
+      id:'128'
+    },
 
     {
       topic: '6.99 kbankReport',

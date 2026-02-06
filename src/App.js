@@ -41,7 +41,8 @@ import {
   HardwareHistoryScreen,
   EmailPrinterScreen,
   ETaxHistoryScreen,
-  ETaxScreen
+  ETaxScreen,
+  ChangeTableScreen
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -127,6 +128,7 @@ function App() {
             <Route path='emailPrinter' element={<EmailPrinterScreen/>} />
             <Route path='eTax' element={<ETaxScreen/>} />
             <Route path='eTaxHistory' element={<ETaxHistoryScreen/>} />
+            <Route path='changeTable' element={<ChangeTableScreen/>} />
             
           </Route>
       </Routes>
