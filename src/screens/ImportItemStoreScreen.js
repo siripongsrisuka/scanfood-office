@@ -255,6 +255,7 @@ const fileInputRef = useRef(null);
               <h6>วันที่สมัคร : {stringFullDate(createdDate)}</h6>
             </CardComponent>
             <CardComponent title="ข้อมูลสินค้า" maxWidth={'none'} >
+              <h6>products : {products.length}</h6>
               <Table striped bordered hover responsive  variant="light"   >
                     <thead  >
                     <tr>

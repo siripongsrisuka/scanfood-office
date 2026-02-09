@@ -12,4 +12,5 @@ export default [
     { label: '🌟Sunmi t1', id:'10' },
     { label: '🌟Sunmi t2', id:'11' },
     { label: '🌟wongnai', id:'12' },
+    { label: 'ยังไม่ทราบ', id:'13' },
 ];
