@@ -288,6 +288,14 @@ export default [
       to: 'kbank',
       id:'706'
     },
+    {
+      topic: '7.6 สื่อต่างๆ',
+      icon: 'bi-speedometer',
+      to: 'source',
+      id:'707'
+    },
+
+    
    
     {
         label: '8. พนักงาน',

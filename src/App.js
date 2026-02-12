@@ -43,7 +43,8 @@ import {
   ETaxHistoryScreen,
   ETaxScreen,
   ChangeTableScreen,
-  KbankScreen
+  KbankScreen,
+  SourceScreen
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -131,6 +132,7 @@ function App() {
             <Route path='eTaxHistory' element={<ETaxHistoryScreen/>} />
             <Route path='changeTable' element={<ChangeTableScreen/>} />
             <Route path='kbank' element={<KbankScreen/>} />
+            <Route path='source' element={<SourceScreen/>} />
             
           </Route>
       </Routes>
