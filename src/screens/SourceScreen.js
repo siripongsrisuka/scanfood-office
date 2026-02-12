@@ -17,7 +17,7 @@ function SourceScreen() {
   return (
     <div style={styles.container}>
         <h1>สื่อต่างๆ</h1>
-        <Button variant="success" onClick={openDriveFolder}>กดฉันสิ กดเลยๆ</Button>
+        <Button variant="success" onClick={openDriveFolder}>สื่อทั้งหมด</Button>
     </div>
   );
 };
