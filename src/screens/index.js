@@ -42,8 +42,10 @@ import ManualPaidScreen from "./ManualPaidScreen";
 import HardwareHistoryScreen from "./HardwareHistoryScreen";
 import EmailPrinterScreen from "./EmailPrinterScreen";
 import ChangeTableScreen from "./ChangeTableScreen";
+import KbankScreen from "./KbankScreen";
 
 export {
+    KbankScreen,
     ChangeTableScreen,
     ETaxHistoryScreen,
     ETaxScreen,

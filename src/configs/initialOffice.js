@@ -282,6 +282,12 @@ export default [
       to: 'upgradeHistory',
       id:'705'
     },
+    {
+      topic: '7.6 kbank',
+      icon: 'bi-speedometer',
+      to: 'kbank',
+      id:'706'
+    },
    
     {
         label: '8. พนักงาน',
