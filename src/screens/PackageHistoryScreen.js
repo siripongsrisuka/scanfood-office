@@ -47,8 +47,8 @@ function PackageHistoryScreen() {
     // 200%
     useEffect(()=>{
         let result = admin
-            ? displayPackages.filter(a=>['success','request'].includes(a.status))
-            : displayPackages.filter(a=>['success','request'].includes(a.status) && a.saleId === profileId);
+            ? displayPackages
+            : displayPackages.filter(a=>a.saleId === profileId);
         if(search){
           result = searchMultiFunction(result,search,['saleName','shopName'])
         }

@@ -28,7 +28,8 @@ export const fetchPackage = createAsyncThunk(
       // Use Promise.all to make multiple queries
       const promises = billDateChunks.map(async (chunk) => {
         const query = db.collection('packageOrder')
-          .where('billDate', 'in', chunk);
+          .where('billDate', 'in', chunk)
+          .where('status','==','success');
   
         try {
           const qsnapshot = await query.get();
