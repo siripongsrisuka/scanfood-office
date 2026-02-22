@@ -31,9 +31,11 @@ import TimeControlHardwareOrder from "./TimeControlHardwareOrder";
 import TimeControlPackage from "./TimeControlPackage";
 import TimeControlHardware from "./TimeControlHardware";
 import TimeControlEtax from "./TimeControlEtax";
+import TimeControlAutoPayment from "./TimeControlAutoPayment";
 
 
 export {
+    TimeControlAutoPayment,
     TimeControlEtax,
     TimeControlHardware,
     TimeControlExtra,

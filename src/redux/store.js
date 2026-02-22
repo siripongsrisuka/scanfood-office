@@ -22,6 +22,7 @@ import extraReducer from './extraSlice';
 import packageReducer from './packageSlice';
 import hardwareReducer from './hardwareSlice';
 import etaxReducer from './etaxSlice';
+import autoPaymentReducer from './autoPaymentSlice';
 
 
   const rootPersistConfig = {
@@ -75,6 +76,7 @@ import etaxReducer from './etaxSlice';
     package:packageReducer,
     hardware:hardwareReducer,
     etax:etaxReducer,
+    autoPayment:autoPaymentReducer
     // care:careReducer,
 
   })

@@ -4,9 +4,9 @@ import { stringYMDHMS3 } from '../Utility/dateTime';
 import { normalSort } from '../Utility/sort';
 
 const initialState = {
-    upgrades:[], // 
-    modal_Upgrade:false,
-    selectedUpgrade:[],
+    autoPayments:[], // 
+    modal_AutoPayment:false,
+    selectedAutoPayment:[],
     startDate:new Date(),
     endDate:new Date(),
     billDates:[],
@@ -14,8 +14,8 @@ const initialState = {
 
 
 // fetch bill
-export const fetchUpgrade = createAsyncThunk(
-  'upgrade/fetchUpgrade',
+export const fetchAutoPayment = createAsyncThunk(
+  'autoPayment/fetchAutoPayment',
   async ({ billDate, selectedDate }) => {
     let data = [];
     // Split billDate into chunks of 10 elements each
@@ -27,7 +27,7 @@ export const fetchUpgrade = createAsyncThunk(
 
     // Use Promise.all to make multiple queries
     const promises = billDateChunck.map(async (chunk) => {
-      const query = db.collection('autoUpgradeSize')
+      const query = db.collection('autoPayment')
         .where('billDate', 'in', chunk);
 
       try {
@@ -59,24 +59,24 @@ export const fetchUpgrade = createAsyncThunk(
 );
 
 
-export const upgradeSlice = createSlice({
-  name: 'upgrade',
+export const autoPaymentSlice = createSlice({
+  name: 'autoPayment',
   initialState,
   reducers: {
-    updateNormalFieldUpgrade: (state, action) => {
+    updateNormalFieldAutoPayment: (state, action) => {
       const { id, updatedField } = action.payload
-      let item = state.upgrades.find(a=>a.id===id);
+      let item = state.autoPayments.find(a=>a.id===id);
       if(item){
         Object.assign(item,updatedField)
       }
-      let item2 = state.selectedUpgrade.find(a=>a.id === id);
+      let item2 = state.selectedAutoPayment.find(a=>a.id === id);
       if(item2){
         Object.assign(item2,updatedField)
       }
     }, 
-    clearUpgrade: state => {
-      state.upgrades = [];
-      state.selectedUpgrade = [];
+    clearAutoPayment: state => {
+      state.autoPayments = [];
+      state.selectedAutoPayment = [];
       state.startDate = new Date();
       state.endDate = new Date();
       state.billDates = [];
@@ -87,48 +87,48 @@ export const upgradeSlice = createSlice({
     updateEndDate: (state, action) => {
       state.endDate = action.payload
     },
-    updateUpgrade: (state, action) => {
+    updateAutoPayment: (state, action) => {
       const { selectedDate } = action.payload
-      state.selectedUpgrade = normalSort('createdAt',state.upgrades.filter(a=>[selectedDate].includes(a.billDate)))
+      state.selectedAutoPayment = normalSort('createdAt',state.autoPayments.filter(a=>[selectedDate].includes(a.billDate)))
     }, 
   },
   extraReducers: builder => {
-    builder.addCase(fetchUpgrade.pending, state => {
-      state.modal_Upgrade = true
+    builder.addCase(fetchAutoPayment.pending, state => {
+      state.modal_AutoPayment = true
     })
-    builder.addCase(fetchUpgrade.fulfilled, (state, action) => {
+    builder.addCase(fetchAutoPayment.fulfilled, (state, action) => {
       const { data, billDate, selectedDate } = action.payload;
       const today = stringYMDHMS3(new Date());
     
       const isDuplicate = billDate.includes(today);
     
-      state.upgrades = isDuplicate
+      state.autoPayments = isDuplicate
         ? [
-            ...state.upgrades.filter(upgrade => upgrade.billDate !== today),
+            ...state.autoPayments.filter(autoPayment => autoPayment.billDate !== today),
             ...data,
           ]
-        : [...state.upgrades, ...data];
+        : [...state.autoPayments, ...data];
     
       state.billDates.push(...billDate.filter(date => date !== today));
     
-      state.selectedUpgrade = normalSort(
+      state.selectedAutoPayment = normalSort(
         'createdAt',
-        state.upgrades.filter(upgrade => selectedDate.includes(upgrade.billDate))
+        state.autoPayments.filter(autoPayment => selectedDate.includes(autoPayment.billDate))
       );
-      state.modal_Upgrade = false;
+      state.modal_AutoPayment = false;
     });
-    builder.addCase(fetchUpgrade.rejected, state => {
-        state.modal_Upgrade = false
+    builder.addCase(fetchAutoPayment.rejected, state => {
+        state.modal_AutoPayment = false
     })
   }
 })
 
 export const { 
-  clearUpgrade, 
-  updateUpgrade, 
+  clearAutoPayment, 
+  updateAutoPayment, 
   updateStartDate, 
   updateEndDate,
-  updateNormalFieldUpgrade
-} = upgradeSlice.actions
+  updateNormalFieldAutoPayment
+} = autoPaymentSlice.actions
 
-export default upgradeSlice.reducer
+export default autoPaymentSlice.reducer

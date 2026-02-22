@@ -21,7 +21,12 @@ export default [
       to:'hardwareHistory',
       id:'100'
     },
-
+    {
+      topic: '1.4 Payment Failed',
+      icon: 'bi-speedometer',
+      to:'paymentFailed',
+      id:'100'
+    },
     
     {
       label: '2. Marketing',

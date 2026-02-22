@@ -44,8 +44,10 @@ import EmailPrinterScreen from "./EmailPrinterScreen";
 import ChangeTableScreen from "./ChangeTableScreen";
 import KbankScreen from "./KbankScreen";
 import SourceScreen from "./SourceScreen";
+import PaymentFailedScreen from "./PaymentFailedScreen";
 
 export {
+    PaymentFailedScreen,
     SourceScreen,
     KbankScreen,
     ChangeTableScreen,

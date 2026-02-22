@@ -183,6 +183,12 @@ function UpgradeStoreSizeScreen() {
   return (
     <div style={styles.container} >
         <h1>ปรับขนาดร้าน</h1>
+        <h6>เงื่อนไข</h6>
+        <ul>
+            <li>ขนาดร้านที่เลือกต้องมากกว่าขนาดร้านปัจจุบัน</li>
+            <li>ราคาคิดตามจำนวนโต๊ะที่เพิ่มขึ้นและแพ็คเกจ VIP ที่เหลืออยู่</li>
+            <li>ออเดอร์มีอายุ 48 ชั่วโมง ถ้าจ่ายหลัง 48 ชั่วโมง ออเดอร์อาจจะไม่ถูกอนุมัติ ต้องไปกดตรวจสอบแบบ manual ที่ข้อ 7.5</li>
+        </ul>
         <Modal_Loading show={loading} />
         <Modal_Qrcode
             show={payment_Modal}

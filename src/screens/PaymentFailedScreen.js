@@ -3,13 +3,13 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   Table,
 } from "react-bootstrap";
-import { CategoryRender, initialColors, OneButton, SearchControl, TimeControlUpgrade } from "../components";
+import { CategoryRender, initialColors, OneButton, SearchControl, TimeControlAutoPayment } from "../components";
 import { formatCurrency, isGodIt, searchMultiFunction, summary, toastSuccess } from "../Utility/function";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { Modal_Loading, Modal_Qrcode } from "../modal";
 import { db } from "../db/firestore";
-import { updateNormalFieldUpgrade } from "../redux/upgradeSlice";
 import { scanfoodAPI } from "../Utility/api";
+import { updateNormalFieldAutoPayment } from "../redux/autoPaymentSlice";
 
 const thisOptions = [
     { id:'1', name:"ทั้งหมด" },
@@ -20,9 +20,9 @@ const thisOptions = [
 ];
 
 
-function UpgradeStoreSizeHistory() {
+function PaymentFailedScreen() {
     const dispatch = useDispatch();
-    const { selectedUpgrade } = useSelector(state=>state.upgrade);
+    const { selectedAutoPayment } = useSelector(state=>state.autoPayment);
     const { profile:{ id:profileId, name:profileName } } = useSelector(state=>state.profile);
     const [payment_Modal, setPayment_Modal] = useState(false);
     const [qrCode, setQrcode] = useState('');
@@ -34,43 +34,42 @@ function UpgradeStoreSizeHistory() {
     const [option, setOption] = useState({ id:'1', name:"ทั้งหมด" });
     const { id:optionId, name } = option;
 
-     const options = useMemo(()=>{
-          return thisOptions.map(a=>({ id:a.id, name:a.name, value:
-              a.id === '1' ? selectedUpgrade.length
-              :a.id === '2' ? selectedUpgrade.filter(a=>a.process === 'request').length
-              :a.id === '3' ? selectedUpgrade.filter(a=>a.process === 'cancel').length
-              :a.id === '4' ? selectedUpgrade.filter(a=>a.process === 'success').length
-              :selectedUpgrade.filter(a=>a.process === 'failed').length
-              }))
-      },[thisOptions,selectedUpgrade]);
+    const options = useMemo(()=>{
+        return thisOptions.map(a=>({ id:a.id, name:a.name, value:
+            a.id === '1' ? selectedAutoPayment.length
+            :a.id === '2' ? selectedAutoPayment.filter(a=>a.process === 'request').length
+            :a.id === '3' ? selectedAutoPayment.filter(a=>a.process === 'cancel').length
+            :a.id === '4' ? selectedAutoPayment.filter(a=>a.process === 'success').length
+            :selectedAutoPayment.filter(a=>a.process === 'failed').length
+            }))
+    },[thisOptions,selectedAutoPayment]);
 
     useEffect(()=>{
         let arr = [];
         switch (optionId) {
           case '1':
-            arr = selectedUpgrade;
+            arr = selectedAutoPayment;
             break;
           case '2':
-            arr = selectedUpgrade.filter(a=>a.process === 'request')
+            arr = selectedAutoPayment.filter(a=>a.process === 'request')
             break;
           case '3':
-            arr = selectedUpgrade.filter(a=>a.process === 'cancel')
+            arr = selectedAutoPayment.filter(a=>a.process === 'cancel')
             break;
            case '4':
-            arr = selectedUpgrade.filter(a=>a.process === 'success')
+            arr = selectedAutoPayment.filter(a=>a.process === 'success')
             break;
           case '5':
-            arr = selectedUpgrade.filter(a=>a.process === 'failed')
+            arr = selectedAutoPayment.filter(a=>a.process === 'failed')
             break;
           default:
             break;
         }
         if(search){
-            arr = searchMultiFunction(selectedUpgrade,search,['orderNumber','profileName','shopName'])
+            arr = searchMultiFunction(selectedAutoPayment,search,['orderNumber','profileName','shopName'])
         };
         setCurrentDisplay(arr);
-    },[selectedUpgrade,search,optionId]);
-
+    },[selectedAutoPayment,search,optionId]);
     function openQRcode(item){
         const { qrCode, amount } = item;
         setQrcode(qrCode)
@@ -90,14 +89,14 @@ function UpgradeStoreSizeHistory() {
       setLoading(true);
       try {
         await db.runTransaction( async (transaction)=>{
-          const upgradeRef = db.collection('autoUpgradeSize').doc(id);
-          const upgradeDoc = await transaction.get(upgradeRef);
-          const { process } = upgradeDoc.data();
+          const autoPaymentRef = db.collection('autoPayment').doc(id);
+          const autoPaymentDoc = await transaction.get(autoPaymentRef);
+          const { process } = autoPaymentDoc.data();
           if(process==='success') throw new Error(`Order นี้ เสร็จสมบูรณ์ไปแล้ว`);
           if(process==='cancel') throw new Error(`Order นี้ ยกเลิกไปแล้ว`);
-          transaction.update(upgradeRef,{ process:'cancel', canceledAt:new Date(), cancelBy:profileId, cancelName:profileName })
+          transaction.update(autoPaymentRef,{ process:'cancel', canceledAt:new Date(), cancelBy:profileId, cancelName:profileName })
         });
-        dispatch(updateNormalFieldUpgrade({
+        dispatch(updateNormalFieldAutoPayment({
           id,
           updatedField:{
             process:'cancel'
@@ -135,12 +134,12 @@ function UpgradeStoreSizeHistory() {
                   {
                       "test":"pack",
                       "ref2":"auto",
-                      "ref1":`upgrade:${id}`
+                      "ref1":`sale:${id}`
                   }
               );
               if(status===200 && data?.success){
                   toastSuccess('ตรวจสอบออเดอร์สำเร็จ ออเดอร์นี้จะถูกอนุมัติทันที ');
-                  dispatch(updateNormalFieldUpgrade({
+                  dispatch(updateNormalFieldAutoPayment({
                     id,
                     updatedField:{
                       process:'success'
@@ -157,7 +156,7 @@ function UpgradeStoreSizeHistory() {
 
   return (
     <div style={styles.container} >
-        <h1>ประวัติเพิ่มโต๊ะ</h1>
+        <h1>ประวัติเปิดออเดอร์อัตโนมัติ</h1>
         <Modal_Loading show={loading} />
         <Modal_Qrcode
             show={payment_Modal}
@@ -165,36 +164,34 @@ function UpgradeStoreSizeHistory() {
             qrCode={qrCode}
             amount={amount}
         />
-        <TimeControlUpgrade/>
+        <TimeControlAutoPayment/>
         <SearchControl {...{ placeholder:'ค้นหาด้วยชื่อผู้ดำเนินการหรือเลขที่ออเดอร์หรือชื่อร้านค้า', search ,setSearch }} />
         <CategoryRender {...{ options, option:optionId, setOption }} />
-        <h4>ค้นพบ : {currentDisplay.length} รายการ : {formatCurrency(summary(currentDisplay,'amount'))}</h4>
+        <h4>ค้นพบ : {currentDisplay.length} รายการ : {formatCurrency(summary(currentDisplay,'net'))}</h4>
         <Table striped bordered hover responsive  variant="light"   >
             <thead  >
             <tr>
                 <th style={styles.container2}>เลขที่</th>
                 <th style={styles.container2}>เวลา</th>
                 <th style={styles.container2}>ร้านค้า</th>
-                <th style={styles.container2}>โต๊ะเดิม</th>
-                <th style={styles.container2}>โต๊ะใหม่</th>
                 <th style={styles.container2}>มูลค่า</th>
                 <th style={styles.container2}>สถานะ</th>
                 <th style={styles.container2}>ผู้ดำเนินการ</th>
-                <th style={styles.container2}>QRCode</th>
+                <th style={styles.container2}>เซล</th>
                 <th style={styles.container2}>จำนวนตรวจสอบ</th>
+                {/* <th style={styles.container2}>QRCode</th> */}
             </tr>
             </thead>
             <tbody  >
             {currentDisplay.map((item, index) => {
-                const { orderNumber, createdAt, shopName, storeSize, nextStoreSize, process, amount, profileName, attemptCount = 0 } = item;
+                const { orderNumber, createdAt, shopName, 
+                    process, profileName, attemptCount = 0, saleName = '', net } = item;
                 
                 return <tr  style={{cursor: 'pointer'}} key={index} >
                             <td style={styles.container3} >{orderNumber}</td>
-                            <td style={styles.container3} >{stringDateTimeReceipt(createdAt)}</td>
-                            <td style={styles.container3} >{shopName}</td>
-                            <td style={styles.container3} >{storeSize}</td>
-                            <td style={styles.container3} >{nextStoreSize}</td>
-                            <td style={styles.container3} >{amount}</td>
+                            <td >{stringDateTimeReceipt(createdAt)}</td>
+                            <td >{shopName}</td>
+                            <td style={styles.container3} >{net}</td>
                             <td onClick={()=>{cancelOrder(item)}} style={styles.container3} >
                               <button style={{ minWidth:'100px', borderRadius:20, backgroundColor:initialColors[process] }} >{process}</button>
                               {process==='failed'
@@ -203,14 +200,15 @@ function UpgradeStoreSizeHistory() {
                               }
                             </td>
                             <td style={styles.container3} >{profileName}</td>
-                            <td style={styles.container3} >
+                            <td style={styles.container3} >{saleName}</td>
+                            <td style={styles.container3} >{attemptCount}</td>
+                            {/* <td style={styles.container3} >
                               {process==='cancel'
                                   ?<OneButton {...{ text:'เปิด QR Code', submit:()=>{}, variant:'secondary' }} />
                                   :<OneButton {...{ text:'เปิด QR Code', submit:()=>{openQRcode(item)} }} />
                               }
                                 
-                            </td>
-                            <td style={styles.container3} >{attemptCount}</td>
+                            </td> */}
                         </tr>
             })}
             </tbody>
@@ -231,4 +229,4 @@ const styles = {
   }
 }
 
-export default UpgradeStoreSizeHistory;
+export default PaymentFailedScreen;
