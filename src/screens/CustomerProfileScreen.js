@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import {
   Row,
   Col,
   Card,
+  Table
 } from "react-bootstrap";
 import { db, prepareFirebaseImage, webImageDelete } from "../db/firestore";
 import { Modal_Loading, Modal_Note, Modal_OneInput, Modal_Shop } from "../modal";
@@ -68,6 +69,34 @@ function CustomerProfileScreen() {
     const [oldImageUrls, setOldImageUrls] = useState(null);
     const [currentShop, setCurrentShop] = useState(initialShop);
     const [shop_Modal, setShop_Modal] = useState(false);
+    const [lastCreated, setLastCreated] = useState([]);
+
+    useEffect(()=>{
+        fetchLastCreated();
+    },[]);
+
+    async function fetchLastCreated(){
+      setLoading(true);
+      try {
+        const query = await db.collection('customerProfile')
+          .orderBy('createdAt', 'desc')
+          .limit(20)
+          .get();
+        const data = query.docs.map(doc=>({
+          id:doc.id,
+          ...doc.data(),
+          createdAt:formatTime(doc.data().createdAt),
+        }));
+        setLastCreated(data);
+        setCurrentCustomer(initialCustomerProfile); setCode('');
+      } catch (error) {
+        alert(error)
+      } finally {
+        setLoading(false);
+      }
+    };
+
+
     const cashierEquipmentMap = useMemo(
       ()=> new Map(cashiersEquipment.map(item=>[item.id, item])),[]
     );
@@ -283,6 +312,33 @@ function CustomerProfileScreen() {
     } 
 };
 
+  async function openCustomerProfile(item){
+    setCurrentCustomer(item);
+    setCode(item.code);
+    setLoading(true);
+    try {
+        const customerRef = db.collection('customerProfile').doc(item.code);
+        const customerDoc = await customerRef.get();
+        if(!customerDoc.exists) return alert('ไม่พบรหัสลูกค้านี้ในระบบ');
+        const { createdAt, updatedAt, notes, ...rest } = customerDoc.data();
+        setCurrentCustomer({
+          createdAt:formatTime(createdAt),
+          updatedAt:formatTime(updatedAt),
+          ...rest, 
+          id:customerDoc.id,
+          notes:notes.map(note=>({
+            ...note,
+            modifiedAt:formatTime(note.modifiedAt),
+          })),
+        });
+    } catch (error) {
+      
+    } finally {
+      setLoading(false);
+    }
+  
+  }
+
 
 
   return (
@@ -315,6 +371,7 @@ function CustomerProfileScreen() {
         />
         <OneButton {...{ text: "ค้นหา", submit: ()=>{setCustomer_Modal(true);setCode('')} }} />
         <OneButton {...{ text: "เพิ่มลูกค้าใหม่", submit: addNewCustomer }} />
+        <OneButton {...{ text: "ล้าง", submit: ()=>{fetchLastCreated()} }} />
         {customerId
           ?<div>
             <h3>Code : {thisCode}</h3>
@@ -422,7 +479,28 @@ function CustomerProfileScreen() {
               </Row>
             
           </div>
-          :null
+          :<Table striped bordered hover responsive  variant="light"   >
+            <thead  >
+                <tr>
+                    <th style={styles.container2} >รหัส</th>
+                    <th style={styles.container3} >วันที่</th>
+                    <th style={styles.container3} >ผู้สร้าง</th>
+                    <th style={styles.container3} >จำนวนร้านค้า</th>
+
+                </tr>
+            </thead>
+            <tbody  >
+            {lastCreated.map((item, index) => {
+                const { createdAt,  createdName, code, shops } = item;
+                return <tr onClick={()=>{openCustomerProfile(item)}} key={index} >
+                            <td style={styles.container4}>{code}</td>
+                            <td style={styles.container4}>{stringDateTimeReceipt(createdAt)}</td>
+                            <td style={styles.container4}>{createdName}</td>
+                            <td style={styles.container4}>{shops.length}</td>
+                        </tr>
+            })}
+            </tbody>
+        </Table>
         }
         
       
