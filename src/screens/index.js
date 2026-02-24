@@ -45,8 +45,10 @@ import ChangeTableScreen from "./ChangeTableScreen";
 import KbankScreen from "./KbankScreen";
 import SourceScreen from "./SourceScreen";
 import PaymentFailedScreen from "./PaymentFailedScreen";
+import CustomerSuccessShiftScreen from "./CustomerSuccessShiftScreen";
 
 export {
+    CustomerSuccessShiftScreen,
     PaymentFailedScreen,
     SourceScreen,
     KbankScreen,

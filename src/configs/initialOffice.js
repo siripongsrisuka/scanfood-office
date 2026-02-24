@@ -129,6 +129,12 @@ export default [
         to: 'customerProfile',
         id:'403'
       },
+      {
+        topic: '4.4 Customer Success Shift',
+        icon: 'bi-speedometer',
+        to: 'customerSuccessShift',
+        id:'404'
+      },
     {
       label: '5. คลังสินค้า',
     },
@@ -294,7 +300,7 @@ export default [
       id:'706'
     },
     {
-      topic: '7.6 สื่อต่างๆ',
+      topic: '7.7 สื่อต่างๆ',
       icon: 'bi-speedometer',
       to: 'source',
       id:'707'

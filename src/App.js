@@ -45,7 +45,8 @@ import {
   ChangeTableScreen,
   KbankScreen,
   SourceScreen,
-  PaymentFailedScreen
+  PaymentFailedScreen,
+  CustomerSuccessShiftScreen
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -135,6 +136,7 @@ function App() {
             <Route path='kbank' element={<KbankScreen/>} />
             <Route path='source' element={<SourceScreen/>} />
             <Route path='paymentFailed' element={<PaymentFailedScreen/>} />
+            <Route path='customerSuccessShift' element={<CustomerSuccessShiftScreen/>} />
             
           </Route>
       </Routes>
