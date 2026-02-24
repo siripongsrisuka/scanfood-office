@@ -135,6 +135,11 @@ export default [
         to: 'customerSuccessShift',
         id:'404'
       },
+      {topic: '4.5 Subscription',
+      icon: 'bi-speedometer',
+      to: 'subscription',
+      id:'405'
+    },
     {
       label: '5. คลังสินค้า',
     },
