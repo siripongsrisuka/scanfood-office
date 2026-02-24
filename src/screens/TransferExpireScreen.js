@@ -6,7 +6,7 @@ import {
 
 import { db } from "../db/firestore";
 import { Modal_FlatlistSearchShop, Modal_Loading } from "../modal";
-import { daysBetween, findInArray, formatTime, toastSuccess } from "../Utility/function";
+import { daysBetween, findInArray, firstExpire, formatTime, toastSuccess } from "../Utility/function";
 import { NumberYMD, plusDays } from "../Utility/dateTime";
 import { CardComponent, OneButton } from "../components";
 import { colors } from "../configs";
@@ -66,8 +66,9 @@ function TransferExpireScreen() {
                                   :a
                           })
                     }
-                transaction.update(shopRef,{ vip:newVip })
-                transaction.update(shopRef2,{ vip:vip2.map(a=>({...a,expire:today})) })
+                    
+                transaction.update(shopRef,{ vip:newVip, vipExpire:firstExpire(newVip) })
+                transaction.update(shopRef2,{ vip:vip2.map(a=>({...a,expire:today})), vipExpire:null })
             })
             toastSuccess('ย้ายวันใช้งานสำเร็จ')
             setOriginal({ id:'', name:'' });

@@ -1,5 +1,5 @@
 import { yearMonth } from './dateTime';
-import { normalSort } from './sort';
+import { normalSort, reverseSort } from './sort';
 import { toast } from 'react-toastify';
 import { db } from '../db/firestore';
 import initialCustomer from '../configs/initialCustomer';
@@ -7,6 +7,16 @@ import initialCustomer from '../configs/initialCustomer';
 export function isApprover (profileId){
   return ['cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'].includes(profileId)
 };
+
+export function firstExpire(vip){
+  const today = new Date();
+  const availableVip = vip.filter(item=>item.expire > today);
+  if(availableVip.length >0){
+    const sorted = reverseSort('expire',availableVip);
+    return sorted[0].expire
+  };
+  return null
+}
 
 export function isApproverPen(profileId){
   if(['cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'].includes(profileId)) return <i class="bi bi-pen"></i>

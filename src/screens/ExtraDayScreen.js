@@ -148,7 +148,7 @@ function ExtraDayScreen() {
         if(!saleManagerTeam) return;
         setCurrent(item);
         setAction_Modal(true);
-    }
+    };
 
   return (
     <div style={styles.container} >

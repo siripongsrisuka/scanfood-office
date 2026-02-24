@@ -5,7 +5,7 @@ import {
 } from "react-bootstrap";
 
 import { db } from "../db/firestore";
-import { findDay, findInArray, formatCurrency, formatTime, summary, toastSuccess } from "../Utility/function";
+import { findDay, findInArray, firstExpire, formatCurrency, formatTime, summary, toastSuccess } from "../Utility/function";
 import { pushByIdFilter } from "../api/onesignal";
 import { Modal_ApproveSoftware, Modal_Loading } from "../modal";
 import { reverseSort } from "../Utility/sort";
@@ -158,6 +158,7 @@ function ApproveSoftwareScreen() {
                 transaction.update(shopRef, {
                     vip: newVip,
                     packageArray: [...newPackageArray, ...newPackages],
+                    vipExpire:firstExpire(newVip)
                 });
                 transaction.set(mailboxRef,{
                     content: `อนุมัติแพ็กเกจเรียบร้อย`,
