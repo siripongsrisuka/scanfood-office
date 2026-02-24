@@ -192,8 +192,8 @@ function PaymentFailedScreen() {
                             <td >{stringDateTimeReceipt(createdAt)}</td>
                             <td >{shopName}</td>
                             <td style={styles.container3} >{net}</td>
-                            <td onClick={()=>{cancelOrder(item)}} style={styles.container3} >
-                              <button style={{ minWidth:'100px', borderRadius:20, backgroundColor:initialColors[process] }} >{process}</button>
+                            <td  style={styles.container3} >
+                              <button onClick={()=>{cancelOrder(item)}} style={{ minWidth:'100px', borderRadius:20, backgroundColor:initialColors[process] }} >{process}</button>
                               {process==='failed'
                                   ?<OneButton {...{ text:'ตรวจสอบอีกครั้ง', submit:()=>{checkFailedOrder(item)}, variant:'secondary' }} />
                                   :null
