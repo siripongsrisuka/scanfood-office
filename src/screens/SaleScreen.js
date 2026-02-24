@@ -57,7 +57,7 @@ const processMap = {
     'request':{ name:'รอชำระ', color:'#FFE871'},
     'success':{ name:'เสร็จสมบูรณ์', color:'#66ff33'},
     'paid':{ name:'ชำระเงินแล้ว', color:'#5DC3FF'},
-    'cancel':{ name:'ยกเลิก', color:'#FF5757'},
+    'cancel':{ name:'ยกเลิก', color:'#ea6e6eff'},
     'checking':{ name:'กำลังตรวจสอบ', color:'rgb(225, 231, 238)'},
     'failed':{ name:'ไม่จ่ายใน 48 ชั่วโมง', color:'#ccb3ff'},
 };
@@ -931,7 +931,7 @@ function SaleScreen() {
                     return <Row onClick={()=>{openPaymentOption(item)}} key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
                                 <Col xs='12' sm='6'  >{name}[{shopName}]</Col>
                                 <Col xs='6' sm='3'  >{formatCurrency(net)}</Col>
-                                <Col xs='6' sm='3'  ><button style={{backgroundColor:color}} >{processName}</button></Col>
+                                <Col xs='6' sm='3'  ><button style={{backgroundColor:color, padding:5, minWidth:'150px', borderRadius:20}} >{processName}</button></Col>
                             </Row>
                 })}
             </React.Fragment>
