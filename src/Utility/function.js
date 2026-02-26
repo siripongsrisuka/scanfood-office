@@ -272,6 +272,42 @@ export const searchMultiFunction = (arr, search, properties = ['name']) => {
   return inputValue;
 }
 
+  const qrcode = new Set(['3', '6',  '9'])
+  const staff = new Set(['12',  '15', '18'])
+  const language = new Set(['21', '24', '27'])
+  const premium = new Set([ '29', '31', '33'])
+  const member = new Set([ '35',  '37','39'])
+  const crm = new Set(['40', '41', '42'])
+
+// 🔥 สร้าง reverse map แค่ครั้งเดียว (สำคัญมาก)
+const reverseMap = new Map();
+
+[
+  ['qrcode', qrcode],
+  ['staff', staff],
+  ['language', language],
+  ['premium', premium],
+  ['member', member],
+  ['crm', crm],
+].forEach(([type, set]) => {
+  for (const value of set) {
+    reverseMap.set(value, type);
+  }
+});
+
+export function reOrder(vip, packageArray) {
+  const types = new Set();
+
+  // ✅ loop packageArray แค่ครั้งเดียว
+  for (const item of packageArray) {
+    const type = reverseMap.get(item);
+    if (type) types.add(type);
+  }
+
+  // ✅ filter แบบ O(1) lookup
+  return vip.filter(item => types.has(item.type));
+}
+
 export function daysBetween(startDate, endDate) {
   // Parse dates to remove any time components
   const start = new Date(startDate);

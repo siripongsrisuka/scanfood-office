@@ -141,6 +141,12 @@ export default [
       id:'405'
     },
     {
+      topic: '4.6 ผูก Code กับร้านใหม่',
+      icon: 'bi-speedometer',
+      to: 'codeRelative',
+      id:'406'
+    },
+    {
       label: '5. คลังสินค้า',
     },
     {

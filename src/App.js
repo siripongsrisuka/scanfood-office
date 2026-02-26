@@ -47,7 +47,8 @@ import {
   SourceScreen,
   PaymentFailedScreen,
   CustomerSuccessShiftScreen,
-  SubscriptionScreen
+  SubscriptionScreen,
+  CodeRelativeScreen
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -139,6 +140,7 @@ function App() {
             <Route path='paymentFailed' element={<PaymentFailedScreen/>} />
             <Route path='customerSuccessShift' element={<CustomerSuccessShiftScreen/>} />
             <Route path='subscription' element={<SubscriptionScreen/>} />
+            <Route path='codeRelative' element={<CodeRelativeScreen/>} />
           </Route>
       </Routes>
       </div>

@@ -39,8 +39,10 @@ import distanceOptions from "./distanceOptions";
 import shopTypeOptions from "./shopTypeOptions";
 import initialShopType from "./initialShopType";
 import paymentJourneys from "./paymentJourneys";
+import initialYearly from "./initialYearly";
 
 export {
+  initialYearly,
   paymentJourneys,
   initialShopType,
   shopTypeOptions,

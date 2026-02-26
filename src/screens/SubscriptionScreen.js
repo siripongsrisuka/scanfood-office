@@ -17,39 +17,37 @@ import {
 } from "react-bootstrap";
 import { plusDays, stringFullDate } from "../Utility/dateTime";
 import { db } from "../db/firestore";
-import { formatTime } from "../Utility/function";
+import { daysBetween, formatTime, reOrder, searchMultiFunction } from "../Utility/function";
 import { Modal_Loading } from "../modal";
+import { initialYearly } from "../configs";
+import { scanfoodAPI } from "../Utility/api";
+import { SearchControl } from "../components";
 
 
 function SubscriptionScreen() {
     const [masterData, setMasterData] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [search, setSearch] = useState('');
+    const [currentDisplay, setCurrentDisplay] = useState([]);
 
     useEffect(()=>{
         fetchMasterData()
     },[]);
 
+    useEffect(()=>{
+        let arr = masterData;
+        if(search) arr = searchMultiFunction(arr, search, ['name', 'code', 'tel']);
+        setCurrentDisplay(arr);
+    }, [search,masterData]);
+
     async function fetchMasterData() {
         setLoading(true);
-        const oneMonthShop = plusDays(new Date(), 30);
         try {
-            const query = await db.collection('shop')
-                .where('vipExpire','<=', oneMonthShop)
-                .get();
-            const shops = query.docs.map(doc=>{
-                const { vip, vipExpire, ...rest } = doc.data();
-                return {
-                    ...rest,
-                    id: doc.id,
-                    vip: vip.map(a=>{
-                        return {
-                            ...a,
-                            expire: formatTime(a.expire)
-                        }
-                    }),
-                    vipExpire: formatTime(vipExpire)
-                }
-            });
+            const { status, data } = await scanfoodAPI.post(
+                "/office/subscription/",
+                {}
+            );
+            const { shops } = data;
             setMasterData(shops);
 
             // const res = await getMasterData();
@@ -60,30 +58,77 @@ function SubscriptionScreen() {
             setLoading(false);
         }
     };
-    console.log(masterData);
+
+  async function billHistory(shopId){
+    setLoading(true);
+    try {
+      const response = await scanfoodAPI.post(
+        "/office/billHistory/",
+        {
+          shopId,
+        }
+      );
+      const { status, data } = response;
+      const { bills } = data;
+      alert(`จำนวนบิลในแต่ละวัน \n${bills.map(a=>`${a.date} : ${a.qty}`).join('\n')}`);
+    } catch (error) {
+      alert(error)
+    } finally {
+      setLoading(false);
+    }
+    
+  }
+
   return (
     <div style={styles.container} >
       <h1>Subscription</h1>
-      <Modal_Loading/>
+      <h6>เงื่อนไขการใช้งาน</h6>
+      <ul>
+        <li>แสดงผลเฉพาะร้านรายปี</li>
+        <li>แสดงผลเฉพาะแพ็กเกจที่ลูกค้าเคยซื้อ</li>
+        <li>แสดงผลเฉพาะแพ็กเกจที่กำลังจะหมดอายุใน 30 วัน</li>
+
+    </ul>
+      <Modal_Loading show={loading} />
+        <SearchControl {...{ search, setSearch, placeholder: "ค้นหาร้านค้าด้วยชื่อหรือ code หรือเบอร์โทร" }} />
+        <br/>
+        <h6>จำนวน : {currentDisplay.length} ร้านค้า</h6>
         <Table striped bordered hover responsive  variant="light"   >
             <thead  >
             <tr>
-                <th style={styles.container2}>No.</th>
-                <th style={styles.container3}>ร้านค้า</th>
-                <th style={styles.container3}>แพ็กเกจ</th>
-                <th style={styles.container3}>วันที่หมดอายุ</th>
-                <th style={styles.container3}>เบอร์โทรร้าน</th>
+                <th rowSpan={2} style={styles.container2}>No.</th>
+                <th rowSpan={2} style={styles.container3}>code</th>
+                <th rowSpan={2} style={styles.container5}>ร้านค้า</th>
+                <th rowSpan={2} style={styles.container5}>แพ็กเกจที่ใช้</th>
+                <th rowSpan={2} style={styles.container3}>วันที่หมดอายุ</th>
+                <th rowSpan={2} style={styles.container3}>เบอร์โทรร้าน</th>
+                <th colSpan={3} style={styles.container3}>ทำอะไรไปแล้ว</th>
+            </tr>
+            <tr>
+                <th style={styles.container3}>email + ทักไลน์</th>
+                <th style={styles.container3}>ทักไลน์</th>
+                <th style={styles.container3}>โทร</th>
             </tr>
             </thead>
             <tbody  >
-            {masterData.map((item, index) => {
-                const { id, name, vip, vipExpire, tel } = item;
+            {currentDisplay.map((item, index) => {
+                const { id, name, vip, vipExpire, tel, code } = item;
                 return <tr   key={id} >
                             <td style={styles.container4}>{index+1}.</td>
-                            <td >{name}</td>
-                            <td >{vip.map(a=>a.type).join(', ')}</td>
-                            <td>{stringFullDate(vipExpire)}</td>
-                            <td>{tel}</td>
+                            <td >{code}</td>
+                            <td onClick={()=>{billHistory(id)}} >{name}<i class="bi bi-search"></i></td>
+                            <td >{
+                            vip.map(a=>{
+                                const day = daysBetween(new Date(), a.expire)
+                                if(day<0) return <p>{`${a.type} (- ${Math.abs(day)} วัน)`}</p>;
+                                return <p>{`${a.type} (${day} วัน)`}</p>;
+                            })}
+                            </td>
+                            <td style={styles.container4} >{stringFullDate(vipExpire)}</td>
+                            <td style={styles.container4} >{tel}</td>
+                            <td style={styles.container4} ></td>
+                            <td style={styles.container4} ></td>
+                            <td style={styles.container4} ></td>
                         </tr>
             })}
             </tbody>
@@ -95,7 +140,25 @@ function SubscriptionScreen() {
 const styles = {
   container : {
     minHeight:'100vh'
-  }
+  },
+  container2 : {
+    textAlign:'center',
+    width:'10%',
+    minWidth:'80px'
+  },
+  container3 : {
+    textAlign:'center',
+    width:'15%',
+    minWidth:'120px'
+  },
+  container4 : {
+    textAlign:'center',
+  },
+  container5 : {
+    textAlign:'center',
+    width:'15%',
+    minWidth:'150px'
+  },
 }
 
 export default SubscriptionScreen;
