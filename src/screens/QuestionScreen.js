@@ -288,7 +288,7 @@ function QuestionScreen() {
        <Table striped bordered hover responsive  variant="light" style={{marginTop:'1rem'}}  >
                 <thead  >
                 <tr>
-                    <th style={styles.container2}>ลำดับ</th>
+                    <th style={styles.container2}>รหัส</th>
                     <th style={styles.container3}>คำถาม</th>
                     <th style={styles.container4}>คำตอบ</th>
                     {optionId==='1'
@@ -299,9 +299,9 @@ function QuestionScreen() {
                 </thead>
                 <tbody  >
                 {currentDisplay.map((item,index) => {
-                    const { question, answer, id, retweetCount = 0, type=''  } = item;
+                    const { question, answer, id, retweetCount = 0, type='', code = ''  } = item;
                     return <tr   key={index} >
-                                <td style={styles.container2}>{index+1}</td>
+                                <td style={styles.container2}>C{code}</td>
                                 <td onClick={()=>{openQuestionModal(item)}} >[{type==='question'?'คำถาม🤔':'ปัญหา🥶'}]{question}</td>
                                 <td onClick={()=>{openQuestionModal(item)}} >
                                 {answer.split('\n').map((line, index) => (

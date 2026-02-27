@@ -163,7 +163,14 @@ function QuestionHistoryScreen() {
                     profileId,
                     profileName,
                 }
-                await questionRef.set(payload);
+                await db.runTransaction(async (transaction)=>{
+                    const caseRef = db.collection('admin').doc('caseNumber');
+                    const caseDoc = await transaction.get(caseRef);
+                    const { value } = caseDoc.data();
+                    payload.code = value;
+                    transaction.update(caseRef, { value:value+1, timestamp:new Date() });
+                    transaction.set(questionRef, payload);
+                })
                 setMasterData(prev=>[payload,...prev])
             }
         } catch (error) {
@@ -339,7 +346,6 @@ function QuestionHistoryScreen() {
             deleteItem={deleteQuestion}
             currentCategory={currentCategory}
         />
-
         <OneButton {...{ text:'จัดการหมวดหมู่', submit:openCategory, variant:'dark' }} />
         <br/>
         <SearchAndBottom {...{ placeholder:'ค้นหาด้วยชื่อคำถาม', search, setSearch, download:false, exportToXlsx:()=>{openProduct(initialQuestion)}, text:'เพิ่มคำถาม/คำตอบ' }} />
