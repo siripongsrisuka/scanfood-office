@@ -10,8 +10,12 @@ import { useSelector } from "react-redux";
 import { normalSort } from "../Utility/sort";
 import { initialQuestion } from "../configs";
 
+const csTeams = new Set(
+    ['WigonwgzboSJbx3QEerBgdLAHR02','GIQ8n8xmJkez5x6WFp368Gl2FC42','yvXmDb0xJbRZhhe8QwTARjcsUnm2','oJCICD7QRGQc2JsT4xRpe08nxwN2']
+)
 
 function QuestionScreen() {
+    const { office: { humanRight } } = useSelector((state)=> state.office);
     const { profile:{ id:profileId, name:profileName } } = useSelector(state=>state.profile);
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
@@ -23,6 +27,25 @@ function QuestionScreen() {
     const [question_Modal, setQuestion_Modal] = useState(false);
     const [resultLength, setResultLength] = useState(0);
     const [learnStatus, setLearnStatus] = useState(true);
+
+    const { score, retweets } = useMemo(()=>{
+        let staffs =  humanRight.filter(a=>csTeams.has(a.id))
+        let score = staffs.map(item=>{
+            return { ...item, score: masterData.filter(a=>a.lastLearn.some(i=>i.profileId === item.id)).length}
+        });
+        let retweets = staffs.map(item=>{
+                //lastRetweet
+                const retweetCount = masterData.reduce((count, question) => {
+                    const retweet = question.lastRetweet ? question.lastRetweet.find(i => i.profileId === item.id) : null;
+                    return count + (retweet ? retweet.qty || 1 : 0);
+                }, 0);
+                return { ...item, score: retweetCount }
+            });
+            score = normalSort('score', score);
+            retweets = normalSort('score', retweets);
+            return { score, retweets }
+        },[humanRight,masterData])
+ 
 
     const [option, setOption] = useState({id:'1',name:'เรียนรู้แล้ว', value:'1', length:0 });
     const { id:optionId, name:optinName, value, length } = option;
@@ -86,7 +109,8 @@ function QuestionScreen() {
             return {
                 lastLearn:[],
                 ...doc.data(),
-                id:doc.id
+                id:doc.id,
+                type: doc.data().type || 'question'
             }
         });
         const arraySorted = normalSort('retweetCount', result);
@@ -120,10 +144,10 @@ function QuestionScreen() {
                 const newLastRetweet = lastRetweet.some(item => item.profileId === profileId)
                     ? lastRetweet.map(item =>
                         item.profileId === profileId
-                            ? { ...item, timestamp }
+                            ? { ...item, timestamp, qty: item.qty ? item.qty + 1 : 1 }
                             : item
                     )
-                    : [...lastRetweet, { profileId, profileName, timestamp }];
+                    : [...lastRetweet, { profileId, profileName, timestamp, qty:1 }];
 
                 transaction.update(questionRef, {
                     retweetCount: newRetweetCount,
@@ -237,7 +261,26 @@ function QuestionScreen() {
             handleLearn={handleLearn}
         />
         <Modal_Loading show={loading} />
+        <div style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)', padding: '10px', borderRadius: '8px' }} >
+            <h5>🌟🌟🌟High Performance Skill Leader</h5>
+            <div style={{ display:'flex', padding:5, paddingBottom:0, overflowX:'auto' }} >
+                    {score.map((item,index)=>
+                    <div key={index} style={{ marginRight: '10px', textAlign: 'center', minWidth:'80px' }} >
+                        <img style={{ width:'50px', borderRadius:'50%' }} src={item.imageId} />
+                        <p>{item.name} : {item.score}</p>
+                    </div>)}
+            </div>
+            <h5>🌟🌟🌟Retweet Skill Leader</h5>
+            <div style={{ display:'flex', padding:5, paddingBottom:0, overflowX:'auto' }} >
+                    {retweets.map((item,index)=>
+                    <div key={index} style={{ marginRight: '10px', textAlign: 'center', minWidth:'80px' }} >
+                        <img style={{ width:'50px', borderRadius:'50%' }} src={item.imageId} />
+                        <p>{item.name} : {item.score}</p>
+                    </div>)}
+            </div>
+        </div>
         <SlideOptions {...{ value, handleChange, options, show:true }} />
+                        
         <SearchControl {...{ placeholder:'ค้นหาด้วยชื่อ', search, setSearch }} />
         
         <CategoryControl {...{ warehouseCategory:category, categorySetting, setCategorySetting }} />

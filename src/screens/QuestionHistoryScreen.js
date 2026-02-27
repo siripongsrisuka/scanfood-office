@@ -91,7 +91,12 @@ function QuestionHistoryScreen() {
         const query = await db.collection('question').get();
         const result = query.docs.map(doc=>{
             const { createdAt, ...data } = doc.data();
-            return {...data, id:doc.id, createdAt:formatTime(createdAt) }
+            return {
+                ...data, 
+                id:doc.id, 
+                createdAt:formatTime(createdAt),
+                type: doc.data().type || 'question'
+            }
         });
         return normalSort('createdAt',result);
 
