@@ -3,7 +3,7 @@ export default {
     answer:'',
     id:'',
     category:[],
-    type:'', // question, problem
+    type:'question', // question, problem
     status:'requested', // requested, approved, rejected
     createdAt:new Date(),
     profileId:'', // ผู้สร้างคำถาม

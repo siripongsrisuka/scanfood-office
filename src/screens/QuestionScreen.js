@@ -256,10 +256,10 @@ function QuestionScreen() {
                 </thead>
                 <tbody  >
                 {currentDisplay.map((item,index) => {
-                    const { question, answer, id, retweetCount = 0,  } = item;
+                    const { question, answer, id, retweetCount = 0, type=''  } = item;
                     return <tr   key={index} >
                                 <td style={styles.container2}>{index+1}</td>
-                                <td onClick={()=>{openQuestionModal(item)}} >{question}</td>
+                                <td onClick={()=>{openQuestionModal(item)}} >[{type==='question'?'คำถาม🤔':'ปัญหา🥶'}]{question}</td>
                                 <td onClick={()=>{openQuestionModal(item)}} >
                                 {answer.split('\n').map((line, index) => (
                                 <React.Fragment key={index}>
