@@ -16,6 +16,8 @@ import {
   Tooltip
 } from "react-bootstrap";
 import { db } from "../db/firestore";
+import { formatTime } from "../Utility/function";
+import { scanfoodAPI } from "../Utility/api";
 
 
 function CodeRelativeScreen() {
@@ -24,21 +26,43 @@ function CodeRelativeScreen() {
     const [search, setSearch] = useState('');
     const [currentDisplay, setCurrentDisplay] = useState([]);
 
-    async function testData(){
-        const snap = await db
-            .collection('checkout')
-              .where('shopId','==','cQpATdNiK697JkaqHg5k')
-              .where('billDate','in',['20260225'])
-            .count()
-            .get();
-        alert(snap.data().count);
-    }
+    useEffect(()=>{
+
+    },[])
+
+
+    async function fetchMasterData() {
+        setLoading(true);
+        try {
+            const response = await scanfoodAPI.post(
+                "/office/newCustomer/",
+                {
+                    
+                }
+            );
+            const { status, data } = response;
+            const { shops } = data;
+            const sortedShops = shops.map(doc=>{
+                const { createdDate, ...rest } = doc.data();
+                return {
+                    ...rest,
+                    createdDate: formatTime(createdDate),
+                    id:doc.id
+                }
+            })
+        
+            setMasterData(sortedShops);
+        } catch (error) {
+            alert(error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
   return (
     <div style={styles.container} >
-        <h1>ผูก Code กับร้านใหม่</h1>
-        <Button onClick={testData} >Test</Button>
+        <h1>ผูก Code กับบัญชีร้านใหม่</h1>
         <div>
         <h6>จำนวน : {currentDisplay.length} ร้านค้า</h6>
         <Table striped bordered hover responsive  variant="light"   >
@@ -47,6 +71,7 @@ function CodeRelativeScreen() {
                 <th  style={styles.container2}>No.</th>
                 <th  style={styles.container3}>code</th>
                 <th  style={styles.container5}>ร้านค้า</th>
+                <th  style={styles.container5}>เบอร์โทร</th>
                 <th  style={styles.container5}>วันที่สมัคร</th>
             </tr>
             </thead>
@@ -57,10 +82,9 @@ function CodeRelativeScreen() {
                             <td style={styles.container4}>{index+1}.</td>
                             <td >{code}</td>
                             <td >{name}</td>
-                            <td >
-                            </td>
-                            <td style={styles.container4} ></td>
-                            <td style={styles.container4} >{tel}</td>
+                            <td >{tel}</td>
+                            <td >{vip}</td>
+                            <td style={styles.container4} >{vipExpire}</td>
                         </tr>
             })}
             </tbody>

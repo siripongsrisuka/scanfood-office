@@ -115,7 +115,7 @@ function SubscriptionScreen() {
                 const { id, name, vip, vipExpire, tel, code } = item;
                 return <tr   key={id} >
                             <td style={styles.container4}>{index+1}.</td>
-                            <td >{code}</td>
+                            <td >{code||id}</td>
                             <td onClick={()=>{billHistory(id)}} >{name}<i class="bi bi-search"></i></td>
                             <td >{
                             vip.map(a=>{

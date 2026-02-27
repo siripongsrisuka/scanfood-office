@@ -5,7 +5,8 @@ import {
   Col,
   Image
 } from "react-bootstrap";
-import { FloatingArea, FloatingText } from "../components";
+import { FloatingArea, FloatingText, OneButton } from "../components";
+import { useSelector } from "react-redux";
 
 function Modal_Question({
   backdrop=true, // true/false/static
@@ -14,15 +15,18 @@ function Modal_Question({
   onHide,
   centered=true,
   current,
-  submit
+  submit,
+  handleLearn
 }) {
-    const { question, answer, imageUrls = [], guideline } = current;
+    const { profile:{ id:profileId } } = useSelector(state=>state.profile);
+    const { question, answer, imageUrls = [], guideline, lastLearn = [], id } = current;
 
     function handleSubmit(){
+        if(!lastLearn.some(a=>a.profileId === profileId) )return;
         const ok = window.confirm('คุณแน่ใจหรือไม่ที่จะคัดลอกและดันการเจอปัญหานี้?');
         if(!ok) return;
         submit(current);
-    }
+    };
 
   return (
     <Modal
@@ -67,6 +71,10 @@ function Modal_Question({
                 </Col>
             ))}
         </Row>
+        {lastLearn.some(a=>a.profileId === profileId) 
+          ? null
+          :<OneButton {...{ text:'Upskill now', submit:()=>{handleLearn(id)} }} />
+        }
       </Modal.Body>
     </Modal>
   );

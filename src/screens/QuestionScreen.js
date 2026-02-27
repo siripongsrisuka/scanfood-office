@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   Table,
 } from "react-bootstrap";
-import { CategoryControl, SearchControl } from "../components";
+import { CategoryControl, SearchControl, SlideOptions } from "../components";
 import { Modal_Loading, Modal_Question } from "../modal";
 import { db } from "../db/firestore";
 import { compareArrays, formatTime, searchFilterFunction, searchMultiFunction, toastSuccess, totalField } from "../Utility/function";
@@ -22,6 +22,33 @@ function QuestionScreen() {
     const [currentQuestion, setCurrentQuestion] = useState(initialQuestion);
     const [question_Modal, setQuestion_Modal] = useState(false);
     const [resultLength, setResultLength] = useState(0);
+    const [learnStatus, setLearnStatus] = useState(true);
+
+    const [option, setOption] = useState({id:'1',name:'เรียนรู้แล้ว', value:'1', length:0 });
+    const { id:optionId, name:optinName, value, length } = option;
+
+    const thisOptions = [
+        {id:'1',name:'เรียนรู้แล้ว', value:'1'},
+        {id:'2',name:'ห้ามดู', value:'2'},
+    ];
+
+    const options = useMemo(()=>{
+        return thisOptions.map(a=>({ id:a.id, name:a.name, value:a.value, length:
+            a.id === '1' ? masterData.filter(a=>a.lastLearn.some(item=>item.profileId===profileId)).length
+            :masterData.filter(a=>!a.lastLearn.some(item=>item.profileId===profileId)).length
+            }))
+    },[thisOptions,masterData,profileId]);
+
+    const handleChange = (value) => {
+        const option = options.find(a=>a.value === value)
+        setOption(option);
+    };
+    
+
+    // const { } = useMemo(() => {
+
+    // }, [search, masterData]);
+
 
     function openQuestionModal(item){
         setCurrentQuestion(item);
@@ -55,7 +82,13 @@ function QuestionScreen() {
         const query = await db.collection('question')
             .where('status','==','approved')
             .get();
-        const result = query.docs.map(doc=>({...doc.data(), id:doc.id}));
+        const result = query.docs.map(doc=>{
+            return {
+                lastLearn:[],
+                ...doc.data(),
+                id:doc.id
+            }
+        });
         const arraySorted = normalSort('retweetCount', result);
         return arraySorted;
     };
@@ -68,6 +101,7 @@ function QuestionScreen() {
 
 
         setLoading(true);
+        const timestamp = new Date();
         try {
             const questionRef = db.collection('question').doc(id);
             const data = await db.runTransaction(async (transaction) => {
@@ -86,14 +120,15 @@ function QuestionScreen() {
                 const newLastRetweet = lastRetweet.some(item => item.profileId === profileId)
                     ? lastRetweet.map(item =>
                         item.profileId === profileId
-                            ? { ...item, timestamp: new Date() }
+                            ? { ...item, timestamp }
                             : item
                     )
-                    : [...lastRetweet, { profileId, profileName, timestamp: new Date() }];
+                    : [...lastRetweet, { profileId, profileName, timestamp }];
 
                 transaction.update(questionRef, {
                     retweetCount: newRetweetCount,
-                    lastRetweet: newLastRetweet
+                    lastRetweet: newLastRetweet,
+                    lastRetweetAt: timestamp, // เอาไว้ดึงแสดงผลล่าสุดว่าดันเมื่อไหร่
                 });
                 return { ...data, retweetCount: newRetweetCount, lastRetweet: newLastRetweet };
             });
@@ -116,7 +151,10 @@ function QuestionScreen() {
         const length = categorySetting.length;
         const thisTotalField = totalField(categorySetting,'id');
         let result = []
-        for(const item of masterData){
+        const filteredData = optionId === '1'
+            ? masterData.filter(a=>a.lastLearn.some(item=>item.profileId===profileId))
+            : masterData.filter(a=>!a.lastLearn.some(item=>item.profileId===profileId))
+        for(const item of filteredData){
             if(length >=1){
                 if(compareArrays(item.category.slice(0,length),thisTotalField)){
                     result.push(item)
@@ -132,7 +170,7 @@ function QuestionScreen() {
         }
 
         setCurrentDisplay(result);
-    },[masterData,categorySetting,search]);
+    },[masterData,categorySetting,search,optionId]);
 
 
     async function copyAndRetweet(item){
@@ -140,6 +178,52 @@ function QuestionScreen() {
         navigator.clipboard.writeText(item.guideline);
         reTweet(item.id,true);
 
+    };
+
+    async function handleLearn(id){
+        const ok = window.confirm('คุณแน่ใจหรือไม่ที่จะเรียนรู้ปัญหานี้?');
+        if(!ok) return;
+        setQuestion_Modal(false)
+
+        setLoading(true);
+        try {
+            const timestamp = new Date();
+            const questionRef = db.collection('question').doc(id);
+            const data = await db.runTransaction(async (transaction) => {
+                const questionDoc = await transaction.get(questionRef);
+                if (!questionDoc.exists) {
+                    throw "Document does not exist!";
+                }
+
+                const data = questionDoc.data();
+                const { learnCount = 0, lastLearn = [] } = data;
+                const lastLearnTime = lastLearn.find(item => item.profileId === profileId);
+                if (lastLearnTime) {
+                    throw "คุณได้เรียนรู้ปัญหานี้แล้ว";
+                }
+                const newLearnCount = learnCount + 1;
+                const newLastLearn = [...lastLearn, { profileId, profileName, timestamp }]
+
+                transaction.update(questionRef, {
+                    learnCount: newLearnCount,
+                    lastLearn: newLastLearn,
+                    lastLearnAt: timestamp, // เอาไว้ดึงแสดงผลล่าสุดว่าดันเมื่อไหร่
+                });
+                return { ...data, learnCount: newLearnCount, lastLearn: newLastLearn, lastLearnAt: timestamp };
+            });
+            const newMasterData = masterData.map(item => {
+                if (item.id === id) {
+                    return { ...item, ...data };
+                }
+                return item;
+            });
+            setMasterData(normalSort('learnCount', newMasterData));
+            toastSuccess('คุณได้เรียนรู้ปัญหานี้เรียบร้อยแล้ว');
+        } catch (error) {
+            alert(error);
+        } finally {
+            setLoading(false);
+        }
     }
 
   return (
@@ -150,9 +234,10 @@ function QuestionScreen() {
             onHide={() => setQuestion_Modal(false)}
             current={currentQuestion}
             submit={copyAndRetweet}
+            handleLearn={handleLearn}
         />
         <Modal_Loading show={loading} />
-
+        <SlideOptions {...{ value, handleChange, options, show:true }} />
         <SearchControl {...{ placeholder:'ค้นหาด้วยชื่อ', search, setSearch }} />
         
         <CategoryControl {...{ warehouseCategory:category, categorySetting, setCategorySetting }} />
@@ -163,12 +248,15 @@ function QuestionScreen() {
                     <th style={styles.container2}>ลำดับ</th>
                     <th style={styles.container3}>คำถาม</th>
                     <th style={styles.container4}>คำตอบ</th>
-                    <th style={styles.container3}>retweet</th>
+                    {optionId==='1'
+                        ?<th style={styles.container3}>retweet</th>
+                        :null
+                    }
                 </tr>
                 </thead>
                 <tbody  >
                 {currentDisplay.map((item,index) => {
-                    const { question, answer, id, retweetCount = 0 } = item;
+                    const { question, answer, id, retweetCount = 0,  } = item;
                     return <tr   key={index} >
                                 <td style={styles.container2}>{index+1}</td>
                                 <td onClick={()=>{openQuestionModal(item)}} >{question}</td>
@@ -180,7 +268,11 @@ function QuestionScreen() {
                                 </React.Fragment>
                                 ))}
                                 </td>
-                                <td onClick={()=>{reTweet(id)}} style={styles.container3}><i class="bi bi-chevron-double-up"></i> {retweetCount}</td>
+                                {optionId==='1'
+                                    ?<td onClick={()=>{reTweet(id)}} style={styles.container3}><i class="bi bi-chevron-double-up"></i> {retweetCount}</td>
+                                    :null
+                                }
+                                
                             </tr>
                 })}
                 </tbody>
