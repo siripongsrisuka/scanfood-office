@@ -73,7 +73,7 @@ async function fetchHumanResource() {
         const rightIds = new Set(sideBar.map(a=>a.id))
         const { id, rights, chat_id } = current;
         const duplicateChatId = currentHumans.find(a=>a.chat_id === chat_id && a.id !== id);
-        if(duplicateChatId) return alert('มี chat_id นี้ในระบบแล้ว กรุณาเปลี่ยนใหม่');
+        if(duplicateChatId && chat_id) return alert('มี chat_id นี้ในระบบแล้ว กรุณาเปลี่ยนใหม่');
         setHuman_Modal(false)
 
         const findHuman = currentHumans.find(a=>a.id===id);
