@@ -467,6 +467,7 @@ function CustomerProfileScreen() {
                                           src={img}
                                           alt={`note-upload-${index}`}
                                           style={{ width: 150, height: 150, objectFit:'contain' }}
+                                          onClick={() => window.open(img, '_blank', 'noopener,noreferrer')}
                                         />
                                       </div>
                                     ))}
