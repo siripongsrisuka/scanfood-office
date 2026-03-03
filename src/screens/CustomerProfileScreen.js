@@ -462,7 +462,8 @@ function CustomerProfileScreen() {
                               {imageUrls && imageUrls.length > 0
                                 ? <div style={{ display: "flex", flexWrap: "wrap", marginTop: 10 }}>
                                     {imageUrls.map((img, index) => (
-                                      <div key={index} style={{ margin: 10 }} >
+                                      <div key={index} style={{ margin: 10, position:'relative' }} >
+                                      <i style={{ position: 'absolute', top: 0, right: 40, cursor: 'pointer' }} class="bi bi-search"></i>
                                         <img
                                           src={img}
                                           alt={`note-upload-${index}`}
