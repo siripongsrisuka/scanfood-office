@@ -316,6 +316,12 @@ export default [
       to: 'source',
       id:'707'
     },
+    {
+      topic: '7.8 จองคิวทอง',
+      icon: 'bi-speedometer',
+      to: 'trainingSchedule',
+      id:'708'
+    },
 
     
    

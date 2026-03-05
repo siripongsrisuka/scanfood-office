@@ -48,8 +48,10 @@ import PaymentFailedScreen from "./PaymentFailedScreen";
 import CustomerSuccessShiftScreen from "./CustomerSuccessShiftScreen";
 import SubscriptionScreen from "./SubscriptionScreen";
 import CodeRelativeScreen from "./CodeRelativeScreen";
+import TrainingScheduleScreen from "./TrainingScheduleScreen";
 
 export {
+    TrainingScheduleScreen,
     CodeRelativeScreen,
     SubscriptionScreen,
     CustomerSuccessShiftScreen,
