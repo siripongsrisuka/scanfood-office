@@ -80,7 +80,12 @@ function OfficeScreen() {
                   <div style={styles.container} >
 
                       <div style={styles.container2} >
-                        <Dropdown title="&emsp;&emsp;&emsp;เมนู&emsp;&emsp;&emsp;" trigger='click' style={styles.container3}  >
+                        <Dropdown 
+                            title="&emsp;&emsp;&emsp;เมนู&emsp;&emsp;&emsp;" 
+                            trigger='click' 
+                            style={styles.container3} 
+                            menuStyle={{ maxHeight: '70vh', overflowY: 'auto' }}
+                             >
                             <Accordion style={{minWidth:'200px'}} defaultActiveKey={0}  >
                               {listDisplay.map((item,index)=>{
                                 const { topic, value } = item;
