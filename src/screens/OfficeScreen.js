@@ -84,7 +84,7 @@ function OfficeScreen() {
                             title="&emsp;&emsp;&emsp;เมนู&emsp;&emsp;&emsp;" 
                             trigger='click' 
                             style={styles.container3} 
-                            menuStyle={{ maxHeight: '70vh', overflowY: 'auto' }}
+                            menuStyle={{ maxHeight: '70vh', overflowY: 'auto', minWidth:'300px' }}
                              >
                             <Accordion style={{minWidth:'200px'}} defaultActiveKey={0}  >
                               {listDisplay.map((item,index)=>{
