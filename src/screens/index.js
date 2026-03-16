@@ -49,8 +49,10 @@ import CustomerSuccessShiftScreen from "./CustomerSuccessShiftScreen";
 import SubscriptionScreen from "./SubscriptionScreen";
 import CodeRelativeScreen from "./CodeRelativeScreen";
 import TrainingScheduleScreen from "./TrainingScheduleScreen";
+import UploadStaffScreen from "./UploadStaffScreen";
 
 export {
+    UploadStaffScreen,
     TrainingScheduleScreen,
     CodeRelativeScreen,
     SubscriptionScreen,

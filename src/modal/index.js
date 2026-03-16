@@ -2,6 +2,7 @@ import Modal_Loading from "./Modal_Loading";
 import Modal_FlatlistSearchFranchise from "./Modal_FlatlistSearchFranchise";
 import Modal_ExtraDay from "./Modal_ExtraDay";
 import Modal_Question from "./Modal_Question";
+import Modal_QuotationMini from "./Modal_QuotationMini";
 
 import Modal_OneInput from "./Modal_OneInput";
 import Modal_Information from "./Modal_Infomation";
@@ -34,6 +35,7 @@ import Modal_Note from "./Modal_Note";
 import Modal_Shop from "./Modal_Shop";
 
 export { 
+    Modal_QuotationMini,
     Modal_Shop,
     Modal_Note,
     Modal_WarehouseImage,

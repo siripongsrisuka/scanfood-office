@@ -79,7 +79,7 @@ function Modal_Qrcode({
       size={size}
     >
       <Modal.Header closeButton>
-        <h2><b>QRCode ชำระเงิน</b></h2>
+        <h2><b>ใบเสนอราคาอย่างย่อ</b></h2>
       </Modal.Header>
 
       <Modal.Body style={{ display:'flex', flexDirection:'column', alignItems:'center' }} >

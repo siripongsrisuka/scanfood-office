@@ -13,7 +13,7 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
 } from 'recharts';
-import { Modal_Cancel, Modal_Customer, Modal_FlatlistSearchShop, Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput, Modal_So, Modal_Qrcode, Modal_DatePicker, Modal_QuotationMini } from "../modal";
+import { Modal_Cancel, Modal_Customer, Modal_FlatlistSearchShop, Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput, Modal_So, Modal_Qrcode, Modal_DatePicker } from "../modal";
 import { db, prepareFirebaseImage } from "../db/firestore";
 import { OneButton, SlideOptions } from "../components";
 import { scanfoodAPI } from "../Utility/api";
@@ -164,13 +164,12 @@ function SaleScreen() {
 
     const thisOptions = [
         {id:'1',name:'ลูกค้าใหม่', value:'1'},
-        {id:'2',name:'ใบเสนอราคา', value:'2'},
-        // {id:'3',name:'success', value:'3'},
-        // {id:'4',name:'waste', value:'4'},
-        {id:'6',name:'แพ็กเกจ', value:'6'},
-        {id:'7',name:'อุปกรณ์', value:'7'},
+        {id:'2',name:'so', value:'2'},
+        {id:'3',name:'success', value:'3'},
+        {id:'4',name:'waste', value:'4'},
         {id:'5',name:'memo', value:'5'},
-
+        {id:'6',name:'SW', value:'6'},
+        {id:'7',name:'HW', value:'7'},
     ];
 
     const options = useMemo(()=>{
@@ -328,180 +327,144 @@ function SaleScreen() {
     // 200%
     async function handleSo(payload){
         const { oneMonth, requestDate, manualPaidImage, manualPaid,
-            taxEnable, card, taxStep, installments
+            taxEnable, taxImageId
          } = currentSo;
         setSo_Modal(false)
 
         if(!shopId && oneMonth) return alert('ยังไม่มี shopId');
 
         setLoading(true);
-         // beamScanfood(VAT), beamShopchamp, kbank, posxpay
-        const paymentType = ['2','3'].includes(taxStep)
-            ?card
-                ?'beamShopchamp(VAT)'
-                :'kbank'
-            :card
-                ?'beamScanfood'
-                :'posxpay';
-
-        
-        
         
         try {
             const amount = isGodIt(profileId)
                 ?1 // payload.net
                 :payload.net
-  
-      
-            // const autoPaymentRef = db.collection('autoPayment').doc();
+            let imageUrl = manualPaidImage;
+            if(manualPaidImage && manualPaid){
+                imageUrl = await prepareFirebaseImage(manualPaidImage,'/saleEvident/','evident')
+            };
+            let taxImageUrl = taxImageId;
+            if(taxImageId && taxEnable){
+                taxImageUrl = await prepareFirebaseImage(taxImageId,'/taxImage/','tax')
+            };
+            let autoPaymentRef = null;
             const timestamp = new Date();
-            let chargeId = '';
-            let qrCode = '';
-            // const base = {
-            //     shopId:`sale:${autoPaymentRef.id}`,
-            //     amount,
-            //     ref2:'auto',
-            // }
-            // const body = paymentType === 'posxpay'
-            //     ?{...base, channelType:'posxpay', serial:'WQRN002405000023', token:process.env.REACT_APP_API_TOKEN }
-            //     :paymentType === 'kbank'
-            //     ?{...base, channelType:'kbank', qrType:'3', merchantId:'KB000002246521' }
-            //     :paymentType === 'beamScanfood'
-            //     ?{...base, channelType:'beamLink', installments, paymentType:'beamScanfood' }
-            //     :{...base, channelType:'beamLink', installments, paymentType:'beamShopchamp'  }
-            // const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,body);
-            // const { 
-            //     chargeId:thisChargeId,
-            //     qrCode:thisQrCode,
-            // } = data?.data;
-            // qrCode = thisQrCode;
-            // if(paymentType==='posxpay'){
-            //     chargeId = thisChargeId;
-            // }
+            const { qrCode, paymentData } = await db.runTransaction(async (transaction) => {
 
-            const paymentData = {
-                ...currentSo,
-                ...payload,
-                orderNumber:'QT20260100001', // ยังไม่ใช้ orderNumber จริง เพราะต้องเอาเลขจาก documentNumber มา ซึ่งอยู่ใน transaction ถัดไป
-                // orderNumber:receiptNumber,
-                createdAt:timestamp,
-                chargeId,
-                qrCode,
-                shopId,
-                shopName,
-                billDate:stringYMDHMS3(timestamp),
-                profileId,
-                profileName,
-                saleId:profileId,
-                saleName:profileName,
-                process:paymentType==='posxpay'?"request":"preManual", // request, cancel, success, paid
-                team,
-                customerId,
-                name,
-                id:'autoPaymentRef.id',
-                requestDate, 
-                requestBillDate:stringYMDHMS3(requestDate),
-                chat_id,
-                chat_id_saleManager:-1003891934173, // หลุย 
-                chat_id_taxManager:-1003871427406, // ต้น
-                };
-            setCurrentSo(paymentData);
-            setQrcode_Modal(true)
+                const docNumberRef = db.collection("admin").doc('documentNumber');
+                autoPaymentRef = db.collection('autoPayment').doc();
+                const docNumberDoc = await transaction.get(docNumberRef);
 
-            // const { paymentData } = await db.runTransaction(async (transaction) => {
-
-            //     const docNumberRef = db.collection("admin").doc('documentNumber');
-            //     const docNumberDoc = await transaction.get(docNumberRef);
-
-            //     const { value } = docNumberDoc.data();
-            //     const thisCurrentSo = value.find(a=>a.id==='qt')
-            //     let newValue = [];
-            //     const thisMonth = timestamp.getMonth() + 1;
-            //     let receiptNumber = `QT${stringReceiptNumber(1)}`;
-            //     if(thisCurrentSo){
-            //         const { month, run } = thisCurrentSo;
-            //         let newRun = run + 1;
-            //         receiptNumber = `QT${stringReceiptNumber(newRun)}`;
+                const { value } = docNumberDoc.data();
+                const thisCurrentSo = value.find(a=>a.id==='so')
+                let newValue = [];
+                const thisMonth = timestamp.getMonth() + 1;
+                let receiptNumber = `SO${stringReceiptNumber(1)}`;
+                if(thisCurrentSo){
+                    const { month, run } = thisCurrentSo;
+                    let newRun = run + 1;
+                    receiptNumber = `SO${stringReceiptNumber(newRun)}`;
                     
-            //         if (thisMonth !== month) {
-            //             newRun = 1;
-            //             receiptNumber = `QT${stringReceiptNumber(newRun)}`;
-            //             newValue = value.map(a=>{
-            //             return a.id==='qt'
-            //                 ?{ month: thisMonth, run: newRun, id:'qt' }
-            //                 :a
-            //             })
-            //         } else {
-            //         newValue = value.map(a=>{
-            //             return a.id==='qt'
-            //                 ?{ month, run: newRun, id:'qt' }
-            //                 :a
-            //         })
-            //         }
-            //     } else {
-            //         newValue = [...value,{ month: thisMonth, run: 1, id:'qt' }]
-            //     };
-                
+                    if (thisMonth !== month) {
+                        newRun = 1;
+                        receiptNumber = `SO${stringReceiptNumber(newRun)}`;
+                        newValue = value.map(a=>{
+                        return a.id==='so'
+                            ?{ month: thisMonth, run: newRun, id:'so' }
+                            :a
+                        })
+                    } else {
+                    newValue = value.map(a=>{
+                        return a.id==='so'
+                            ?{ month, run: newRun, id:'so' }
+                            :a
+                    })
+                    }
+                } else {
+                    newValue = [...value,{ month: thisMonth, run: 1, id:'so' }]
+                };
+                let chargeId = '';
+                let qrCode = '';
+                if(!manualPaid){
+                    const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,{ 
+                        channelType:'posxpay',
+                        shopId:`sale:${autoPaymentRef.id}`,
+                        amount,
+                        serial:'WQRN002405000023',
+                        token:process.env.REACT_APP_API_TOKEN,
+                        ref2:'auto'
+                    });
 
-            //     transaction.update(docNumberRef, { value:newValue, timestamp: new Date() });
-            //     const paymentData = {
-            //         ...currentSo,
-            //         ...payload,
-            //         orderNumber:receiptNumber,
-            //         createdAt:timestamp,
-            //         chargeId,
-            //         qrCode,
-            //         shopId,
-            //         shopName,
-            //         billDate:stringYMDHMS3(timestamp),
-            //         profileId,
-            //         profileName,
-            //         saleId:profileId,
-            //         saleName:profileName,
-            //         process:paymentType==='posxpay'?"request":"preManual", // request, cancel, success, paid
-            //         team,
-            //         customerId,
-            //         name,
-            //         id:autoPaymentRef.id,
-            //         requestDate, 
-            //         requestBillDate:stringYMDHMS3(requestDate),
-            //         chat_id,
-            //         chat_id_saleManager:-1003891934173, // หลุย 
-            //         chat_id_taxManager:-1003871427406, // ต้น
-            //     };
-            //     if(taxEnable){
-            //         paymentData.taxProcess = 'waiting';
-            //     }
-            //     transaction.set(autoPaymentRef,paymentData)
-            //     return {
-            //         qrCode,
-            //         paymentData
-            //     }
-            // });
+                    const { 
+                        chargeId:thisChargeId,
+                        qrCode:thisQrCode,
+                    } = data?.data;
+                    chargeId = thisChargeId;
+                    qrCode = thisQrCode;
+                }
+
+
+                transaction.update(docNumberRef, { value:newValue, timestamp: new Date() });
+                const paymentData = {
+                    ...currentSo,
+                    ...payload,
+                    orderNumber:receiptNumber,
+                    createdAt:timestamp,
+                    chargeId,
+                    qrCode,
+                    shopId,
+                    shopName,
+                    billDate:stringYMDHMS3(timestamp),
+                    profileId,
+                    profileName,
+                    saleId:profileId,
+                    saleName:profileName,
+                    process:manualPaid?"manual":"request", // request, cancel, success, paid
+                    team,
+                    customerId,
+                    name,
+                    id:autoPaymentRef.id,
+                    requestDate, 
+                    requestBillDate:stringYMDHMS3(requestDate),
+                    manualPaidImage:imageUrl,
+                    chat_id,
+                    chat_id_saleManager:-1003891934173, // หลุย 
+                    chat_id_taxManager:-1003871427406, // ต้น
+                    taxImageId:taxImageUrl,
+                };
+                if(taxEnable){
+                    paymentData.taxProcess = 'waiting';
+                }
+                transaction.set(autoPaymentRef,paymentData)
+                return {
+                    qrCode,
+                    paymentData
+                }
+            });
 
             
 
 
 
-            // if(manualPaid){
-            //     const [ data1, data2 ] = await Promise.all([
-            //         send({...paymentData, chat_id }),
-            //         send({...paymentData, chat_id:paymentData.chat_id_saleManager }),
-            //     ])
-            //     const { message_id } = data1
-            //     const { message_id:message_id_saleManager } = data2
-            //     await db.collection('autoPayment').doc(autoPaymentRef.id).update({
-            //         message_id,
-            //         message_id_saleManager
-            //     });
-            //     toastSuccess('สร้างบิลสำเร็จ รอชำระเงิน');
-            // } else {
-            //     setQrcode(qrCode);
-            //     setAmount(amount);
-            //     setQrcode_Modal(true);
-            // }
-       
-            // setPayments(prev=>[paymentData,...prev]);
+            if(manualPaid){
+                const [ data1, data2 ] = await Promise.all([
+                    send({...paymentData, chat_id }),
+                    send({...paymentData, chat_id:paymentData.chat_id_saleManager }),
+                ])
+                const { message_id } = data1
+                const { message_id:message_id_saleManager } = data2
+                await db.collection('autoPayment').doc(autoPaymentRef.id).update({
+                    message_id,
+                    message_id_saleManager
+                });
+                toastSuccess('สร้างบิลสำเร็จ รอชำระเงิน');
+            } else {
+                setQrcode(qrCode);
+                setAmount(amount);
+                setQrcode_Modal(true);
+            }
+
+            setPayments(prev=>[paymentData,...prev]);
         } catch (error) {
             alert(error);
         } finally {
@@ -849,11 +812,6 @@ function SaleScreen() {
         {(isGodIt(profileId) || !!saleManagerTeam) && <OneButton {...{ text:"Profile", submit:openProfile }} />}
         
         <SlideOptions {...{ value, handleChange, options, show:true }} />
-        <Modal_QuotationMini
-            show={qrCode_Modal}
-            payload={currentSo}
-            onHide={()=>{setQrcode_Modal(false)}}
-        />
         <Modal_FlatListTwoColumn
             header={'Profile'}
             show={profile_Modal}
@@ -886,14 +844,13 @@ function SaleScreen() {
             hardwares={warehouse}
             submit={handleSo}
             disabled={optionId!=='1'} // ป้องกันหน้าอื่นแก้ข้อมูล so
-
         />
-        {/* <Modal_Qrcode
+        <Modal_Qrcode
             show={qrCode_Modal}
             onHide={()=>{setQrcode_Modal(false)}}
             qrCode={qrCode}
             amount={amount}
-        /> */}
+        />
         <Modal_FlatlistSearchShop
             show={connect_Modal}
             onHide={()=>{setConnect_Modal(false)}}

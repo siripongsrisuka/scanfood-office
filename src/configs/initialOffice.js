@@ -251,6 +251,12 @@ export default [
       to: 'changeTable',
       id:'128'
     },
+    {
+      topic: '6.11 อัปโหลดพนักงาน',
+      icon: 'bi-speedometer',
+      to: 'uploadStaff',
+      id:'128'
+    },
 
     {
       topic: '6.99 kbankReport',

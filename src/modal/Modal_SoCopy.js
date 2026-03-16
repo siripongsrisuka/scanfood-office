@@ -10,12 +10,12 @@ import {
 import { formatCurrency, formatCurrency2, summary } from "../Utility/function";
 import { MdRadioButtonUnchecked, MdRadioButtonChecked } from 'react-icons/md'; // replace with correct MaterialCommunityIcons mapping
 import { colors } from "../configs";
-import { CardComponent, FloatingArea, FloatingText, FooterButton, OneButton, RootImage } from "../components";
+import { CardComponent, FloatingArea, FloatingText, FooterButton, MasterCheckBox, OneButton, RootImage } from "../components";
 import DatePicker from "react-datepicker";
 import { SlCalender } from "react-icons/sl";
+import { Button } from "rsuite";
 import { useSelector } from "react-redux";
-import { RadioGroup, Radio, Button } from "rsuite";
-const { white, dark, theme3, five, one, nine, softWhite, green, six } = colors;
+const { white, dark, theme3, five, one, nine, softWhite, green, six, greenSanta } = colors;
 
 function Modal_So({
   backdrop=true, // true/false/static
@@ -29,38 +29,33 @@ function Modal_So({
   submit,
   hardwares,
   disabled,
-  manualChecked=false,
-  
+  manualChecked=false
 }) {
     const { profile:{ admin }} = useSelector(state=>state.profile);
     const fileInputRef = useRef(null);
+    const taxImageIdRef = useRef(null);
     
-    const { 
-        storeSize, 
-        software, 
-        requestDate = '', 
-        hardware, 
-        note = '', 
-        deliveryType = 'normal', 
-        oneMonth = false, 
-        manualPaidImage,
-        marketplaceFranchiseEnable,
-        taxAddress = '',
-        taxEmail = '',
-        taxStep = '0',
-        installments = '0',
-        card = false,
-        juristic = '0',
-        vatInfo,
+    const { storeSize, software, requestDate = '', hardware, note = '', 
+        deliveryType = 'normal', oneMonth = false, manualPaid, manualPaidImage,
+    marketplaceFranchiseEnable,
+    taxEnable = false,
+    etaxEnable = false,
+    hardCopyTaxEnable = false,
+    taxImageId = '',
+    taxAddress = '',
+    taxEmail = '',
+    receiptEnable = false,
+    taxStep = '0'
 } = current;
-    const { name: vatName, address: vatAddress, postcode: vatPostcode, taxId: vatTaxId, branch: vatBranch, email: vatEmail, tel: vatTel, contactName: vatContactName } = vatInfo || {};
+
+    
     const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => (
         <div  style={{ borderRadius:20 }} onClick={onClick} ref={ref}>
           {value}
         </div>
     ));
 
-  const { display, extraCharge, softwarePrice, net, hardwarePrice, deliveryFee, marketplaceFee, vat, withholdingTax, installmentFee, subtotal } = useMemo(()=>{
+  const { display, extraCharge, softwarePrice, net, hardwarePrice, deliveryFee, marketplaceFee } = useMemo(()=>{
     const thisSize = storeSize>100?100:storeSize;
     const display = licenses.map(({ name, price, color })=>({ name, ...price.find(b=>b.table===thisSize && b.save!==0), color }));
     const softwarePrice = oneMonth?1000:summary(software,'price')
@@ -76,40 +71,7 @@ function Modal_So({
     const marketplaceFee = marketplaceFranchiseEnable
         ?3000
         :0
-    const subtotal = extraCharge + softwarePrice + hardwarePrice  + marketplaceFee 
-    let beforeInstallments = subtotal + deliveryFee;
-    let installmentFee = 0;
-    // ถ้าจ่ายผ่านบัตรเครดิต ต้องบวกค่าธรรมเนียมการผ่อนชำระเข้าไปในราคาทั้งหมด
-    if(card){
-        const installmentRates = {
-            '0': 0.03,
-            '3': 0.0573,
-            '4': 0.0658,
-            '6': 0.0829,
-            '10': 0.1177
-        };
-        installmentFee = beforeInstallments * installmentRates[installments];
-        beforeInstallments = beforeInstallments + installmentFee;
-    }
-
-    let beforeVat = beforeInstallments;
-
-
-    let vat = 0;
-    let withholdingTax = 0;
-
-    // case ออกใบกำกับภาษีแบบอิเล็กทรอนิกส์(E-Tax) จะต้องบวก VAT 7% เข้าไปในราคาทั้งหมด และถ้าเป็นนิติบุคคลที่ซื้อซอฟต์แวร์ จะต้องหักภาษี ณ ที่จ่าย 3% จากราคาซอฟต์แวร์
-    if(['2','3'].includes(taxStep)){
-        vat = beforeVat * 0.07; // บวกราคาขึ้นอีก 7% ถ้าลูกค้าต้องการใบกำกับภาษีแบบอิเล็กทรอนิกส์(E-Tax)
-    };
-
-    if(juristic === '1' && softwarePrice>0){
-        withholdingTax = softwarePrice * 0.03; // หักภาษี ณ ที่จ่าย 3% สำหรับนิติบุคคลที่ซื้อซอฟต์แวร์
-    }
-    const net = beforeVat + vat - withholdingTax;
-
-
-    // const net = extraCharge + softwarePrice + hardwarePrice + deliveryFee + marketplaceFee;
+    const net = extraCharge + softwarePrice + hardwarePrice + deliveryFee + marketplaceFee;
 
       return {
           display,
@@ -118,24 +80,20 @@ function Modal_So({
           net,
           hardwarePrice,
           deliveryFee,
-          marketplaceFee,
-          vat,
-          withholdingTax,
-          installmentFee,
-          subtotal
+          marketplaceFee
       }
-  },[licenses,storeSize,software,hardware,deliveryType,oneMonth,marketplaceFranchiseEnable,taxStep, juristic, card, installments]);
+  },[licenses,storeSize,software,hardware,deliveryType,oneMonth,marketplaceFranchiseEnable]);
 
 
   function handleSubmit(){
     if(software.length===0 && hardware.length === 0 && !oneMonth && !marketplaceFranchiseEnable) return alert('เลือกอย่างน้อย 1 รายการ');
 
+    if(manualPaid && !manualPaidImage) return alert('กรุณาแนบสลิปการชำระเงิน');
 
-    if(taxStep !== '0' && !taxEmail) return alert('กรุณากรอกอีเมลสำหรับจัดส่งใบกำกับภาษี');
-    if(taxStep ==='3' && !taxAddress) return alert('กรุณากรอกที่อยู่สำหรับจัดส่งใบกำกับภาษี');
-    if(card && ['0','3','4'].includes(installments) && net <3000)return alert('ขั้นต่ำ 3,000 บาท')
-    if(card && installments ==='6' && net <4000)return alert('ขั้นต่ำ 4,000 บาท')
-    if(card && installments ==='10' && net <5000)return alert('ขั้นต่ำ 5,000 บาท')
+    if(taxEnable && !taxImageId) return alert('กรุณาแนบรูปภาพข้อมูลสำหรับออกใบกำกับภาษี');
+    if(taxEnable && etaxEnable && !taxEmail) return alert('กรุณากรอกอีเมลสำหรับจัดส่งใบกำกับภาษี');
+    if(taxEnable && hardCopyTaxEnable && !taxAddress) return alert('กรุณากรอกที่อยู่สำหรับจัดส่งใบกำกับภาษี');
+    if(taxEnable && !etaxEnable && !hardCopyTaxEnable && !receiptEnable) return alert('กรุณาเลือกอย่างน้อย 1 ประเภทใบกำกับภาษี');
 
     const ok = window.confirm('คุณแน่ใจที่จะเปิดบิลใช่หรือไม่?');
     if(!ok) return;
@@ -146,11 +104,7 @@ function Modal_So({
         hardwarePrice,
         deliveryFee,
         marketplaceFee,
-        net,
-        vat,
-        withholdingTax,
-        installmentFee,
-        subtotal
+        net
     })
   };
 
@@ -224,6 +178,9 @@ function Modal_So({
         fileInputRef.current.click();
     };
 
+    const handleButtonTaxClick = () => {
+        taxImageIdRef.current.click();
+    };
 
     const handleImageChange = (e) => {
         const file = e.target.files[0]; // Get the selected file
@@ -235,6 +192,22 @@ function Modal_So({
         reader.onloadend = async () => {
             // setImage(reader.result); // Set the image data as the result of FileReader
             setCurrent(prev=>({...prev,manualPaidImage:reader.result}))
+        };
+
+        reader.readAsDataURL(file); // Convert file to a base64 string
+        }
+    };
+
+    const handleTaxImageIdChange = (e) => {
+        const file = e.target.files[0]; // Get the selected file
+
+        if (file) {
+
+        // Create a FileReader to read the file
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            // setImage(reader.result); // Set the image data as the result of FileReader
+            setCurrent(prev=>({...prev,taxImageId:reader.result}))
         };
 
         reader.readAsDataURL(file); // Convert file to a base64 string
@@ -407,24 +380,55 @@ function Modal_So({
             </Form.Select>
             <br/>
             <h2>5.3 โน๊ตแจ้งคลัง</h2>
-             <h6>บังคับกรอกข้อมูลต่อไปนี้</h6>
-            <ul>
-                <li style={{ textDecoration: 'underline' }} >ที่อยู่จัดส่ง ได่แก่ ชื่อผู้รับ ที่อยู่ เบอร์ติดต่อ</li>
-                <li>ip address เราเตอร์ของที่ร้าน เพื่อให้คลังตั้งค่าเครื่องปริ้นแลนให้</li>
-                <li>ถ้าร้านยังไม่ติดเน็ต ให้แจ้งว่า ip address : ร้านยังไม่ติดเน็ต</li>
-            </ul>
             <FloatingArea
                 name="note"
-                placeholder="ได้แก่ ip address, ที่อยู่จัดส่ง"
+                placeholder="เช่น ip address, ที่อยู่จัดส่ง"
                 value={note}
                 onChange={(event)=>{setCurrent({...current,note:event.target.value})}}
             />
         </CardComponent>
-        
+        <CardComponent title='รูปแบบการชำระเงิน' maxWidth={'95vw'} accentColor={six}  >
+            <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
+                <div style={{ marginBottom: 12, fontWeight: 'bold' }}>
+                    <h2>6. รูปแบบการชำระเงิน</h2>
+                </div>
+                <Form.Select 
+                        aria-label="Default select example" 
+                        value={manualPaid} 
+                        onChange={(event)=>{
+                            event.preventDefault()
+                            setCurrent(prev=>({...prev, manualPaid:event.target.value==='true'}))
+                        }}
+                        style={{width:'250px'}}
+                    >
+                        <option value={false}>ชำระเงินอัตโนมัติ</option>
+                        <option value={true} >ชำระเงินแบบแนบสลิป</option>
+                </Form.Select>
+                {manualPaid
+                    ?<form >
+                        <input
+                        type="file"
+                        ref={fileInputRef}
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        style={{ display: 'none' }} // Hide the default file input
+                        />
+                        <Button onClick={handleButtonClick} variant="light">
+                        {manualPaidImage
+                            ?<Image style={styles.image} src={manualPaidImage} />
+                            :<RootImage style={styles.image} />
+                        }
+                        
+                        </Button>
+                    </form>
+                    :null
+                }
+            </div>
+        </CardComponent>
         <CardComponent title='ใบกำกับภาษี' maxWidth={'95vw'} accentColor={'#FA8900'}  >
             <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
                 <div style={{ marginBottom: 12, fontWeight: 'bold' }}>
-                    <h2>6. ลูกค้าต้องการใบกำกับภาษี/ใบเสร็จรับเงินไหม?</h2>
+                    <h2>7. ลูกค้าต้องการใบกำกับภาษี/ใบเสร็จรับเงินไหม?</h2>
                 </div>
                 <Form.Select 
                         aria-label="Default select example" 
@@ -433,183 +437,97 @@ function Modal_So({
                             event.preventDefault()
                             setCurrent(prev=>({...prev, taxStep:event.target.value}))
                         }}
-                        style={{width:'350px'}}
+                        style={{width:'280px'}}
                     >
                         <option value="0">ไม่ต้องการ</option>
                         <option value="1" >ต้องการใบเสร็จรับเงิน</option>
                         <option value="2" >ต้องการใบกำกับภาษีแบบอิเล็กทรอนิกส์(E-Tax)</option>
-                        <option value="3" >ต้องการ(E-Tax)และแบบกระดาษ</option>
+                        <option value="3" >ต้องการใบกำกับภาษีแบบอิเล็กทรอนิกส์(E-Tax)และแบบกระดาษ</option>
                 </Form.Select>
                 {taxStep !== '0'
                     ?<React.Fragment>
-                        <br/>
-                        <h6>6.1 ประเภทลูกค้า</h6>
-                        <RadioGroup
-                            name="juristic"
-                            value={juristic}
-                            onChange={(value) =>
-                                setCurrent((prev) => ({ ...prev, juristic: value }))
-                            }
-                            style={{ paddingLeft:20 }}
-                            >
-                            <Radio value="0">บุคคลธรรมดา</Radio>
-                            <Radio value="1">นิติบุคคล</Radio>
-                        </RadioGroup>
-                        <h6>6.2 กรอกข้อมูลสำหรับออกเอกสาร(กรอกทุกข้อ*)</h6>
-                        <Row>
-                            <Col sm='12' md='6' >
-                                <FloatingText
-                                    name="vatName"
-                                    placeholder="ชื่อธุรกิจ(ถ้าเป็นบุคคลธรรมดาให้กรอกชื่อ-นามสกุล)"
-                                    value={vatName}
-                                    onChange={(event)=>{setCurrent({...current,vatInfo:{...vatInfo,name:event.target.value}})}}
-                                />
-                            </Col>
-                            <Col sm='12' md='6' >
-                                <FloatingText
-                                    name="vatAddress"
-                                    placeholder="ที่อยู่"
-                                    value={vatAddress}
-                                    onChange={(event)=>{setCurrent({...current,vatInfo:{...vatInfo,address:event.target.value}})}}
-                                />
-                            </Col>
-                            {['2','3'].includes(taxStep) &&
-                            <Col sm='12' md='6' >
-                                    <FloatingText
-                                        name="vatPostcode"
-                                        placeholder="รหัสไปรษณีย์"
-                                        value={vatPostcode}
-                                        onChange={(event)=>{setCurrent({...current,vatInfo:{...vatInfo,postcode:event.target.value}})}}
-                                    />
-                                </Col>}
-                            {['2','3'].includes(taxStep) 
-                                ?<Col sm='12' md='6' >
-                                    <FloatingText
-                                        name="vatTaxId"
-                                        placeholder="เลขประจำตัวผู้เสียภาษี"
-                                        value={vatTaxId}
-                                        onChange={(event)=>{setCurrent({...current,vatInfo:{...vatInfo,taxId:event.target.value}})}}
-                                    />
-                                </Col>
-                                :null
-                            }
-                            {['2','3'].includes(taxStep) 
-                                ?<Col sm='12' md='6' >
-                                    <FloatingText
-                                        name="branch"
-                                        placeholder="สาขา(ถ้าไม่ใช่สำนักงานใหญ่ให้กรอกชื่อสาขา)"
-                                        value={vatBranch}
-                                        onChange={(event)=>{setCurrent({...current,vatInfo:{...vatInfo,vatBranch:event.target.value}})}}
-                                    />
-                                </Col>
-                                :null
-                            }
-                            {['2','3'].includes(taxStep) 
-                                ?<Col sm='12' md='6' >
-                                    <FloatingText
-                                        name="vatContactName"
-                                        placeholder="ชื่อผู้ติดต่อ"
-                                        value={vatContactName}
-                                        onChange={(event)=>{setCurrent({...current,vatInfo:{...vatInfo,contactName:event.target.value}})}}
-                                    />
-                                </Col>
-                                :null
+                        <h6>7.1 แนบรูปภาพข้อมูลสำหรับใช้ออกเอกสาร</h6>
+                        <h6 style={{ color:'red'}} >คำเตือน แนบรูปให้ถูกต้องและต้องมีข้อมูลครบถ้วน☠️☠️☠️</h6>
+                        {taxStep === '1'
+                            ?<OneButton variant="warning" text={'ตัวอย่างข้อมูลออกใบเสร็จรับเงิน'} />
+                            :<OneButton variant="warning" text={'ตัวอย่างข้อมูลออกใบกำกับภาษี'} />
+                        }
+                        <form >
+                            <input
+                            type="file"
+                            ref={taxImageIdRef}
+                            accept="image/*"
+                            onChange={handleTaxImageIdChange}
+                            style={{ display: 'none' }} // Hide the default file input
+                            />
+                            <Button onClick={handleButtonTaxClick} variant="light">
+                            {taxImageId
+                                ?<Image style={styles.image} src={taxImageId} />
+                                :<RootImage style={styles.image} />
                             }
                             
-                            
-                            <Col sm='12' md='6' >
-                                <FloatingText
-                                    name="vatEmail"
-                                    placeholder="อีเมล"
-                                    value={vatEmail}
-                                    onChange={(event)=>{setCurrent({...current,vatInfo:{...vatInfo,email:event.target.value}})}}
-                                />
-                            </Col>
-                            <Col sm='12' md='6' >
-                                <FloatingText
-                                    name="vatTel"
-                                    placeholder="เบอร์โทรศัพท์สำหรับติดต่อ"
-                                    value={vatTel}
-                                    onChange={(event)=>{setCurrent({...current,vatInfo:{...vatInfo,tel:event.target.value}})}}
-                                />
-                            </Col>
-                        </Row>
-                        <br/>
-                        <FloatingText
-                            name="taxEmail"
-                            placeholder="6.3 อีเมลสำหรับจัดส่งใบกำกับภาษี"
-                            value={taxEmail}
-                            onChange={(event)=>{setCurrent({...current,taxEmail:event.target.value})}}
+                            </Button>
+                        </form>
+                        <MasterCheckBox
+                            status={receiptEnable}
+                            color={greenSanta}
+                            onClick={()=>{
+                                setCurrent(prev=>({...prev, receiptEnable:!receiptEnable}))
+                            }}
+                            value='ขอ ใบเสร็จรับเงิน'
+                            disabled={false}
                         />
-                        {taxStep === '3'
+                        <br/>
+                        <MasterCheckBox
+                            status={etaxEnable}
+                            color={greenSanta}
+                            onClick={()=>{
+                                setCurrent(prev=>({...prev, etaxEnable:!etaxEnable}))
+                            }}
+                            value='ขอ E-Tax'
+                            disabled={false}
+                        />
+                        <br/>
+                        {etaxEnable || receiptEnable
+                            ?<FloatingText
+                                name="taxEmail"
+                                placeholder="อีเมลสำหรับจัดส่งใบกำกับภาษี"
+                                value={taxEmail}
+                                onChange={(event)=>{setCurrent({...current,taxEmail:event.target.value})}}
+                            />
+                            :null
+                        }
+                        <MasterCheckBox
+                            status={hardCopyTaxEnable}
+                            color={greenSanta}
+                            onClick={()=>{
+                                setCurrent(prev=>({...prev, hardCopyTaxEnable:!hardCopyTaxEnable}))
+                            }}
+                            value='ขอใบกำกับภาษีแบบกระดาษ(ใบจริง)'
+                            disabled={false}
+                        />
+                        {hardCopyTaxEnable
                             ?<FloatingArea
                                 name="taxAddress"
-                                placeholder={`6.4 ที่อยู่สำหรับจัดส่งใบกำกับภาษี`}
+                                placeholder="ที่อยู่สำหรับจัดส่งใบกำกับภาษี"
                                 value={taxAddress}
                                 onChange={(event)=>{setCurrent({...current,taxAddress:event.target.value})}}
                             />
                             :null
                         }
-                        <h6>* ทางบัญชีจะส่งใบกำกับภาษี(E-Tax)และใบเสร็จรับเงินทางอีเมลทุกวันศุกร์(ทุกเคส)</h6>
-                        <h6>* ทางบัญชีจะส่งใบกำกับภาษี(แบบกระดาษ)ทางไปรษณีย์ทุกวันจันทร์ถัดไป(เฉพาะเคสที่ร้องขอ)</h6>
+                        <h6>* ทางบัญชีจะส่งใบกำกับภาษีหรือใบเสร็จรับเงินทางอีเมลทุกวันศุกร์(ทุกเคส)</h6>
+                        <h6>* ทางบัญชีจะส่งใบกำกับภาษีหรือใบเสร็จรับเงินทางไปรษณีย์ทุกวันจันทร์ถัดไป(เฉพาะเคสที่ร้องขอ)</h6>
                      
                     </React.Fragment>
                     :null
                 }
             </div>
         </CardComponent>
-
-        <CardComponent title='รูปแบบการชำระเงิน' maxWidth={'95vw'} accentColor={six}  >
-            <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
-                <div style={{ marginBottom: 12, fontWeight: 'bold' }}>
-                    <h2>7. จ่ายผ่านบัตรเครดิตไหม?</h2>
-                </div>
-                <Form.Select 
-                        aria-label="Default select example" 
-                        value={card} 
-                        onChange={(event)=>{
-                            event.preventDefault()
-                            setCurrent(prev=>({...prev, card:event.target.value==='true'}))
-                        }}
-                        style={{width:'250px'}}
-                    >
-                        <option value={false}>ไม่ใช่</option>
-                        <option value={true} >ใช่</option>
-                </Form.Select>
-                {card
-                    ?<div style={{ paddingLeft:10 }} >
-                        <br/>
-                        <h6>7.1 เลือก รูปแบบการจ่าย?</h6>
-
-                        <RadioGroup
-                            name="installments"
-                            value={installments}
-                            onChange={(value) =>
-                                setCurrent((prev) => ({ ...prev, installments: value }))
-                            }
-                            >
-                            <Radio value="0">จ่ายเต็มจำนวน(+3%)</Radio>
-                            <Radio value="3">ผ่อน 3 เดือน(+5.73%)(ขั้นต่ำ 3,000)</Radio>
-                            <Radio value="4">ผ่อน 4 เดือน(+6.58%)(ขั้นต่ำ 3,000)</Radio>
-                            <Radio value="6">ผ่อน 6 เดือน(+8.29%)(ขั้นต่ำ 4,000)</Radio>
-                            <Radio value="10">ผ่อน 10 เดือน(+11.77%)(ขั้นต่ำ 5,000)</Radio>
-                        </RadioGroup>
-                        <p>*บวกราคาขั้นไปอีก x % เพราะค่าธรรมเนียมการผ่อนชำระ</p>
-                    </div>
-                    :null
-                }
-                
-            </div>
-        </CardComponent>
-        {manualPaidImage
-            ?<Image style={styles.image} src={manualPaidImage} />
-            :<RootImage style={styles.image} />
-        }
         {admin &&
             <CardComponent title='marketplace' maxWidth={'95vw'} accentColor={'#D9D9D9'}  >
             <div style={{ padding: 16, border: '1px solid #ccc', borderRadius: 8 }}>
                 <div style={{ marginBottom: 12, fontWeight: 'bold' }}>
-                    <h2>1. marketplace(เห็นเฉพาะแอดมิน)</h2>
+                    <h2>1. marketplace(เฉพาะแอดมิน)</h2>
                 </div>
                 <Form.Select 
                         aria-label="Default select example" 
