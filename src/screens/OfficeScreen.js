@@ -126,8 +126,10 @@ function OfficeScreen() {
                     <div style={styles.container8} >
                       <div onClick={()=>{setShort(true)}} style={styles.container9} > 
                         <i class="bi bi-list"></i>
+                        <h6  >V.2 </h6>
                       </div>
                       <img style={styles.container10} src="/logo512.png" />
+                       
                     </div>
                       <div style={styles.container11}>
                         <div className="resSidebar">
