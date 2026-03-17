@@ -6,10 +6,10 @@ import {
 import { db } from "../db/firestore";
 import { fetchLicense, formatTime, toastSuccess } from "../Utility/function";
 import { normalSort } from "../Utility/sort";
-import { Modal_Loading, Modal_So } from "../modal";
+import { Modal_Loading, Modal_Quotation } from "../modal";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { OneButton } from "../components";
-import { initialSo } from "../configs";
+import { initialQuotation } from "../configs";
 import { scanfoodAPI } from "../Utility/api";
 import { telegramDelete, telegramDeleteQueue } from "../Utility/telegram";
 
@@ -20,7 +20,7 @@ function ManualPaidScreen() {
     const [masterData, setMasterData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [so_Modal, setSo_Modal] = useState(false);
-    const [currentSo, setCurrentSo] = useState(initialSo);
+    const [currentSo, setCurrentSo] = useState(initialQuotation);
     const [licenses, setLicenses] = useState([]);
 
     async function fetchManualPaidData(){
@@ -118,7 +118,7 @@ function ManualPaidScreen() {
   return (
     <div style={styles.container} >
         <h1>อนุมัติแพ็กเกจ</h1>
-        <Modal_So
+        <Modal_Quotation
             show={so_Modal}
             onHide={()=>{setSo_Modal(false)}}
             current={currentSo}

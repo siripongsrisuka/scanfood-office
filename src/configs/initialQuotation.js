@@ -39,4 +39,5 @@ export default {
     withholdingTax:0,
     installmentFee:0,
     subtotal:0,
+    taxProcess:null
 };

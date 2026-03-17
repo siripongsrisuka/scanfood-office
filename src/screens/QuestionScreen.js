@@ -11,7 +11,9 @@ import { normalSort } from "../Utility/sort";
 import { initialQuestion } from "../configs";
 
 const csTeams = new Set(
-    ['WigonwgzboSJbx3QEerBgdLAHR02','GIQ8n8xmJkez5x6WFp368Gl2FC42','yvXmDb0xJbRZhhe8QwTARjcsUnm2','oJCICD7QRGQc2JsT4xRpe08nxwN2']
+    ['WigonwgzboSJbx3QEerBgdLAHR02','GIQ8n8xmJkez5x6WFp368Gl2FC42',
+        'yvXmDb0xJbRZhhe8QwTARjcsUnm2','oJCICD7QRGQc2JsT4xRpe08nxwN2',
+    'Fowzb726uJTosbm4XIT72ossz2w1','QU9npt4jjURts3TI0x2JsJ9PEMi1']
 )
 
 function QuestionScreen() {
@@ -27,6 +29,7 @@ function QuestionScreen() {
     const [question_Modal, setQuestion_Modal] = useState(false);
     const [resultLength, setResultLength] = useState(0);
     const [learnStatus, setLearnStatus] = useState(true);
+
 
     const { score, retweets } = useMemo(()=>{
         let staffs =  humanRight.filter(a=>csTeams.has(a.id))

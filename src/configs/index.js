@@ -27,7 +27,7 @@ import initialTeam from "./initialTeam";
 import initialWarehouse from "./initialWarehouse";
 import initialExtraDay from "./initialExtraDay";
 import initialQuestion from "./initialQuestion";
-import initialSo from "./initialSo";
+import initialQuotation from "./initialQuotation";
 import cashiersEquipment from "./cashiersEquipment";
 import networkSystems from "./networkSystems";
 import printerModes from "./printerModes";
@@ -40,8 +40,12 @@ import shopTypeOptions from "./shopTypeOptions";
 import initialShopType from "./initialShopType";
 import paymentJourneys from "./paymentJourneys";
 import initialYearly from "./initialYearly";
+import initialLead from "./initialLead";
+import initialMemo from "./initialMemo";
 
 export {
+  initialMemo,
+  initialLead,
   initialYearly,
   paymentJourneys,
   initialShopType,
@@ -54,7 +58,7 @@ export {
   printerModes,
   networkSystems,
   cashiersEquipment,
-  initialSo,
+  initialQuotation,
   initialQuestion,
     initialExtraDay,
     initialWarehouse,

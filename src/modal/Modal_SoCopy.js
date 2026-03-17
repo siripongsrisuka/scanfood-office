@@ -17,7 +17,7 @@ import { Button } from "rsuite";
 import { useSelector } from "react-redux";
 const { white, dark, theme3, five, one, nine, softWhite, green, six, greenSanta } = colors;
 
-function Modal_So({
+function Modal_Quotation({
   backdrop=true, // true/false/static
   animation=true,
   show,
@@ -407,11 +407,11 @@ function Modal_So({
                 {manualPaid
                     ?<form >
                         <input
-                        type="file"
-                        ref={fileInputRef}
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        style={{ display: 'none' }} // Hide the default file input
+                            type="file"
+                            ref={fileInputRef}
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            style={{ display: 'none' }} // Hide the default file input
                         />
                         <Button onClick={handleButtonClick} variant="light">
                         {manualPaidImage
@@ -581,4 +581,4 @@ const styles = {
   }
 };
 
-export default Modal_So;
+export default Modal_Quotation;

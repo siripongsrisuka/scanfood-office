@@ -32,9 +32,18 @@ import TimeControlPackage from "./TimeControlPackage";
 import TimeControlHardware from "./TimeControlHardware";
 import TimeControlEtax from "./TimeControlEtax";
 import TimeControlAutoPayment from "./TimeControlAutoPayment";
-
+import Quotation from "./Quotation";
+import Lead from "./Lead";
+import Memo from "./Memo";
+import LicenseCheck from "./LicenseCheck";
+import HardwareCheck from "./HardwareCheck";
 
 export {
+    HardwareCheck,
+    LicenseCheck,
+    Memo,
+    Lead,
+    Quotation,
     TimeControlAutoPayment,
     TimeControlEtax,
     TimeControlHardware,

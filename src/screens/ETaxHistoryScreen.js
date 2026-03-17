@@ -6,8 +6,8 @@ import {
 import { OneButton, SearchControl, TimeControlEtax } from "../components";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { fetchLicense, searchMultiFunction } from "../Utility/function";
-import { Modal_Loading, Modal_So } from "../modal";
-import { initialSo } from "../configs";
+import { Modal_Loading, Modal_Quotation } from "../modal";
+import { initialQuotation } from "../configs";
 
 
 function ETaxHistoryScreen() {
@@ -18,7 +18,7 @@ function ETaxHistoryScreen() {
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
     const [so_Modal, setSo_Modal] = useState(false);
-    const [currentSo, setCurrentSo] = useState(initialSo);
+    const [currentSo, setCurrentSo] = useState(initialQuotation);
     const [licenses, setLicenses] = useState([]);
 
     // 200%
@@ -62,7 +62,7 @@ function ETaxHistoryScreen() {
     <div style={styles.container} >
         <h1>ประวัติ E-Tax</h1>
         <TimeControlEtax/>
-        <Modal_So
+        <Modal_Quotation
             show={so_Modal}
             onHide={()=>{setSo_Modal(false)}}
             current={currentSo}

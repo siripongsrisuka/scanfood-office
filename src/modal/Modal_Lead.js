@@ -21,7 +21,7 @@ const { softWhite, darkGray, dark } = colors;
 
 const positionOptions = ['owner','manager']
 
-function Modal_Customer({
+function Modal_Lead({
   backdrop=true, // true/false/static
   animation=true,
   show,
@@ -231,4 +231,4 @@ const styles = {
     }
 }
 
-export default Modal_Customer;
+export default Modal_Lead;

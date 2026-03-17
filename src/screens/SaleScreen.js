@@ -2,227 +2,94 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useSelector } from "react-redux";
 import {
   Button,
-  Row,
-  Col,
-  Card,
 } from "react-bootstrap";
-import {
-  Radar,
-  RadarChart,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-} from 'recharts';
-import { Modal_Cancel, Modal_Customer, Modal_FlatlistSearchShop, Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput, Modal_So, Modal_Qrcode, Modal_DatePicker, Modal_QuotationMini } from "../modal";
-import { db, prepareFirebaseImage } from "../db/firestore";
-import { OneButton, SlideOptions } from "../components";
+
+import { Modal_Lead, Modal_FlatlistSearchShop, Modal_Loading, Modal_Quotation, Modal_QuotationMini } from "../modal";
+import { db } from "../db/firestore";
+import { HardwareCheck, Lead, LicenseCheck, Memo, Quotation, SlideOptions } from "../components";
 import { scanfoodAPI } from "../Utility/api";
-import { stringDateTimeReceipt, stringFullDate, stringReceiptNumber, stringYMDHMS3, yearMonth } from "../Utility/dateTime";
-import initialCustomer from "../configs/initialCustomer";
-import { colors, initialProcess, initialSo } from "../configs";
-import { fetchCustomer, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fetchSoftware, fetchSuccessCases, fetchWaste, formatCurrency, formatTime, isGodIt, toastSuccess, wait } from "../Utility/function";
-import initialShopType from "../configs/initialShopType";
-import initialCancelId from "../configs/initialCancelId";
-import { ta } from "date-fns/locale";
-const { softWhite, dark, softGray, greenSanta, white, blue } = colors;
+import {  stringReceiptNumber, stringYMDHMS3 } from "../Utility/dateTime";
+import { colors, initialLead, initialQuotation } from "../configs";
+import { fetchCustomer, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fetchSoftware, toastSuccess } from "../Utility/function";
 
-const data = [
-    { subject: 'R', A: 120 },
-    { subject: 'B', A: 98 },
-    { subject: 'T', A: 86 },
-    { subject: 'RF', A: 99 },
-    { subject: 'L', A: 85 },
+const { greenSanta, blue } = colors;
+
+const thisOptions = [
+        {id:'1',name:'ลูกค้าใหม่', value:'1'},
+        {id:'2',name:'ใบเสนอราคา', value:'2'},
+        {id:'3',name:'แพ็กเกจ', value:'3'},
+        {id:'4',name:'อุปกรณ์', value:'4'},
+        {id:'5',name:'memo', value:'5'},
 ];
-
-// const options = [
-//         {id:'1',name:'lead', value:'1'},
-//         {id:'2',name:'so', value:'2'},
-//         {id:'3',name:'success', value:'3'},
-//         {id:'4',name:'waste', value:'4'},
-//         {id:'5',name:'memo', value:'5'},
-//         {id:'6',name:'SW', value:'6'},
-//         {id:'7',name:'HW', value:'7'},
-// ];
-
-const customerOptions = [
-    { id:'1', name:'เปิดบิล'},
-    { id:'2', name:'โทร'},
-    { id:'3', name:'แก้ไขโปรไฟล์'},
-    { id:'4', name:'ผูกบัญชีร้านค้า'},
-    { id:'5', name:'ย้ายไปถังขยะ'},
-];
-
-const processMap = {
-    'manual':{ name:'รออนุมัติ', color:'#FF914d'},
-    'request':{ name:'รอชำระ', color:'#FFE871'},
-    'success':{ name:'เสร็จสมบูรณ์', color:'#66ff33'},
-    'paid':{ name:'ชำระเงินแล้ว', color:'#5DC3FF'},
-    'cancel':{ name:'ยกเลิก', color:'#ea6e6eff'},
-    'checking':{ name:'กำลังตรวจสอบ', color:'rgb(225, 231, 238)'},
-    'failed':{ name:'ไม่จ่ายใน 48 ชั่วโมง', color:'#ccb3ff'},
-};
-
-const paymentOptions = [
-    { id:'1', name:'ผูกร้าน' },
-    { id:'2', name:'ขอ QR Payment' },
-    { id:'3', name:'รายละเอียด' },
-    { id:'4', name:'ยกเลิกออเดอร์' },
-]
-
-const initialCancel = { cancelId:'', reason:'' };
-
-const initialMemo = {
-    id:'',
-    createdAt:new Date(),
-    profileId:'',
-    profileName:'',
-    content:'',
-    team:''
-};
-
-const softwareOptions = [
-    { id:'1', name:'อนุมัติทันที'},
-    { id:'2', name:'แก้ไขวันอนุมัติ'},
-];
-
-const initialSoftware = {
-    shopId:'',
-    shopName:'',
-    profileId:'',
-    profileName:'',
-    timestamp:'',
-    imageId:'',
-    net:'',
-    status:'order',
-    vat:false,
-    email:'',
-    tel:'',
-    suggestCode:'',
-    requestDate:new Date(),
-    requestBillDate:stringYMDHMS3(new Date()),
-};
 
 function SaleScreen() {
-    const { profile:{ id:thisProfileId, name:thisName, team:thisTeam = "A", saleManagerTeam:thisSaleManagerTeam = '', chat_id:thisChat_id = '' } } = useSelector(state=>state.profile);
+    const { profile:{ id:profileId, name:profileName, team = "A", chat_id = '' } } = useSelector(state=>state.profile);
     const { office:{ humanRight } } = useSelector(state=>state.office);
     const { warehouse } = useSelector(state=>state.warehouse);
-    const [currentProfile, setCurrentProfile] = useState({ id:thisProfileId, name:thisName, team:thisTeam, saleManagerTeam: thisSaleManagerTeam, chat_id: thisChat_id });
-    const { id:profileId, name:profileName, team, saleManagerTeam, chat_id } = currentProfile;
-    const [profile_Modal, setProfile_Modal] = useState(false);
-
-    function openProfile(){
-        setProfile_Modal(true);
-    };
-
-
     const [loading, setLoading] = useState(false);
-    const [licenses, setLicenses] = useState([]);
-    const [so_Modal, setSo_Modal] = useState(false);
-    const [currentSo, setCurrentSo] = useState(initialSo);
+
+    const [saleId, setSaleId] = useState(profileId);
+
+    const sales = useMemo(()=>{
+        return humanRight.filter(a=>a.team && !a.saleManagerTeam)
+    },[humanRight]);
+
+    const [licenses, setLicenses] = useState([]); // ราคา software
+
+    //------------------------เกี่ยวกับ Lead ------------------------------
+    const [leads, setLeads] = useState([]);// จำนวน lead ทั้งหมด
+    const [currentLead, setCurrentLead] = useState(initialLead);
+    const { id:leadId, shopId, shopName, name, status:leadStatus } = currentLead;
+    const [lead_Modal, setLead_Modal] = useState(false);
+
+    //------------------------เกี่ยวกับ ใบเสนอราคา ------------------------------
+    const [quotations, setQuotations] = useState([]);
+    const [quotation_Modal, setQuotation_Modal] = useState(false);
+    const [currentQuotation, setCurrentQuotation] = useState(initialQuotation);
 
     // แสดงผล QR Code 
     const [qrCode_Modal, setQrcode_Modal] = useState(false);
-    const [qrCode, setQrcode] = useState('');
-    const [amount, setAmount] = useState('');
 
-    // สร้าง customer ใหม่ หรือ แก้ไข customer เดิม
-    const [currentCustomer, setCurrentCustomer] = useState(initialCustomer);
-    const [customer_Modal, setCustomer_Modal] = useState(false);
-    const { tel, id:customerId, storeSize, shopId, shopName, name } = currentCustomer;
-
-    const [customers, setCustomers] = useState([]);
-    const [customerAction_Modal, setCustomerAction_Modal] = useState(false);
-    const [cancel_Modal, setCancel_Modal] = useState(false);
-    const [currentCancel, setCurrentCancel] = useState(initialCancel);
     const [connect_Modal, setConnect_Modal] = useState(false);
 
-    const [paymentAction_Modal, setPaymentAction_Modal] = useState(false);
-    const [currentPayment, setCurrentPayment] = useState(initialSo);
-    const [paymentActions, setPaymentActions] = useState(paymentOptions);
-    const [payments, setPayments] = useState([]);
-
-    const [successCases, setSuccessCases] = useState([]);
-    const [waste, setWaste] = useState([]);
     const [softwares, setSoftwares] = useState([]); // license เฉพาะที่ยังไม่ได้อนุมัติ
-    const [hardwares, setHardwares] = useState([]);
+    const [hardwares, setHardwares] = useState([]); // hardware เฉพาะที่ยังไม่ได้จัดส่ง
 
     const [memo, setMemo] = useState([]);
-    const [memo_Modal, setMemo_Modal] = useState(false);
-    const [currentMemo, setCurrentMemo] = useState(initialMemo);
-    const { content } = currentMemo;
 
     const [option, setOption] = useState({id:'1',name:'ลูกค้าใหม่', value:'1' });
     const { id:optionId, name:optinName, value } = option;
 
-    const [currentSoftware, setCurrentSoftware] = useState(initialSoftware);
-    const { requestDate } = currentSoftware;
-    const [softwareAction_Modal, setSoftwareAction_Modal] = useState(false);
-    const [request_Modal, setRequest_Modal] = useState(false);
-    const [note_Modal, setNote_Modal] = useState(false);
-    const [currentHardware, setCurrentHardware] = useState({ id:'', note:''});
-    const { note, id:hardwareId } = currentHardware;
-
-    const thisOptions = [
-        {id:'1',name:'ลูกค้าใหม่', value:'1'},
-        {id:'2',name:'ใบเสนอราคา', value:'2'},
-        // {id:'3',name:'success', value:'3'},
-        // {id:'4',name:'waste', value:'4'},
-        {id:'6',name:'แพ็กเกจ', value:'6'},
-        {id:'7',name:'อุปกรณ์', value:'7'},
-        {id:'5',name:'memo', value:'5'},
-
-    ];
-
     const options = useMemo(()=>{
         return thisOptions.map(a=>({ id:a.id, name:a.name, value:a.value, length:
-            a.id === '1' ? customers.length
-            :a.id === '2' ? payments.length
-            :a.id === '3' ? successCases.length
-            :a.id === '4' ? waste.length
-            :a.id === '5' ? memo.length
-            :a.id === '6' ? softwares.length
-            :hardwares.length
+            a.id === '1' ? leads.length
+            :a.id === '2' ? quotations.length
+            :a.id === '3' ? softwares.length
+            :a.id === '4' ? hardwares.length
+            :memo.length
          }))
-    },[thisOptions,customers,payments,successCases,waste,memo,softwares,hardwares]);
-        
-
-
-    const colorMap = useMemo(
-        () => new Map(initialProcess.map(a=>[a.id,a.color]))
-    ,[])
-
-    const shopTypeMap = useMemo(
-        ()=> new Map(initialShopType.map(a=>[a.id,a.name]))
-    ,[])
-
-    const cancelMap = useMemo(
-        () => new Map(initialCancelId.map(a=>[a.id,a.name]))
-    ,[])
+    },[thisOptions,leads,quotations,memo,softwares,hardwares]);
 
     useEffect(()=>{
         handleFetchAll()
-    },[profileId]);
+    },[saleId]);
 
     async function handleFetchAll(){
         setLoading(true);
         try {
-            const [licenses, hardwares, softwares, payments, wastes, successCases, customers, memo ] = await Promise.all([
+            const [licenses, hardwares, softwares, quotations, leads, memo ] = await Promise.all([
                 fetchLicense(),
-                fetchHardware(profileId),
-                fetchSoftware(profileId),
-                fetchPayment(profileId),
-                fetchWaste(profileId),
-                fetchSuccessCases(profileId),
-                fetchCustomer(profileId),
-                fetchMemo(profileId)
+                fetchHardware(saleId), // เฉพาะร้านการที่ยังไม่จัดส่ง
+                fetchSoftware(saleId),
+                fetchPayment(saleId),
+                fetchCustomer(saleId),
+                fetchMemo(saleId)
             ])
             setLicenses(licenses); // ราคา software
             setHardwares(hardwares); // hardware ท่ีรอจัดส่ง
             setSoftwares(softwares); // software ที่รอ activate
-            setPayments(payments); // payments ย้อนหลัง 30 doc
-            setWaste(wastes); // ลูกค้าที่ปิดไม่ได้ทั้งหมด ที่เกิดขึ้นในเดือนนี้
-            setSuccessCases(successCases); // successCase ทั้งหมดที่เกิดในเดือนนี้
-            setCustomers(customers); // Lead ลูกค้าทั้งหมดที่ยังไม่เลือกสถานะ
+            setQuotations(quotations); // quotations ย้อนหลัง 30 doc
+            setLeads(leads); // Lead ลูกค้าทั้งหมดที่ยังไม่เลือกสถานะ
             setMemo(memo); // memo ย้อนหลัง 30 อัน
         } catch (error) {
             alert(error);
@@ -232,33 +99,33 @@ function SaleScreen() {
     };
 
         // 200%
-    async function handleCustomer(){
-        setCustomer_Modal(false);
-        if(currentCustomer.status !=='waiting') return alert('แก้ไขไม่ได้')
+    async function handleLead(){
+        setLead_Modal(false);
+        if(leadStatus !=='waiting') return alert('แก้ไขไม่ได้')
         setLoading(true);
         try {
-            if(customerId){
-                const customerRef = db.collection('customer').doc(customerId);
-                await customerRef.update(currentCustomer);
-                setCustomers(prev=>prev.map(item=>
-                    item.id === customerId
-                        ?currentCustomer
+            if(leadId){
+                const leadRef = db.collection('customer').doc(leadId);
+                await leadRef.update(currentLead);
+                setLeads(prev=>prev.map(item=>
+                    item.id === leadId
+                        ?currentLead
                         :item
                 ));
                 toastSuccess('อัปเดตสำเร็จ')
             } else {
-                const customerRef = db.collection('customer').doc();
+                const leadRef = db.collection('customer').doc();
                 const payload = {
-                    ...currentCustomer,
-                    id:customerRef.id,
-                    profileId,
+                    ...currentLead,
+                    id:leadRef.id,
+                    profileId:saleId,
                     profileName,
                     team,
                     billDate:stringYMDHMS3(new Date()),
                     createdAt:new Date(),
                 }
-                await customerRef.set(payload);
-                setCustomers(prev=>[payload,...prev]);
+                await leadRef.set(payload);
+                setLeads(prev=>[payload,...prev]);
                 toastSuccess('เพิ่มสำเร็จ')
             }
         } catch (error) {
@@ -266,48 +133,6 @@ function SaleScreen() {
         } finally {
             setLoading(false);
         }
-    };
-
-    function openCustomerAction(item){
-        setCurrentCustomer(item);
-        if(optionId==='1') return setCustomerAction_Modal(true);
-
-        // ถ้า optionId เป็นอย่างอื่น จะเปิด customerProfile เลย
-        setCustomer_Modal(true)
-    };
-
-    async function handleCustomerAction(item){
-        setCustomerAction_Modal(false);
-        await wait(500)
-        switch (item.id) {
-            case '1': // เปิดบิล
-                if(!storeSize) return alert('ไม่มี storeSize')
-                setCurrentSo({...initialSo, storeSize:Number(storeSize) })
-                setSo_Modal(true)
-                break;
-            case '2': // 100%
-                if(!tel) return alert('ไม่มีเบอร์')
-                window.location.href = `tel:${tel}`;
-                break;
-            case '3': // 100%
-                setCustomer_Modal(true);
-                break;
-            case '4':
-                setConnect_Modal(true);
-                break;
-            case '5':
-                setCancel_Modal(true);
-                setCurrentCancel(initialCancel);
-                break;
-            case '6': // เปิดบิลเคสขอใบกำกับภาษี
-                if(!storeSize) return alert('ไม่มี storeSize')
-                setCurrentSo({...initialSo, storeSize:Number(storeSize) })
-                setSo_Modal(true)
-                break;
-        
-            default:
-                break;
-        };
     };
 
     async function send({ chat_id, orderNumber, saleName, shopName, process }){
@@ -326,11 +151,11 @@ function SaleScreen() {
     }
 
     // 200%
-    async function handleSo(payload){
-        const { oneMonth, requestDate, manualPaidImage, manualPaid,
-            taxEnable, card, taxStep, installments
-         } = currentSo;
-        setSo_Modal(false)
+    async function handleQuotation(payload){
+        const { oneMonth, requestDate,
+            card, taxStep, installments
+         } = currentQuotation;
+        setQuotation_Modal(false)
 
         if(!shopId && oneMonth) return alert('ยังไม่มี shopId');
 
@@ -344,166 +169,137 @@ function SaleScreen() {
                 ?'beamScanfood'
                 :'posxpay';
 
-        
-        
-        
         try {
-            const amount = isGodIt(profileId)
-                ?1 // payload.net
-                :payload.net
+            // const amount = isGodIt(profileId)
+            //     ?1 // payload.net
+            //     :payload.net
+            const amount = payload.net;
   
       
-            // const autoPaymentRef = db.collection('autoPayment').doc();
+            const autoPaymentRef = db.collection('autoPayment').doc();
             const timestamp = new Date();
             let chargeId = '';
             let qrCode = '';
-            // const base = {
-            //     shopId:`sale:${autoPaymentRef.id}`,
-            //     amount,
-            //     ref2:'auto',
-            // }
-            // const body = paymentType === 'posxpay'
-            //     ?{...base, channelType:'posxpay', serial:'WQRN002405000023', token:process.env.REACT_APP_API_TOKEN }
-            //     :paymentType === 'kbank'
-            //     ?{...base, channelType:'kbank', qrType:'3', merchantId:'KB000002246521' }
-            //     :paymentType === 'beamScanfood'
-            //     ?{...base, channelType:'beamLink', installments, paymentType:'beamScanfood' }
-            //     :{...base, channelType:'beamLink', installments, paymentType:'beamShopchamp'  }
-            // const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,body);
-            // const { 
-            //     chargeId:thisChargeId,
-            //     qrCode:thisQrCode,
-            // } = data?.data;
-            // qrCode = thisQrCode;
-            // if(paymentType==='posxpay'){
-            //     chargeId = thisChargeId;
-            // }
+            const base = {
+                shopId:`sale:${autoPaymentRef.id}`,
+                amount:Number(amount.toFixed(2)),
+                ref2:'auto',
+            }
+            const body = paymentType === 'posxpay'
+                ?{...base, channelType:'posxpay', serial:'WQRN002405000023', token:process.env.REACT_APP_API_TOKEN }
+                :paymentType === 'kbank'
+                ?{...base, channelType:'kbank', qrType:'3', merchantId:'KB000002246521' }
+                :paymentType === 'beamScanfood'
+                ?{...base, channelType:'beamLink', installments, paymentType:'beamScanfood' }
+                :{...base, channelType:'beamLink', installments, paymentType:'beamShopchamp'  }
+            const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,body);
+            const { 
+                chargeId:thisChargeId,
+                qrCode:thisQrCode,
+            } = data?.data;
+            qrCode = thisQrCode;
+            if(paymentType==='posxpay'){
+                chargeId = thisChargeId;
+            }
 
             const paymentData = {
-                ...currentSo,
+                ...currentQuotation,
                 ...payload,
-                orderNumber:'QT20260100001', // ยังไม่ใช้ orderNumber จริง เพราะต้องเอาเลขจาก documentNumber มา ซึ่งอยู่ใน transaction ถัดไป
-                // orderNumber:receiptNumber,
+                orderNumber:'', // ยังไม่ใช้ orderNumber จริง เพราะต้องเอาเลขจาก documentNumber มา ซึ่งอยู่ใน transaction ถัดไป
                 createdAt:timestamp,
                 chargeId,
                 qrCode,
                 shopId,
                 shopName,
                 billDate:stringYMDHMS3(timestamp),
-                profileId,
+                profileId:saleId,
                 profileName,
-                saleId:profileId,
+                saleId,
                 saleName:profileName,
                 process:paymentType==='posxpay'?"request":"preManual", // request, cancel, success, paid
                 team,
-                customerId,
+                customerId:leadId,
                 name,
-                id:'autoPaymentRef.id',
+                id:autoPaymentRef.id,
                 requestDate, 
                 requestBillDate:stringYMDHMS3(requestDate),
                 chat_id,
                 chat_id_saleManager:-1003891934173, // หลุย 
                 chat_id_taxManager:-1003871427406, // ต้น
                 };
-            setCurrentSo(paymentData);
-            setQrcode_Modal(true)
 
-            // const { paymentData } = await db.runTransaction(async (transaction) => {
+            const addOnData = await db.runTransaction(async (transaction) => {
+                let orderNumber = '';
+                let taxProcess = null;
+                const docNumberRef = db.collection("admin").doc('documentNumber');
+                const docNumberDoc = await transaction.get(docNumberRef);
 
-            //     const docNumberRef = db.collection("admin").doc('documentNumber');
-            //     const docNumberDoc = await transaction.get(docNumberRef);
-
-            //     const { value } = docNumberDoc.data();
-            //     const thisCurrentSo = value.find(a=>a.id==='qt')
-            //     let newValue = [];
-            //     const thisMonth = timestamp.getMonth() + 1;
-            //     let receiptNumber = `QT${stringReceiptNumber(1)}`;
-            //     if(thisCurrentSo){
-            //         const { month, run } = thisCurrentSo;
-            //         let newRun = run + 1;
-            //         receiptNumber = `QT${stringReceiptNumber(newRun)}`;
+                const { value } = docNumberDoc.data();
+                const thisCurrentSo = value.find(a=>a.id==='qt')
+                let newValue = [];
+                const thisMonth = timestamp.getMonth() + 1;
+                let receiptNumber = `QT${stringReceiptNumber(1)}`;
+                if(thisCurrentSo){
+                    const { month, run } = thisCurrentSo;
+                    let newRun = run + 1;
+                    receiptNumber = `QT${stringReceiptNumber(newRun)}`;
                     
-            //         if (thisMonth !== month) {
-            //             newRun = 1;
-            //             receiptNumber = `QT${stringReceiptNumber(newRun)}`;
-            //             newValue = value.map(a=>{
-            //             return a.id==='qt'
-            //                 ?{ month: thisMonth, run: newRun, id:'qt' }
-            //                 :a
-            //             })
-            //         } else {
-            //         newValue = value.map(a=>{
-            //             return a.id==='qt'
-            //                 ?{ month, run: newRun, id:'qt' }
-            //                 :a
-            //         })
-            //         }
-            //     } else {
-            //         newValue = [...value,{ month: thisMonth, run: 1, id:'qt' }]
-            //     };
-                
+                    if (thisMonth !== month) {
+                        newRun = 1;
+                        receiptNumber = `QT${stringReceiptNumber(newRun)}`;
+                        newValue = value.map(a=>{
+                        return a.id==='qt'
+                            ?{ month: thisMonth, run: newRun, id:'qt' }
+                            :a
+                        })
+                    } else {
+                    newValue = value.map(a=>{
+                        return a.id==='qt'
+                            ?{ month, run: newRun, id:'qt' }
+                            :a
+                    })
+                    }
+                } else {
+                    newValue = [...value,{ month: thisMonth, run: 1, id:'qt' }]
+                };
 
-            //     transaction.update(docNumberRef, { value:newValue, timestamp: new Date() });
-            //     const paymentData = {
-            //         ...currentSo,
-            //         ...payload,
-            //         orderNumber:receiptNumber,
-            //         createdAt:timestamp,
-            //         chargeId,
-            //         qrCode,
-            //         shopId,
-            //         shopName,
-            //         billDate:stringYMDHMS3(timestamp),
-            //         profileId,
-            //         profileName,
-            //         saleId:profileId,
-            //         saleName:profileName,
-            //         process:paymentType==='posxpay'?"request":"preManual", // request, cancel, success, paid
-            //         team,
-            //         customerId,
-            //         name,
-            //         id:autoPaymentRef.id,
-            //         requestDate, 
-            //         requestBillDate:stringYMDHMS3(requestDate),
-            //         chat_id,
-            //         chat_id_saleManager:-1003891934173, // หลุย 
-            //         chat_id_taxManager:-1003871427406, // ต้น
-            //     };
-            //     if(taxEnable){
-            //         paymentData.taxProcess = 'waiting';
-            //     }
-            //     transaction.set(autoPaymentRef,paymentData)
-            //     return {
-            //         qrCode,
-            //         paymentData
-            //     }
-            // });
+                transaction.update(docNumberRef, { value:newValue, timestamp: new Date() });
+           
+                orderNumber = receiptNumber
+                if(['2','3'].includes(taxStep)){
+                    taxProcess = 'waiting';
+                }
+                transaction.set(autoPaymentRef,{
+                    ...paymentData,
+                    taxProcess,
+                    orderNumber
+                })
+                return {
+                    taxProcess,
+                    orderNumber
+                }
+            });
 
-            
-
-
-
-            // if(manualPaid){
-            //     const [ data1, data2 ] = await Promise.all([
-            //         send({...paymentData, chat_id }),
-            //         send({...paymentData, chat_id:paymentData.chat_id_saleManager }),
-            //     ])
-            //     const { message_id } = data1
-            //     const { message_id:message_id_saleManager } = data2
-            //     await db.collection('autoPayment').doc(autoPaymentRef.id).update({
-            //         message_id,
-            //         message_id_saleManager
-            //     });
-            //     toastSuccess('สร้างบิลสำเร็จ รอชำระเงิน');
-            // } else {
-            //     setQrcode(qrCode);
-            //     setAmount(amount);
-            //     setQrcode_Modal(true);
-            // }
+            if(paymentType==='posxpay'){
+                const [ data1, data2 ] = await Promise.all([
+                    send({...paymentData, chat_id }),
+                    send({...paymentData, chat_id:paymentData.chat_id_saleManager }),
+                ])
+                const { message_id } = data1
+                const { message_id:message_id_saleManager } = data2
+                await db.collection('autoPayment').doc(autoPaymentRef.id).update({
+                    message_id,
+                    message_id_saleManager
+                });
+                toastSuccess('สร้างบิลสำเร็จ รอชำระเงิน');
+            }
+            setQrcode_Modal(true);
+            const current = {...paymentData,...addOnData}
+            setCurrentQuotation(current)
        
-            // setPayments(prev=>[paymentData,...prev]);
+            setQuotations(prev=>[current,...prev]);
         } catch (error) {
-            alert(error);
+            alert(error.message);
         } finally {
             setLoading(false);
         }
@@ -514,7 +310,7 @@ function SaleScreen() {
         const { id, name, storeSize } = item;
 
         // ป้องกันให้แพ็กเกจผิดขนาดร้าน
-        if(optionId==='2' && storeSize !== currentPayment.storeSize && currentPayment.software.length>0) return alert('ขนาดร้านไม่ตรงกัน')
+        if(optionId==='2' && storeSize !== currentQuotation.storeSize && currentQuotation.software.length>0) return alert('ขนาดร้านไม่ตรงกัน ไม่สามารถผูกกับใบเสนอราคานี้ได้ ต้องไปแจ้งไอทีให้ปรับขนาดโต๊ะให้');
         setLoading(true);
         
         try {
@@ -523,17 +319,13 @@ function SaleScreen() {
                     "/gateway/webhook/manualConnect",
                     {
                         shop:item,
-                        currentPayment
+                        currentPayment:currentQuotation
                     }
                 );
-                const updatedField = {
-                    shopId:id, shopName:name, storeSize, status:'paid'
-                }
-                const currentCustomer = customers.find(a=>a.id === currentPayment.customerId);
-                setSuccessCases(prev=>[{...currentCustomer,...updatedField},...prev]);
-                setCustomers(prev=>prev.filter(a=>a.id !== currentPayment.customerId));
-                setPayments(prev=>prev.map(item=>
-                    item.id === currentPayment.id
+         
+                setLeads(prev=>prev.filter(a=>a.id !== currentQuotation.customerId));
+                setQuotations(prev=>prev.map(item=>
+                    item.id === currentQuotation.id
                         ?{
                             ...item,process:'success'
                         }
@@ -543,141 +335,23 @@ function SaleScreen() {
                 const updatedField = {
                     shopId:id, shopName:name, storeSize
                 }
-                const customerRef = db.collection('customer').doc(customerId);
+                const customerRef = db.collection('customer').doc(leadId);
                 await customerRef.update(updatedField);
-                setCustomers(prev=>prev.map(item=>
-                    item.id === customerId
+                setLeads(prev=>prev.map(item=>
+                    item.id === leadId
                         ?{
                             ...item,...updatedField
                         }
                         :item
                 ));
             };
-         
             toastSuccess('ผูกร้านสำเร็จแล้ว');
 
-
         } catch (error) {
             alert(error);
         } finally {
             setLoading(false);
         }
-    };
-
-    // 200%
-    async function handleCancel(){
-        const { cancelId, reason } = currentCancel;
-        setCancel_Modal(false);
-        setLoading(true);
-        try {
-            const customerRef = db.collection('customer').doc(customerId);
-            const updatedField = {
-                cancelId, 
-                reason, 
-                status:'cancel',
-                yearMonth:yearMonth(new Date()) 
-            }
-            await customerRef.update(updatedField);
-            setCustomers(prev=>prev.filter(a=>a.id !== customerId));
-            setWaste(prev=>[{...currentCustomer,...updatedField},...prev])
-            toastSuccess('อัปเดตสำเร็จ');
-        } catch (error) {
-            alert(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-
-
-
-    function openPaymentOption(item){
-        setCurrentPayment(item);
-        setPaymentAction_Modal(true);
-        if(item.process==='success'){
-            setPaymentActions([
-                { id:'2', name:'ขอ QR Payment' },
-                { id:'3', name:'รายละเอียด' },
-            ])
-        } else if(item.process==='paid'){
-            setPaymentActions([
-                { id:'1', name:'ผูกร้าน' }, // ผูกร้านเพื่อ approve อัตโนมัติและทำ revenue
-                { id:'2', name:'ขอ QR Payment' },
-                { id:'3', name:'รายละเอียด' },
-            ])
-        } else if(item.process==='cancel'){
-            setPaymentActions([
-                { id:'3', name:'รายละเอียด' },
-            ])
-        } else { // request
-            setPaymentActions([
-                // { id:'1', name:'ผูกร้าน' }, ห้ามผูกร้านเด็กขาด เพราะมันจะ approve เลย
-                { id:'2', name:'ขอ QR Payment' },
-                { id:'3', name:'รายละเอียด' },
-                { id:'4', name:'ยกเลิกออเดอร์' },
-            ])
-        }
-    };
-
-        // 100%
-    async function handleCancelPayment(){
-        setLoading(true);
-        try {
-            await db.runTransaction( async (transaction)=>{
-                const orderRef = db.collection('autoPayment').doc(currentPayment.id);
-                const orderDoc = await transaction.get(orderRef);
-                const { process } = orderDoc.data();
-                if(process!=='request') throw new Error(`ยกเลิกสถานะนี้ไม่ได้นะ : ${process}`);
-                transaction.update(orderRef,{ process:'cancel' })
-            });
-            setPayments(prev=>prev.map(item=>
-                item.id === currentPayment.id
-                    ?{ ...item, process:'cancel' }
-                    :item
-            ));
-            toastSuccess('ยกเลิกบิลสำเร็จ')
-        } catch (error) {
-            alert(error);
-        } finally {
-            setLoading(false);
-        }
-    }
-
-    async function handleMemo(){
-        setMemo_Modal(false);
-        const { id, content } = currentMemo;
-        setLoading(true);
-        try {
-            if(id){
-                const memoRef = db.collection('memo').doc(id);
-                await memoRef.update({ content });
-                setMemo(prev=>prev.map(item=>
-                    item.id === id
-                        ?currentMemo
-                        :item
-                ))
-                toastSuccess('อัปเดตสำเร็จ')
-            } else {
-                const memoRef = db.collection('memo').doc();
-                const payload = {
-                    content,
-                    profileId,
-                    profileName,
-                    team,
-                    createdAt:new Date(),
-                    id:memoRef.id
-                };
-                await memoRef.set(payload);
-                setMemo(prev=>[payload,...prev])
-                toastSuccess('สร้างรายการสำเร็จ')
-            }
-        } catch (error) {
-            alert(error);
-        } finally {
-            setLoading(false);
-            setCurrentMemo(initialMemo)
-        }
-
     };
 
     const handleChange = (value) => {
@@ -685,362 +359,116 @@ function SaleScreen() {
         setOption(option);
     };
 
-
-    function checkOpen(){
-        if(optionId==='5') return setMemo_Modal(true);
-        setCustomer_Modal(true);
-        setCurrentCustomer(initialCustomer);
-    };
-
-    function openMemo(item){
-        setCurrentMemo(item);
-        setMemo_Modal(true);
-    };
-
-    async function handlePaymentAction(item){
-        setPaymentAction_Modal(false);
-        await wait(500);
-        const { qrCode, net } = currentPayment
-        switch (item.id) {
-            case '1':
-                openPaidOrder()
-                break;
-            case '2': // 100%
-                setQrcode(qrCode);
-                setQrcode_Modal(true);
-                setAmount(net)
-                break;
-            case '3': // 100%
-                setCurrentSo(currentPayment);
-                setSo_Modal(true);
-                break;
-            case '4':
-                const ok = window.confirm('ยืนยันการยกเลิกออเดอร์')
-                if(ok){
-                    handleCancelPayment()
-                }
-                break;
-            default:
-                break;
-        }
-    };
-
-    async function openPaidOrder(){
-        const { shopId } = currentPayment;
-        if(shopId) return alert('ผูก shop ไว้อยู่แล้ว');
-        setConnect_Modal(true);
-    };
-
-    function openSoftware(item){
-        setCurrentSoftware(item);
-        setSoftwareAction_Modal(true);
-    };
-
-    async function handleSoftwareAction(item){
-        setSoftwareAction_Modal(false);
-        await wait(500);
-        switch (item.id) {
-            case '1': // เปิดใช้งานทันที
-                activateSoftware(currentSoftware.id)
-                break;
-            case '2': // แก้ไขวันเปิดใช้งาน
-                setRequest_Modal(true)
-                break;
-            default:
-                break;
-        }
-    };
-
-    // 200%
-    async function activateSoftware(docId){
-        setLoading(true);
-        try {
-            const response = await scanfoodAPI.post(
-                "/gateway/webhook/manualApprove",
-                {
-                    docId
-                }
-            );
-            setSoftwares(prev=>prev.filter(a=>a.id !== docId));
-            toastSuccess('Activate Software Success')
-        } catch (error) {
-            alert(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    async function handleRequestDate(date){
-        setRequest_Modal(false);
-        setLoading(true);
-        const { id } = currentSoftware;
-        try {
-            await db.runTransaction( async (transaction)=>{
-                const packageRef = db.collection('packageOrder').doc(id);
-                const packageDoc = await transaction.get(packageRef);
-                const { status } = packageDoc.data();
-                if(status!=='request') throw new Error(`อัปเดตสถานะนี้ไม่ได้นะ : ${process}`);
-                transaction.update(packageRef,{ 
-                    requestDate:date,
-                    requestBillDate:stringYMDHMS3(date)
-                })
-
-            });
-            setSoftwares(prev=>prev.map(item=>
-                item.id === id
-                    ?{...item, requestDate:date, requestBillDate:stringYMDHMS3(date)}
-                    :item
-            ))
-        } catch (error) {
-            alert(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    function openHardware(item){
-        setCurrentHardware(item);
-        setNote_Modal(true);
-    };
-
-    async function handleNote(){
-        setNote_Modal(false);
-        setLoading(true);
-        try {
-            const hardwareRef = db.collection('hardwareOrder').doc(hardwareId);
-            await hardwareRef.update({ note });
-            setHardwares(prev=>prev.map(item=>
-                item.id === hardwareId
-                    ?{
-                        ...item, note
-                    }
-                    :item
-            ));
-            toastSuccess('อัปเดตสำเร็จ');
-        } catch (error) {
-            alert(error);
-        } finally {
-            setLoading(false);
-            setCurrentHardware({ id:'', note:'' })
-        }
-    };
-
-
-    function handleProfile(item){
-        setProfile_Modal(false);
-        setCurrentProfile(item);
-    }
-
   return (
     <div style={styles.container} >
         <div style={{ display:'flex', justifyContent:'space-between', marginRight:'3rem', paddingTop:'1rem' }} >
-            {/* <RadarChart width={105} height={100} data={data}>
-                <PolarGrid />
-                <PolarAngleAxis dataKey="subject" />
-                <PolarRadiusAxis domain={[0, 100]} />
-                <Radar dataKey="A" stroke="#d32f2f" fill="#d32f2f" fillOpacity={0.3} />
-            </RadarChart> */}
             <div>
                 <Button style={{ backgroundColor:blue, borderRadius:100, width:'40px', height:'40px', borderColor:greenSanta }} onClick={handleFetchAll} ><i class="bi bi-arrow-clockwise"></i></Button>&emsp;
-                <Button style={{ backgroundColor:greenSanta, borderRadius:100, width:'40px', height:'40px', borderColor:greenSanta }} onClick={checkOpen} ><i class="bi bi-plus-circle"></i></Button>
             </div>
-   
         </div>
-        {(isGodIt(profileId) || !!saleManagerTeam) && <OneButton {...{ text:"Profile", submit:openProfile }} />}
+        <div style={{ display:'flex', padding:5, paddingBottom:0, overflowX:'auto' }} >
+                {sales.map((item,index)=>{
+                    const active = item.id === saleId;
+                    return <div onClick={()=>{setSaleId(item.id)}} key={index} style={{ marginRight: '3px', textAlign: 'center', minWidth:'60px', cursor:'pointer' }} >
+                        {/* <img style={{ width:'50px', borderRadius:'50%' }} src={item.imageId} /> */}
+                        <img
+                            style={{
+                                width: '50px',
+                                borderRadius: '50%',
+                                filter: active ? 'grayscale(0%)' : 'grayscale(100%)'
+                            }}
+                            src={item.imageId}
+                        />
+                    </div>
+                }
+                )}
+        </div>
         
         <SlideOptions {...{ value, handleChange, options, show:true }} />
         <Modal_QuotationMini
             show={qrCode_Modal}
-            payload={currentSo}
+            payload={currentQuotation}
             onHide={()=>{setQrcode_Modal(false)}}
         />
-        <Modal_FlatListTwoColumn
-            header={'Profile'}
-            show={profile_Modal}
-            onHide={()=>{setProfile_Modal(false)}}
-            value={humanRight}
-            onClick={handleProfile}
-        />
-        <Modal_OneInput
-            show={note_Modal}
-            header={`Note`}
-            onHide={()=>{setNote_Modal(false);setCurrentHardware({ id:'', note:'' })}}
-            value={note}
-            onClick={handleNote}
-            placeholder='ใส่ note'
-            onChange={(value)=>{setCurrentHardware(prev=>({...prev, note:value }))}}
-            area={true}
-        />
-        <Modal_DatePicker
-            show={request_Modal}
-            onHide={()=>{setRequest_Modal(false)}}
-            requestDate={requestDate}
-            submit={handleRequestDate}
-        />
-        <Modal_So
-            show={so_Modal}
-            onHide={()=>{setSo_Modal(false)}}
-            current={currentSo}
-            setCurrent={setCurrentSo}
+        <Modal_Quotation
+            show={quotation_Modal}
+            onHide={()=>{setQuotation_Modal(false)}}
+            current={currentQuotation}
+            setCurrent={setCurrentQuotation}
             licenses={licenses}
             hardwares={warehouse}
-            submit={handleSo}
+            submit={handleQuotation}
             disabled={optionId!=='1'} // ป้องกันหน้าอื่นแก้ข้อมูล so
-
         />
-        {/* <Modal_Qrcode
-            show={qrCode_Modal}
-            onHide={()=>{setQrcode_Modal(false)}}
-            qrCode={qrCode}
-            amount={amount}
-        /> */}
         <Modal_FlatlistSearchShop
             show={connect_Modal}
             onHide={()=>{setConnect_Modal(false)}}
             onClick={handleConnect}
         />
-        <Modal_FlatListTwoColumn
-            header={'Payment Action'}
-            show={paymentAction_Modal}
-            onHide={()=>{setPaymentAction_Modal(false)}}
-            value={paymentActions}
-            onClick={handlePaymentAction}
-        />
+        <Modal_Lead
+            show={lead_Modal}
+            onHide={()=>{setLead_Modal(false)}}
+            current={currentLead}
+            setCurrent={setCurrentLead}
+            submit={handleLead}
+            disabled={currentLead.status !=='waiting'}
 
-        <Modal_OneInput
-            show={memo_Modal}
-            header={`Memo`}
-            onHide={()=>{setMemo_Modal(false);setCurrentMemo(initialMemo)}}
-            value={content}
-            onClick={handleMemo}
-            placeholder='ใส่ memo'
-            onChange={(value)=>{setCurrentMemo(prev=>({...prev, content:value }))}}
-            area={true}
-        />
-        <Modal_Cancel
-            show={cancel_Modal}
-            onHide={()=>{setCancel_Modal(false)}}
-            currentCancel={currentCancel}
-            setCurrentCancel={setCurrentCancel}
-            current={currentSo}
-            submit={handleCancel}
-        />
-        <Modal_FlatListTwoColumn
-            header={'CustomerOptions'}
-            show={customerAction_Modal}
-            onHide={()=>{setCustomerAction_Modal(false)}}
-            value={customerOptions}
-            onClick={handleCustomerAction}
-        />
-        <Modal_Customer
-            show={customer_Modal}
-            onHide={()=>{setCustomer_Modal(false)}}
-            current={currentCustomer}
-            setCurrent={setCurrentCustomer}
-            submit={handleCustomer}
-            disabled={currentCustomer.status !=='waiting'}
-
-        />
-        <Modal_FlatListTwoColumn
-            header={'Software Action'}
-            show={softwareAction_Modal}
-            onHide={()=>{setSoftwareAction_Modal(false)}}
-            value={softwareOptions}
-            onClick={handleSoftwareAction}
         />
         <Modal_Loading show={loading} />
-       
         {optionId==='1'
-            ?<React.Fragment>
-                <h4>ทั้งหมด : {customers.length} ลูกค้า</h4>
-                {customers.map((item)=>{
-                    const { name, storeSize, shopType, note, process, day, shopId } = item;
-                    const color = colorMap.get(process);
-                    const shopTypeName = shopTypeMap.get(shopType);
-                    return <Row onClick={()=>{openCustomerAction(item)}} key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
-
-                                <Col xs='12' sm='4'md='3'lg='3' ><i style={{ color }} class="bi bi-circle-fill"></i>&nbsp;<span style={{ color:softGray }} >({day})</span><span  >({storeSize})</span>{name}{shopId?<span><button style={{ backgroundColor:'rgba(247,199,77,0.9)'}} >ผูกบัญชีแล้ว</button></span>:null}</Col>
-                                <Col xs='6' sm='4'md='3'lg='3'  >{shopTypeName}</Col>
-                                <Col md='12' lg='6'  >Note : {note}</Col>
-                            </Row>
-                })}
-            </React.Fragment>
+            ?<Lead 
+                {...{
+                    leads,
+                    setCurrentQuotation,
+                    setConnect_Modal,
+                    setQuotation_Modal,
+                    setLeads,
+                    setLoading,
+                    currentLead,
+                    setCurrentLead,
+                    setLead_Modal
+                }}
+            />
             :optionId==='2'
-            ?<React.Fragment> 
-                <h4>ทั้งหมด : {payments.length} บิล</h4>
-                {payments.map((item)=>{
-                    const { name, shopName, net, process } = item;
-                    const { name:processName, color } = processMap[process]??'ไม่ระบุสถานะ';
-                    return <Row onClick={()=>{openPaymentOption(item)}} key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
-                                <Col xs='12' sm='6'  >{name}[{shopName}]</Col>
-                                <Col xs='6' sm='3'  >{formatCurrency(net)}</Col>
-                                <Col xs='6' sm='3'  ><button style={{backgroundColor:color, padding:5, minWidth:'150px', borderRadius:20}} >{processName}</button></Col>
-                            </Row>
-                })}
-            </React.Fragment>
-            :optionId === '3'
-            ?<React.Fragment> 
-                <h4>ทั้งหมด : {successCases.length} Success</h4>
-                {successCases.map((item)=>{
-                    const { name,  shopType,  process,  revenue } = item;
-                    const shopTypeName = shopTypeMap.get(shopType);
-                    return <Row onClick={()=>{openCustomerAction(item)}} key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' ,cursor:'pointer' }} >
-                                <Col xs='12' sm='4'md='3'lg='3' >{name}</Col>
-                                <Col xs='6' sm='4'md='3'lg='3'  >{shopTypeName}</Col>
-                                <Col xs='6' sm='4'md='3'lg='3'  >Revenue : {formatCurrency(revenue)}</Col>
-                            </Row>
-                })}
-            </React.Fragment>
-            :optionId==='4'
-            ?<React.Fragment> 
-                <h4>ทั้งหมด : {waste.length} Failed</h4>
-                {waste.map((item)=>{
-                    const { name, shopType,reason, cancelId } = item;
-                    const shopTypeName = shopTypeMap.get(shopType);
-                    const cancelName = cancelMap.get(cancelId)
-                    return <Row onClick={()=>{openCustomerAction(item)}} key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative', cursor:'pointer' }} >
-                                <Col xs='12' sm='4'md='3'lg='3' >{name}</Col>
-                                <Col xs='6' sm='4'md='3'lg='3'  >{shopTypeName}</Col>
-                                <Col xs='6' sm='4'md='3'lg='3'  >เหตุผล : {cancelName}</Col>
-                                <Col xs='6' sm='4'md='3'lg='3'  >{reason}</Col>
-                            </Row>
-                })}
-            </React.Fragment>
+            ?<Quotation
+                {...{
+                    quotations,
+                    setCurrentQuotation,
+                    currentQuotation,
+                    setQuotation_Modal,
+                    setQrcode_Modal,
+                    setQuotations,
+                    currentLead,
+                    optionId,
+                    setLoading,
+                    setLeads,
+                    leads
+                }}
+            />
+            :optionId ==='3'
+            ?<LicenseCheck
+                {...{
+                    softwares,
+                    setSoftwares,
+                    setLoading
+                }}
+            />
+            :optionId ==='4'
+            ?<HardwareCheck
+                {...{
+                    hardwares,
+                    setHardwares,
+                    setLoading
+                }}
+            />
+            :<Memo
+                {...{
+                    memo,
+                    setMemo,
+                    setLoading
+                }}
+            />
             
-            :optionId ==='5'
-            ?<Row>
-            {memo.map((item,index)=>{
-                const { createdAt, content } = item;
-                    return <Col onClick={()=>{openMemo(item)}} xs='12' sm='6'md='4'lg='3' key={index}  >
-                        <Card style={{ marginBottom:'1rem', padding:5 }} >
-                            <h6>{stringDateTimeReceipt(createdAt)}</h6>
-                            <p>{content}</p>
-                        </Card>
-                    </Col>
-                })}
-            </Row>
-            :optionId ==='6'
-            ?<React.Fragment> 
-                <h4>ทั้งหมด : {softwares.length} รายการ</h4>
-                {softwares.map((item)=>{
-                    const { name, shopName, net, requestDate } = item;
-                    return <Row onClick={()=>{openSoftware(item)}}  key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
-                                <Col xs='12' sm='6'  >{name}[{shopName}]</Col>
-                                <Col xs='6' sm='3'  >{formatCurrency(net)}</Col>
-                                <Col xs='6' sm='3'  >วันอนุมัติ : {stringFullDate(requestDate)}</Col>
-                            </Row>
-                })}
-            </React.Fragment> 
-            :<React.Fragment> 
-                <h4>ทั้งหมด : {hardwares.length} รายการ</h4>
-                {hardwares.map((item)=>{
-                    const { name, shopName, note } = item;
-                    return <Row onClick={()=>{openHardware(item)}}  key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
-                                <Col xs='12' sm='6'  >{name}[{shopName}]</Col>
-                                <Col xs='6' sm='3'  >{note}</Col>
-                            </Row>
-                })}
-            </React.Fragment> 
         }
       <div>
     </div>

@@ -3,7 +3,7 @@ import { Modal } from "react-bootstrap";
 import html2canvas from "html2canvas";
 import { QRCodeSVG } from "qrcode.react";
 import { OneButton } from "../components";
-import { formatCurrency } from "../Utility/function";
+import { summary } from "../Utility/function";
 
 const numberFormat = (value) => {
   return Number(value || 0).toLocaleString("en-US", {
@@ -46,17 +46,11 @@ function formatDate(date = new Date()) {
 }
 
 const ThaiQrQuotationCard = ({
-  items = [
-    {
-      name: "Software Scanfood Franchise package 1",
-      price: 5580,
-    },
-  ],
   data
 }) => {
     const { logo, companyName, docNo, subtotal = 0 ,installmentFee = 0,
         card = false, deliveryFee = 0, installments = '0', vat = 0, withholdingTax = 0,
-        net = 0, grandTotal = 0, date, qrCode = 0, storeSize = 20, 
+        net = 0, grandTotal = 0, date, qrCode = '', items = []
      } = data
   return (
     <div style={styles.card}>
@@ -115,6 +109,7 @@ const ThaiQrQuotationCard = ({
       <div style={styles.qrWrapper}>
         <div style={styles.qrBox}>
           <QRCodeSVG value={qrCode} size={220} level="M" includeMargin />
+          <p>สแกนเพื่อชำระเงิน</p>
         </div>
       </div>
     </div>
@@ -128,8 +123,6 @@ function Modal_QuotationMini({
   onHide,
   centered = true,
   size = "lg",
-  qrCode,
-  amount,
   payload
 }) {
   const cardRef = useRef(null);
@@ -163,13 +156,29 @@ function Modal_QuotationMini({
         100:"L",
     }
     const size = packageSize[storeSize] || 'Extra';
-    const name = oneMonth
-        ? `Software Scanfood package (${size}) - ทดลองใช้ 1 เดือน`
+    let name = oneMonth
+        ? `Software Scanfood package (${size}) - ทดลองใช้ 1 เดือน\n`
         :marketplaceFranchiseEnable
-        ?`Software Scanfood Franchise package (${size})`
-        :null
+        ?`Software Scanfood Franchise package (${size})\n`
+        :`Software Scanfood package (${size})\n`
+    if(software.some(a=>a.name==='POS และQR code สแกนสั่งอาหาร') && software.some(a=>a.name==='แยกสิทธิ์พนักงาน')){
+        name += `   - แพ็กเกจหลัก\n`
+    }
+    if(software.some(a=>a.name==='POS และQR code สแกนสั่งอาหาร') && !software.some(a=>a.name==='แยกสิทธิ์พนักงาน')){
+        name += `   - แพ็กเกจพื้นฐาน\n`
+    }
+    if(!software.some(a=>a.name==='POS และQR code สแกนสั่งอาหาร') && software.some(a=>a.name==='แยกสิทธิ์พนักงาน')){
+        name += `   - แพ็กเกจแยกสิทธิ์พนักงาน\n`
+    }
+    const filteredSoftware = software.filter(item=>!['POS และQR code สแกนสั่งอาหาร','แยกสิทธิ์พนักงาน'].includes(item.name))
+    filteredSoftware.forEach(a=>{
+      name += `   - ${a.name}\n`
+    })
+
+    const softwarePrice = summary(software,'price')
+    
     // Software Scanfood Franchise package 1
-    const items = [...software.map(s=>({ name:s.name, price:s.price })), ...hardware.map(h=>({ name:`${h.name}x${h.qty}`, price:h.net }))]
+    const items = [{ name, price:softwarePrice }, ...hardware.map(h=>({ name:`${h.name}x${h.qty}`, price:h.net }))]
         return {
             
             ...payload,
@@ -178,10 +187,10 @@ function Modal_QuotationMini({
             docNo,
             grandTotal,
             date,
+            items
         }
   },[payload])
 
-  console.log(payload)
 
   const captureImage = async () => {
     if (!cardRef.current) return;
@@ -201,13 +210,6 @@ function Modal_QuotationMini({
     console.log("base64 =>", base64);
   };
 
-  const subtotal = 6000;
-  const discount = 420;
-  const afterDiscount = 5580;
-  const vat = 390.6;
-  const grandTotal = 5970.6;
-  const withholdingTax = 167.4;
-  const netPay = amount || 5803.2;
 
   return (
     <Modal
@@ -235,24 +237,6 @@ function Modal_QuotationMini({
         <div ref={cardRef}>
           <ThaiQrQuotationCard
             {...{ data }}
-            // logo="/scanfood.webp"
-            // companyName="บริษัท ช็อปแชมป์ จำกัด"
-            // date="10-03-2026"
-            // docNo="QT2026030035"
-            // qrCode={qrCode}
-            // items={[
-            //   {
-            //     name: "Software Scanfood Franchise package 1",
-            //     price: afterDiscount,
-            //   },
-            // ]}
-            // subtotal={subtotal}
-            // discount={discount}
-            // afterDiscount={afterDiscount}
-            // vat={vat}
-            // grandTotal={grandTotal}
-            // withholdingTax={withholdingTax}
-            // netPay={netPay}
           />
         </div>
 
@@ -358,6 +342,9 @@ const styles = {
     background: "#fff",
     padding: 10,
     borderRadius: 6,
+    display:'flex',
+    flexDirection:'column',
+    alignItems:'center'
   },
 };
 

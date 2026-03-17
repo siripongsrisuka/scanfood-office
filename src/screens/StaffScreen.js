@@ -22,7 +22,12 @@ const initialHuman = {
 
 function StaffScreen() {
     const dispatch = useDispatch();
-    const { office: { humanRight } } = useSelector((state)=> state.office);
+    const { office: { humanRight, telegram } } = useSelector((state)=> state.office);
+
+
+    const telegramMap = useMemo(()=>{
+        return new Map(telegram.map(a=>[a.id, a.title]))
+    },[telegram])
    
     const [human_Modal, setHuman_Modal] = useState(false);
     const [current, setCurrent] = useState(initialHuman);
@@ -37,32 +42,32 @@ function StaffScreen() {
     },[])
 
   
+    // ดึงข้อมูลทุกครั้ง เพราะต้องอัปเดตชื่อ รูปและเบอร์โทร
+    async function fetchHumanResource() {
+      setLoading(true);
 
-async function fetchHumanResource() {
-  setLoading(true);
-
-  try {
-    const promises = humanRight.map(async (item) => {
       try {
-        const doc = await db.collection("profile").doc(item.id).get();
+        const promises = humanRight.map(async (item) => {
+          try {
+            const doc = await db.collection("profile").doc(item.id).get();
 
-        if (doc.exists) {
-          const { name, imageId, tel } = doc.data();
-          return { ...item, name, imageId, tel };
-        }
+            if (doc.exists) {
+              const { name, imageId, tel } = doc.data();
+              return { ...item, name, imageId, tel };
+            }
 
-        return item; // fallback if doc not found
-      } catch (err) {
-        return item; // fallback if error
+            return item; // fallback if doc not found
+          } catch (err) {
+            return item; // fallback if error
+          }
+        });
+
+        const res = await Promise.all(promises);
+        setCurrentHumans(res);
+      } finally {
+        setLoading(false);
       }
-    });
-
-    const res = await Promise.all(promises);
-    setCurrentHumans(res);
-  } finally {
-    setLoading(false);
-  }
-}
+    }
 
     useEffect(()=>{
       fetchHumanResource();
@@ -73,7 +78,7 @@ async function fetchHumanResource() {
         const rightIds = new Set(sideBar.map(a=>a.id))
         const { id, rights, chat_id } = current;
         const duplicateChatId = currentHumans.find(a=>a.chat_id === chat_id && a.id !== id);
-        if(duplicateChatId && chat_id) return alert('มี chat_id นี้ในระบบแล้ว กรุณาเปลี่ยนใหม่');
+        if(duplicateChatId && chat_id) return alert('มีคนใช้ telegram นี้ในระบบแล้ว กรุณาเปลี่ยนใหม่');
         setHuman_Modal(false)
 
         const findHuman = currentHumans.find(a=>a.id===id);
@@ -158,13 +163,14 @@ async function fetchHumanResource() {
                 <th style={styles.container4}>รูปภาพ</th>
                 <th style={styles.container4}>ชื่อ</th>
                 <th style={styles.container4}>เบอร์โทร</th>
+                <th style={styles.container4}>Telegram</th>
                 <th style={styles.container4}>สิทธิ์</th>
                 <th style={styles.container4}>จัดการ</th>
             </tr>
             </thead>
             <tbody  >
             {currentHumans.map((item, index) => {
-                const { id, name, tel, rights, imageId } = item;
+                const { id, name, tel, rights, imageId, chat_id } = item;
                 return <tr  key={id} >
                             <td style={styles.container6}>{index+1}.</td>
                             <td style={styles.container6}>
@@ -173,6 +179,7 @@ async function fetchHumanResource() {
 
                             <td >{name}</td>
                             <td style={styles.container6}>{tel}</td>
+                            <td style={styles.container6}>{chat_id?telegramMap.get(chat_id):''}</td>
                             <td style={styles.container6}>{rights.length}</td>
                             <td style={styles.container6}>
                                 <OneButton {...{ text:'จัดการ', submit:()=>{setHuman_Modal(true);setCurrent(item)}, variant:'warning' }} />

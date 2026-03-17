@@ -8,7 +8,7 @@ import { stringDateTimeReceipt } from "../Utility/dateTime";
 import TablePagination from '@mui/material/TablePagination';
 import { goToTop, isApproverPen, searchMultiFunction } from "../Utility/function";
 import { Modal_FlatListTwoColumn, Modal_Loading } from "../modal";
-import { initialSo } from "../configs";
+import { initialQuotation } from "../configs";
 import { db } from "../db/firestore";
 import { updateNormalFieldHardware } from "../redux/hardwareSlice";
 
@@ -31,7 +31,7 @@ function HardwareHistoryScreen() {
     const [search, setSearch] = useState('');
     const [loading, setLoading] = useState(false);
     const [sale_modal, setSale_Modal] = useState(false);
-    const [current, setCurrent] = useState(initialSo);
+    const [current, setCurrent] = useState(initialQuotation);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage); // start form 0

@@ -23,8 +23,8 @@ import Modal_Human from "./Modal_Human";
 import Modal_FindHuman from "./Modal_FindHuman";
 import Modal_ApproveSoftware from "./Modal_ApproveSoftware";
 import Modal_Qrcode from "./Modal_Qrcode";
-import Modal_So from "./Modal_So";
-import Modal_Customer from "./Modal_Customer";
+import Modal_Quotation from "./Modal_Quotation";
+import Modal_Lead from "./Modal_Lead";
 import Modal_Cancel from "./Modal_Cancel";
 import Modal_DatePicker from "./Modal_DatePicker";
 import Modal_Stock from "./Modal_Stock";
@@ -46,8 +46,8 @@ export {
     Modal_Stock,
     Modal_DatePicker,
     Modal_Cancel,
-    Modal_Customer,
-    Modal_So,
+    Modal_Lead,
+    Modal_Quotation,
     Modal_Qrcode,
     Modal_ApproveSoftware,
     Modal_Human,

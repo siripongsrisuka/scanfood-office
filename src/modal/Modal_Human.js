@@ -31,10 +31,12 @@ function Modal_Human({
     const { id, rights, name, team ='', saleManagerTeam ='', chat_id = '' } = current;
     const [alert_Modal, setAlert_Modal] = useState(initialAlert);
     const { status, content, onClick, variant } = alert_Modal;
+
     const existTelegram = useMemo(()=>{
       const usedChatIds = humanRight.filter(a=>a.id !== id).map(a=>a.chat_id);
       return telegram.filter(a=>!usedChatIds.includes(a.id))
-    },[chat_id, telegram, humanRight])
+    },[chat_id, telegram, humanRight]);
+
 
     function manageRights(id,status){
         setCurrent(prev=>({
@@ -96,7 +98,7 @@ function Modal_Human({
                 onChange={(event)=>{setCurrent(prev=>({...prev,saleManagerTeam:event.target.value}))}}
                 style={{marginTop:'1rem',marginBottom:'1rem',width:'100%'}}
             >
-              <option value='' disabled >หัวหน้าทีม Sale</option>
+              <option value=''  >หัวหน้าทีม Sale</option>
               {initialTeam.map((item,index)=>{
                 return <option key={index} value={item} >หัวหน้าทีม Sale:{item}</option>
               })}

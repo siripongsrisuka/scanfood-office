@@ -6,9 +6,9 @@ import {
 import { OneButton, SearchControl } from "../components";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { fetchLicense, formatTime, searchMultiFunction, toastSuccess } from "../Utility/function";
-import { Modal_Loading, Modal_So } from "../modal";
+import { Modal_Loading, Modal_Quotation } from "../modal";
 import { db } from "../db/firestore";
-import { initialSo } from "../configs";
+import { initialQuotation } from "../configs";
 import { sendEtax, telegramDelete, telegramDeleteQueue } from "../Utility/telegram";
 
 
@@ -21,7 +21,7 @@ function ETaxScreen() {
     const [masterData, setMasterData] = useState([]);
     const [loading, setLoading] = useState(false);
     const [so_Modal, setSo_Modal] = useState(false);
-    const [currentSo, setCurrentSo] = useState(initialSo);
+    const [currentSo, setCurrentSo] = useState(initialQuotation);
     const [licenses, setLicenses] = useState([]);
 
     // 200%
@@ -115,7 +115,7 @@ function ETaxScreen() {
     <div style={styles.container} >
         <h1>ขอ E-Tax</h1>
 
-        <Modal_So
+        <Modal_Quotation
             show={so_Modal}
             onHide={()=>{setSo_Modal(false)}}
             current={currentSo}

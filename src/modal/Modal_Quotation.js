@@ -17,7 +17,7 @@ import { useSelector } from "react-redux";
 import { RadioGroup, Radio, Button } from "rsuite";
 const { white, dark, theme3, five, one, nine, softWhite, green, six } = colors;
 
-function Modal_So({
+function Modal_Quotation({
   backdrop=true, // true/false/static
   animation=true,
   show,
@@ -603,7 +603,7 @@ function Modal_So({
         </CardComponent>
         {manualPaidImage
             ?<Image style={styles.image} src={manualPaidImage} />
-            :<RootImage style={styles.image} />
+            :null
         }
         {admin &&
             <CardComponent title='marketplace' maxWidth={'95vw'} accentColor={'#D9D9D9'}  >
@@ -663,4 +663,4 @@ const styles = {
   }
 };
 
-export default Modal_So;
+export default Modal_Quotation;

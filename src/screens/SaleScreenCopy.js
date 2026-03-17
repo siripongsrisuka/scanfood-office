@@ -13,13 +13,13 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
 } from 'recharts';
-import { Modal_Cancel, Modal_Customer, Modal_FlatlistSearchShop, Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput, Modal_So, Modal_Qrcode, Modal_DatePicker } from "../modal";
+import { Modal_Cancel, Modal_Lead, Modal_FlatlistSearchShop, Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput, Modal_Quotation, Modal_Qrcode, Modal_DatePicker } from "../modal";
 import { db, prepareFirebaseImage } from "../db/firestore";
 import { OneButton, SlideOptions } from "../components";
 import { scanfoodAPI } from "../Utility/api";
 import { stringDateTimeReceipt, stringFullDate, stringReceiptNumber, stringYMDHMS3, yearMonth } from "../Utility/dateTime";
 import initialCustomer from "../configs/initialCustomer";
-import { colors, initialProcess, initialSo } from "../configs";
+import { colors, initialProcess, initialQuotation } from "../configs";
 import { fetchCustomer, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fetchSoftware, fetchSuccessCases, fetchWaste, formatCurrency, formatTime, isGodIt, toastSuccess, wait } from "../Utility/function";
 import initialShopType from "../configs/initialShopType";
 import initialCancelId from "../configs/initialCancelId";
@@ -118,7 +118,7 @@ function SaleScreen() {
     const [loading, setLoading] = useState(false);
     const [licenses, setLicenses] = useState([]);
     const [so_Modal, setSo_Modal] = useState(false);
-    const [currentSo, setCurrentSo] = useState(initialSo);
+    const [currentSo, setCurrentSo] = useState(initialQuotation);
 
     // แสดงผล QR Code 
     const [qrCode_Modal, setQrcode_Modal] = useState(false);
@@ -137,7 +137,7 @@ function SaleScreen() {
     const [connect_Modal, setConnect_Modal] = useState(false);
 
     const [paymentAction_Modal, setPaymentAction_Modal] = useState(false);
-    const [currentPayment, setCurrentPayment] = useState(initialSo);
+    const [currentPayment, setCurrentPayment] = useState(initialQuotation);
     const [paymentActions, setPaymentActions] = useState(paymentOptions);
     const [payments, setPayments] = useState([]);
 
@@ -281,7 +281,7 @@ function SaleScreen() {
         switch (item.id) {
             case '1': // เปิดบิล
                 if(!storeSize) return alert('ไม่มี storeSize')
-                setCurrentSo({...initialSo, storeSize:Number(storeSize) })
+                setCurrentSo({...initialQuotation, storeSize:Number(storeSize) })
                 setSo_Modal(true)
                 break;
             case '2': // 100%
@@ -300,7 +300,7 @@ function SaleScreen() {
                 break;
             case '6': // เปิดบิลเคสขอใบกำกับภาษี
                 if(!storeSize) return alert('ไม่มี storeSize')
-                setCurrentSo({...initialSo, storeSize:Number(storeSize) })
+                setCurrentSo({...initialQuotation, storeSize:Number(storeSize) })
                 setSo_Modal(true)
                 break;
         
@@ -835,7 +835,7 @@ function SaleScreen() {
             requestDate={requestDate}
             submit={handleRequestDate}
         />
-        <Modal_So
+        <Modal_Quotation
             show={so_Modal}
             onHide={()=>{setSo_Modal(false)}}
             current={currentSo}
@@ -889,7 +889,7 @@ function SaleScreen() {
             value={customerOptions}
             onClick={handleCustomerAction}
         />
-        <Modal_Customer
+        <Modal_Lead
             show={customer_Modal}
             onHide={()=>{setCustomer_Modal(false)}}
             current={currentCustomer}

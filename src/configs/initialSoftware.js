@@ -1,17 +1,18 @@
-export default { // ก้อนข้อมูลคำสั่งซื้อ software
+import { stringYMDHMS3 } from "../Utility/dateTime";
+
+export default {
     shopId:'',
     shopName:'',
     profileId:'',
     profileName:'',
     timestamp:'',
-    orderNumber:'',
     imageId:'',
-    tel:'',
     net:'',
-    packageId:[],
-    yourCode:'',
-    status:'order',//
+    status:'order',
     vat:false,
     email:'',
-    suggestCode:''
-  }
+    tel:'',
+    suggestCode:'',
+    requestDate:new Date(),
+    requestBillDate:stringYMDHMS3(new Date()),
+};
