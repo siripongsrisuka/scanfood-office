@@ -363,11 +363,6 @@ function SaleScreen() {
 
   return (
     <div style={styles.container} >
-        <div style={{ display:'flex', justifyContent:'space-between', marginRight:'3rem', paddingTop:'1rem' }} >
-            <div>
-                <Button style={{ backgroundColor:blue, borderRadius:100, width:'40px', height:'40px', borderColor:greenSanta }} onClick={handleFetchAll} ><i class="bi bi-arrow-clockwise"></i></Button>&emsp;
-            </div>
-        </div>
         {admin || saleManagerTeam
             ?<div style={{ display:'flex', padding:5, paddingBottom:0, overflowX:'auto' }} >
                 {sales.map((item,index)=>{
