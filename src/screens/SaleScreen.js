@@ -172,10 +172,10 @@ function SaleScreen() {
                 :'posxpay';
 
         try {
-            // const amount = isGodIt(profileId)
-            //     ?1 // payload.net
-            //     :payload.net
-            const amount = payload.net;
+            const amount = admin
+                ?1 // payload.net
+                :payload.net
+            // const amount = payload.net;
   
       
             const autoPaymentRef = db.collection('autoPayment').doc();

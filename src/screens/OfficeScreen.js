@@ -107,7 +107,7 @@ function OfficeScreen() {
                             }} >&emsp;<i class="bi bi-box-arrow-left"></i>&emsp;ออกจากระบบ</Dropdown.Item>
                         </Dropdown>&emsp;&emsp;&emsp;&emsp;
                       </div>
-                      <h6 onClick={()=>window.location.reload()} >V.2 รีเฟรช</h6>
+                      <h6 onClick={()=>window.location.reload()} >V.3 รีเฟรช</h6>
                       <div onClick={()=>{setShort(false)}} style={styles.container4} > 
                         <i class="bi bi-list"></i>
                       </div>
@@ -126,7 +126,7 @@ function OfficeScreen() {
                     <div style={styles.container8} >
                       <div onClick={()=>{setShort(true)}} style={styles.container9} > 
                         <i class="bi bi-list"></i>
-                        <h6  >V.2 </h6>
+                        <h6  >V.3 </h6>
                       </div>
                       <img style={styles.container10} src="/logo512.png" />
                        
