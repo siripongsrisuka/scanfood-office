@@ -4,7 +4,7 @@ import {
   Button,
 } from "react-bootstrap";
 
-import { Modal_Lead, Modal_FlatlistSearchShop, Modal_Loading, Modal_Quotation, Modal_QuotationMini } from "../modal";
+import { Modal_Lead, Modal_FlatlistSearchShop, Modal_Loading, Modal_Quotation, Modal_QuotationMini, Modal_QuotationFull } from "../modal";
 import { db } from "../db/firestore";
 import { HardwareCheck, Lead, LicenseCheck, Memo, Quotation, SlideOptions } from "../components";
 import { scanfoodAPI } from "../Utility/api";
@@ -51,6 +51,8 @@ function SaleScreen() {
 
     // แสดงผล QR Code 
     const [qrCode_Modal, setQrcode_Modal] = useState(false);
+    const [mini_Modal, setMini_Modal] = useState(false);
+    const [full_Modal, setFull_Modal] = useState(false);
 
     const [connect_Modal, setConnect_Modal] = useState(false);
 
@@ -172,10 +174,10 @@ function SaleScreen() {
                 :'posxpay';
 
         try {
-            const amount = admin
-                ?1 // payload.net
-                :payload.net
-            // const amount = payload.net;
+            // const amount = admin
+            //     ?1 // payload.net
+            //     :payload.net
+            const amount = payload.net;
   
       
             const autoPaymentRef = db.collection('autoPayment').doc();
@@ -295,7 +297,7 @@ function SaleScreen() {
                 });
                 toastSuccess('สร้างบิลสำเร็จ รอชำระเงิน');
             }
-            setQrcode_Modal(true);
+            setMini_Modal(true);    
             const current = {...paymentData,...addOnData}
             setCurrentQuotation(current)
        
@@ -361,6 +363,7 @@ function SaleScreen() {
         setOption(option);
     };
 
+
   return (
     <div style={styles.container} >
         {admin || saleManagerTeam
@@ -386,9 +389,14 @@ function SaleScreen() {
         
         <SlideOptions {...{ value, handleChange, options, show:true }} />
         <Modal_QuotationMini
-            show={qrCode_Modal}
+            show={mini_Modal}
             payload={currentQuotation}
-            onHide={()=>{setQrcode_Modal(false)}}
+            onHide={()=>{setMini_Modal(false)}}
+        />
+        <Modal_QuotationFull
+            show={full_Modal}
+            payload={currentQuotation}
+            onHide={()=>{setFull_Modal(false)}}
         />
         <Modal_Quotation
             show={quotation_Modal}
@@ -436,13 +444,14 @@ function SaleScreen() {
                     setCurrentQuotation,
                     currentQuotation,
                     setQuotation_Modal,
-                    setQrcode_Modal,
+                    setQrcode_Modal:setMini_Modal,
                     setQuotations,
                     currentLead,
                     optionId,
                     setLoading,
                     setLeads,
-                    leads
+                    leads,
+                    setFull_Modal
                 }}
             />
             :optionId ==='3'

@@ -50,8 +50,10 @@ import SubscriptionScreen from "./SubscriptionScreen";
 import CodeRelativeScreen from "./CodeRelativeScreen";
 import TrainingScheduleScreen from "./TrainingScheduleScreen";
 import UploadStaffScreen from "./UploadStaffScreen";
+import TaxInvoiceReceiptTemplate from "./TaxInvoiceReceiptTemplate";
 
 export {
+    TaxInvoiceReceiptTemplate,
     UploadStaffScreen,
     TrainingScheduleScreen,
     CodeRelativeScreen,

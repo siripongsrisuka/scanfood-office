@@ -155,8 +155,8 @@ function Modal_Quotation({
   };
 
     function handleManualPaidChange(action){
-        // action = approcved / rejected
-        const ok = window.confirm(`คุณแน่ใจที่จะ${action==='approved'?'อนุมัติ':'ปฏิเสธ'}แพ็กเกจนี้หรือไม่?`);
+        // action = approcved / rejected / reverse
+        const ok = window.confirm(`คุณแน่ใจที่จะ${action==='approved'?'อนุมัติ':action==='rejected'?'ปฏิเสธ':'คืนค่า'}แพ็กเกจนี้หรือไม่?`);
         if(!ok) return;
         submit({...current, action })
     }
@@ -611,6 +611,7 @@ function Modal_Quotation({
         {manualChecked
             ?<Modal.Footer>
                 <OneButton {...{ text:'ปิด', submit:onHide, variant:'secondary' }} />
+                <OneButton {...{ text:'คืนค่า', submit:()=>{handleManualPaidChange('reverse')}, variant:'warning' }} />
                 <OneButton {...{ text:'อนุมัติแพ็กเกจ', submit:()=>{handleManualPaidChange('approved')}, variant:'success' }} />
                 <OneButton {...{ text:'ปฏิเสธแพ็กเกจ', submit:()=>{handleManualPaidChange('rejected')}, variant:'danger' }} />
             </Modal.Footer>

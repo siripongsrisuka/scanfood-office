@@ -68,7 +68,7 @@ const ThaiQrQuotationCard = ({
             key={index}
             index={index + 1}
             name={item.name}
-            price={item.price}
+            price={item?.net||item.price} // logic เก่า ใช้ price แทน net เพราะในบางกรณี item ไม่มี net เช่น software ที่ไม่มี qty
           />
         ))}
       </div>
@@ -145,8 +145,8 @@ function Modal_QuotationMini({
         ? "บริษัท ช็อปแชมป์ จำกัด"
         : "บริษัท สแกนฟู้ด อินโนเวชั่น จำกัด"
     const logo = vat>0
-        ? "/shopchamp.webp"
-        : "/scanfood.webp"
+        ? "/shopchamp.png"
+        : "/scanfood.png"
     const docNo = orderNumber || "QT2026030035";
     const grandTotal = subtotal + deliveryFee + installmentFee + vat;
     const date = formatDate(requestDate);
@@ -178,7 +178,7 @@ function Modal_QuotationMini({
     const softwarePrice = summary(software,'price')
     
     // Software Scanfood Franchise package 1
-    const items = [{ name, price:softwarePrice }, ...hardware.map(h=>({ name:`${h.name}x${h.qty}`, price:h.net }))]
+    const items = [{ name, price:softwarePrice }, ...hardware.map(h=>({ name:`${h.name}x${h.qty}`, price:h.net, price:h.price, qty:h.qty, net:h.net  }))]
         return {
             
             ...payload,
@@ -200,14 +200,13 @@ function Modal_QuotationMini({
       useCORS: true,
       backgroundColor: "#f4f4f4",
     });
-
     const link = document.createElement("a");
-    link.download = "quotation-qr.png";
+    // link.download = "quotation-qr.png";
+    link.download = `${data.companyName}_${data.orderNumber}_${data.vatInfo.contactName}_${data.vatInfo.name}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
 
     const base64 = canvas.toDataURL("image/png");
-    console.log("base64 =>", base64);
   };
 
 

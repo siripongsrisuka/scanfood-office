@@ -8,6 +8,75 @@ export function isApprover (profileId){
   return ['cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'].includes(profileId)
 };
 
+export function numberToThaiText(num) {
+  if (isNaN(num)) return "";
+
+  const txtNumArr = [
+    "ศูนย์", "หนึ่ง", "สอง", "สาม", "สี่",
+    "ห้า", "หก", "เจ็ด", "แปด", "เก้า"
+  ];
+
+  const txtDigitArr = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน", "ล้าน"];
+
+  function readNumber(number) {
+    let result = "";
+    const numStr = number.toString();
+
+    for (let i = 0; i < numStr.length; i++) {
+      const digit = parseInt(numStr.charAt(i));
+      const position = numStr.length - i - 1;
+
+      if (digit === 0) continue;
+
+      if (position === 0 && digit === 1 && numStr.length > 1) {
+        result += "เอ็ด";
+      } else if (position === 1 && digit === 2) {
+        result += "ยี่";
+      } else if (position === 1 && digit === 1) {
+        result += "";
+      } else {
+        result += txtNumArr[digit];
+      }
+
+      result += txtDigitArr[position];
+    }
+
+    return result;
+  }
+
+  function readMillion(number) {
+    const million = Math.floor(number / 1000000);
+    const rest = number % 1000000;
+
+    let result = "";
+
+    if (million > 0) {
+      result += readMillion(million) + "ล้าน";
+    }
+
+    if (rest > 0) {
+      result += readNumber(rest);
+    }
+
+    return result;
+  }
+
+  const [integerPart, decimalPart] = num.toFixed(2).split(".");
+
+  let bahtText = readMillion(parseInt(integerPart));
+
+  if (decimalPart === "00") {
+    return bahtText + "บาทถ้วน";
+  } else {
+    return (
+      bahtText +
+      "บาท" +
+      readNumber(parseInt(decimalPart)) +
+      "สตางค์"
+    );
+  }
+}
+
 export function firstExpire(vip){
   const today = new Date();
   const availableVip = vip.filter(item=>item.expire > today);

@@ -33,8 +33,10 @@ import Modal_Email from "./Modal_Email";
 import Modal_WarehouseImage from "./Modal_WarehouseImage";
 import Modal_Note from "./Modal_Note";
 import Modal_Shop from "./Modal_Shop";
+import Modal_QuotationFull from "./Modal_QuotationFull";
 
 export { 
+    Modal_QuotationFull,
     Modal_QuotationMini,
     Modal_Shop,
     Modal_Note,

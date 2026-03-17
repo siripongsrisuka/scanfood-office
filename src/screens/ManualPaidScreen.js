@@ -74,6 +74,14 @@ function ManualPaidScreen() {
                 toastSuccess('อนุมัติแพ็กเกจเรียบร้อย');
                 setMasterData(prev=>prev.filter(i=>i.id !== id));
 
+            } else if(action === 'reverse'){
+                await db.collection('autoPayment').doc(id).update({
+                    process: 'preManual',
+                    manualPaidImage:''
+                    
+                });
+                toastSuccess('คืนค่าแพ็กเกจเรียบร้อย');
+                setMasterData(prev=>prev.filter(i=>i.id !== id));
             } else { //rejected
                   await db.collection('autoPayment').doc(id).update({
                     process: 'cancel',

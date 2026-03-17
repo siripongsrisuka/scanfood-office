@@ -26,8 +26,6 @@ const quotationOptions = [
     { id:'1', name:'ผูกร้าน' },
     { id:'2', name:'ใบเสนอราคาอย่างย่อ' },
     { id:'2.1', name:'ใบเสนอราคา' },
-    { id:'2.2', name:'ใบเสนอราคาแพ็กเกจ' },
-    { id:'2.3', name:'ใบเสนอราคาอุปกรณ์' },
     { id:'3', name:'รายละเอียด' },
     { id:'4', name:'ยกเลิกออเดอร์' },
     { id:'5', name:'แนบหลักฐานชำระเงิน' },
@@ -45,7 +43,8 @@ function Quotation({
     optionId = '2',
     setLoading,
     setLeads,
-    leads
+    leads,
+    setFull_Modal
 }) {
     const {  id:customerId,   } = currentLead;
     const { id:quotationId, withholdingTax = 0, hardware = []  } = currentQuotation;
@@ -80,46 +79,29 @@ function Quotation({
         setPaymentAction_Modal(true);
         const { process } = item;
         let options = [];
-        const display = withholdingTax>0 && hardware.length>0
-            ?[
-                { id:'1', name:'ผูกร้าน' },
-                { id:'2', name:'ใบเสนอราคาอย่างย่อ' },
-                { id:'2.2', name:'ใบเสนอราคาแพ็กเกจ' },
-                { id:'2.3', name:'ใบเสนอราคาอุปกรณ์' },
-                { id:'3', name:'รายละเอียด' },
-                { id:'4', name:'ยกเลิกออเดอร์' },
-                { id:'5', name:'แนบหลักฐานชำระเงิน' },
-            ]
-            :[
-                { id:'1', name:'ผูกร้าน' },
-                { id:'2', name:'ใบเสนอราคาอย่างย่อ' },
-                { id:'2.1', name:'ใบเสนอราคา' },
-                { id:'3', name:'รายละเอียด' },
-                { id:'4', name:'ยกเลิกออเดอร์' },
-                { id:'5', name:'แนบหลักฐานชำระเงิน' },
-            ]
+   
         switch (process) {
             case 'success':
                 // จ่ายเงินแล้ว ผูกร้านแล้ว
-                options = display.filter(a=>!['1','4','5'].includes(a.id))
+                options = quotationOptions.filter(a=>['2','2.1','3'].includes(a.id))
                 break;
             case 'paid':
                 // จ่ายเงินแล้ว แต่ยังไม่ได้ผูกร้าน
-                options = display.filter(a=>!['4','5'].includes(a.id))
+                options = quotationOptions.filter(a=>['1','2','2.1','3'].includes(a.id))
                 break;
             case 'cancel':
                 // ยกเลิกแล้ว ดูได้เฉยๆ
-                options = quotationOptions.filter(a=>['3'].includes(a.id))
+                options = quotationOptions.filter(a=>['2','2.1','3'].includes(a.id))
                 break;
 
             case 'preManual':
                 // ก่อนแนบหลักฐาน
-                options = display.filter(a=>!['1'].includes(a.id))
+                options = quotationOptions.filter(a=>['2','2.1','3','4','5'].includes(a.id))
                 break;
         
             default:
                 // request and manual 
-                options = display.filter(a=>!['1','5'].includes(a.id))
+                options = quotationOptions.filter(a=>['2','2.1','3','4'].includes(a.id))
                 break;
         };
         setOptions(options)
@@ -136,6 +118,9 @@ function Quotation({
                 break;
             case '2': // 100%
                 setQrcode_Modal(true);
+                break;
+            case '2.1': // 100%
+                setFull_Modal(true);
                 break;
             case '3': // 100%
                 setCurrentQuotation(currentQuotation);

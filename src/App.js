@@ -50,7 +50,8 @@ import {
   SubscriptionScreen,
   CodeRelativeScreen,
   TrainingScheduleScreen,
-  UploadStaffScreen
+  UploadStaffScreen,
+  TaxInvoiceReceiptTemplate
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -145,6 +146,7 @@ function App() {
             <Route path='codeRelative' element={<CodeRelativeScreen/>} />
             <Route path='trainingSchedule' element={<TrainingScheduleScreen/>} />
             <Route path='uploadStaff' element={<UploadStaffScreen/>} />
+            <Route path='taxInvoice' element={<TaxInvoiceReceiptTemplate/>} />
           </Route>
       </Routes>
       </div>
