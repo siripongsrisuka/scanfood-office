@@ -23,12 +23,14 @@ const thisOptions = [
 ];
 
 function SaleScreen() {
-    const { profile:{ id:profileId, name:profileName, team = "A", chat_id = '' } } = useSelector(state=>state.profile);
+    const { profile } = useSelector(state=>state.profile);
+    const { id:profileId, name:profileName, team = "A", chat_id = '', admin = false, saleManagerTeam = '' }  = profile;
     const { office:{ humanRight } } = useSelector(state=>state.office);
     const { warehouse } = useSelector(state=>state.warehouse);
     const [loading, setLoading] = useState(false);
 
     const [saleId, setSaleId] = useState(profileId);
+
 
     const sales = useMemo(()=>{
         return humanRight.filter(a=>a.team && !a.saleManagerTeam)
@@ -366,11 +368,11 @@ function SaleScreen() {
                 <Button style={{ backgroundColor:blue, borderRadius:100, width:'40px', height:'40px', borderColor:greenSanta }} onClick={handleFetchAll} ><i class="bi bi-arrow-clockwise"></i></Button>&emsp;
             </div>
         </div>
-        <div style={{ display:'flex', padding:5, paddingBottom:0, overflowX:'auto' }} >
+        {admin || saleManagerTeam
+            ?<div style={{ display:'flex', padding:5, paddingBottom:0, overflowX:'auto' }} >
                 {sales.map((item,index)=>{
                     const active = item.id === saleId;
                     return <div onClick={()=>{setSaleId(item.id)}} key={index} style={{ marginRight: '3px', textAlign: 'center', minWidth:'60px', cursor:'pointer' }} >
-                        {/* <img style={{ width:'50px', borderRadius:'50%' }} src={item.imageId} /> */}
                         <img
                             style={{
                                 width: '50px',
@@ -382,7 +384,10 @@ function SaleScreen() {
                     </div>
                 }
                 )}
-        </div>
+            </div>
+            :null
+        }
+        
         
         <SlideOptions {...{ value, handleChange, options, show:true }} />
         <Modal_QuotationMini
