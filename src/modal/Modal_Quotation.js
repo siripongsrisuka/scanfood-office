@@ -103,7 +103,7 @@ function Modal_Quotation({
         vat = beforeVat * 0.07; // บวกราคาขึ้นอีก 7% ถ้าลูกค้าต้องการใบกำกับภาษีแบบอิเล็กทรอนิกส์(E-Tax)
     };
 
-    if(juristic === '1' && softwarePrice>0){
+    if(juristic === '1' && softwarePrice>0 && ['2','3'].includes(taxStep)){
         withholdingTax = softwarePrice * 0.03; // หักภาษี ณ ที่จ่าย 3% สำหรับนิติบุคคลที่ซื้อซอฟต์แวร์
     }
     const net = beforeVat + vat - withholdingTax;
@@ -217,27 +217,6 @@ function Modal_Quotation({
         
             default:
                 break;
-        }
-    };
-
-    const handleButtonClick = () => {
-        fileInputRef.current.click();
-    };
-
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0]; // Get the selected file
-
-        if (file) {
-
-        // Create a FileReader to read the file
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            // setImage(reader.result); // Set the image data as the result of FileReader
-            setCurrent(prev=>({...prev,manualPaidImage:reader.result}))
-        };
-
-        reader.readAsDataURL(file); // Convert file to a base64 string
         }
     };
 
