@@ -11,7 +11,8 @@ import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { OneButton } from "../components";
 import { initialQuotation } from "../configs";
 import { scanfoodAPI } from "../Utility/api";
-import { telegramDelete, telegramDeleteQueue } from "../Utility/telegram";
+import { deleteMessage, sendMessage, telegramDeleteQueue } from "../Utility/telegram";
+import { v4 as uuidv4 } from 'uuid';
 
 
 function ManualPaidScreen() {
@@ -33,7 +34,7 @@ function ManualPaidScreen() {
         });
         const sortedData = normalSort('createdAt', data);
         return sortedData
-    }
+    };
 
 
     useEffect(()=>{
@@ -59,7 +60,8 @@ function ManualPaidScreen() {
     async function handleSo(payload){
         setSo_Modal(false);
         setLoading(true);
-        const { message_id, message_id_saleManager, chat_id, chat_id_saleManager } = currentSo;
+        const { message_id, message_id_saleManager, chat_id, chat_id_saleManager, manualApproveMessage = null } = currentSo;
+        let name = '';
         try {
             const { id, action = 'approved' } = payload;
             if(action === 'approved'){
@@ -71,6 +73,8 @@ function ManualPaidScreen() {
                     "/gateway/webhook/posxpay/",
                     payload
                 );
+                name = 'อนุมัติเสร็จสิ้น';
+               
                 toastSuccess('อนุมัติแพ็กเกจเรียบร้อย');
                 setMasterData(prev=>prev.filter(i=>i.id !== id));
 
@@ -80,6 +84,7 @@ function ManualPaidScreen() {
                     manualPaidImage:''
                     
                 });
+                name = 'คืนค่าเสร็จสิ้น';
                 toastSuccess('คืนค่าแพ็กเกจเรียบร้อย');
                 setMasterData(prev=>prev.filter(i=>i.id !== id));
             } else { //rejected
@@ -87,27 +92,55 @@ function ManualPaidScreen() {
                     process: 'cancel',
                     
                 });
+                name = 'ปฏิเสธแพ็กเกจเสร็จสิ้น';
                 toastSuccess('ปฏิเสธแพ็กเกจเรียบร้อย');
                 setMasterData(prev=>prev.filter(i=>i.id !== id));
-            }
-        
-            await telegramDelete({ chat_id: chat_id_saleManager, message_id:message_id_saleManager});
-            await telegramDeleteQueue({ chat_id, message_id});
-        
-            const { status:status2, data:data2 } = await scanfoodAPI.post(
-                "/telegram/office/reply/",
-                {
-                    "channelType":"manualApprove",
-                    "chat_id":chat_id,
-                    "message_id": message_id,
-                    "process":action,
+            };
+
+            if(manualApproveMessage){
+                const updatePromises = [];
+
+                const { process = [] } = manualApproveMessage;
+                const newProcess = [
+                                        ...process, 
+                                        { name:`${name}`, createdAt: `${stringDateTimeReceipt(new Date())}\n*ข้อความจะถูกลบอัตโนมัติใน 12 ชั่วโมง\n✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅`, id:uuidv4() }
+                                    ]
+                updatePromises.push(sendMessage({ chat_id, ...manualApproveMessage, process:newProcess }));
+                if(message_id){ // ช่องของเซล
+                    updatePromises.push(deleteMessage({ chat_id, message_id }));
                 }
-            );
-            const { message_id:xxx } = data2;
-            await telegramDeleteQueue({ chat_id, message_id:xxx });
-        
+                if(message_id_saleManager){ // ช่องของผู้จัดการ
+                    updatePromises.push(deleteMessage({ chat_id:chat_id_saleManager, message_id: message_id_saleManager }));
+                }
+                const results = await Promise.all(updatePromises);
+                const newMessageId = results[0];
+                // setTimeout(async()=>{
+                //       await deleteMessage({ chat_id: chat_id, message_id: newMessageId });
+                // }, 30000);
+                await telegramDeleteQueue({ chat_id: chat_id, message_id: newMessageId });
+            }
+
         } catch (error) {
-            alert(error);
+            // alert(error.message);
+            console.error("handleQuotation error:", error);
+            console.error("error.message:", error?.message);
+            console.error("error.code:", error?.code);
+            console.error("error.response?.status:", error?.response?.status);
+            console.error("error.response?.data:", error?.response?.data);
+            console.error("error.stack:", error?.stack);
+
+            alert(
+                JSON.stringify(
+                    {
+                        message: error?.message,
+                        code: error?.code,
+                        status: error?.response?.status,
+                        data: error?.response?.data,
+                    },
+                    null,
+                    2
+                )
+            );
         } finally {
             setLoading(false);
         }

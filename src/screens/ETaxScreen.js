@@ -9,8 +9,9 @@ import { fetchLicense, formatTime, searchMultiFunction, toastSuccess } from "../
 import { Modal_Loading, Modal_Quotation } from "../modal";
 import { db } from "../db/firestore";
 import { initialQuotation } from "../configs";
-import { sendEtax, telegramDelete, telegramDeleteQueue } from "../Utility/telegram";
-
+import { deleteMessage, sendMessage, telegramDeleteQueue } from "../Utility/telegram";
+import { reverseSort } from "../Utility/sort";
+import { v4 as uuidv4 } from 'uuid';
 
 function ETaxScreen() {
     const { warehouse } = useSelector(state=>state.warehouse);
@@ -47,7 +48,7 @@ function ETaxScreen() {
                 fetchData(),
             ])
             setLicenses(licenses); // ราคา software
-            setMasterData(orders);
+            setMasterData(reverseSort('createdAt', orders)); // ข้อมูลใบสั่งขายที่มีการขอใบกำกับภาษี
         } catch (error) {
             alert(error);
         } finally {
@@ -56,18 +57,22 @@ function ETaxScreen() {
     };
 
     async function fetchData(){
-        const query = await db.collection('autoPayment')
-            .where('taxProcess','==','waiting')
-            .get();
-        return query.docs.map(doc=>{
-          const { createdAt, requestDate, ...rest } = doc.data();
-          return {
-            id: doc.id,
-            createdAt: formatTime(createdAt),
-            requestDate: formatTime(requestDate),
-            ...rest
-          }
-        });
+        try {
+          const query = await db.collection('autoPayment')
+              .where('taxProcess','==','waiting')
+              .get();
+          return query.docs.map(doc=>{
+            const { createdAt, requestDate, ...rest } = doc.data();
+            return {
+              id: doc.id,
+              createdAt: formatTime(createdAt),
+              requestDate: formatTime(requestDate),
+              ...rest
+            }
+          });
+        } catch (error) {
+          console.log(error)
+        }
     }
 
     function openSoModal(item){
@@ -81,7 +86,7 @@ function ETaxScreen() {
       if(!ok) return;
       setLoading(true);
       try {
-        const telegram = await db.runTransaction( async (transaction)=>{
+        const autoPaymentData = await db.runTransaction( async (transaction)=>{
           const soRef = db.collection('autoPayment').doc(item.id);
           const soDoc = await transaction.get(soRef);
           if(!soDoc.exists) throw new Error('ไม่พบข้อมูลใบสั่งขาย');
@@ -93,15 +98,30 @@ function ETaxScreen() {
           return soDoc.data()
         });
 
-        const { chat_id_taxManager, message_id_eTax, chat_id, orderNumber, etaxEnable, receiptEnable, hardCopyTaxEnable } = telegram;
+        const { telegram = [], chat_id_taxManager, message_id_eTax, message_id_eTax_manager, chat_id } = autoPaymentData;
 
-        if(message_id_eTax){
-            await telegramDelete({ chat_id: chat_id_taxManager, message_id: message_id_eTax });
+        const etaxPayload = telegram.find(a=>a.type === 'E-TAX');
+        if(etaxPayload){
+          const updatePromises = [];
+
+          const { process = [] } = etaxPayload;
+          const newProcess = [
+                                  ...process, 
+                                  { name:`ดำเนินการเสร็จสิ้น`, createdAt: `${stringDateTimeReceipt(new Date())}\n*ข้อความจะถูกลบอัตโนมัติใน 12 ชั่วโมง\n✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅`, id:uuidv4() }
+                              ]
+          updatePromises.push(sendMessage({ chat_id, ...etaxPayload, process:newProcess }));
+          if(message_id_eTax){ // ช่องของเซล
+              updatePromises.push(deleteMessage({ chat_id, message_id: message_id_eTax }));
+          }
+          if(message_id_eTax_manager){ // ช่องของผู้จัดการ
+              updatePromises.push(deleteMessage({ chat_id:chat_id_taxManager, message_id: message_id_eTax_manager }));
+          }
+          const results = await Promise.all(updatePromises);
+          const newMessageId = results[0];
+          await telegramDeleteQueue({ chat_id: chat_id, message_id: newMessageId });
         }
-        if(chat_id){
-            const reply_message_id = await sendEtax({ chat_id, orderNumber, status:'ส่งใบกำกับภาษีเรียบร้อย', etaxEnable, receiptEnable, hardCopyTaxEnable });
-            await telegramDeleteQueue({ chat_id, message_id: reply_message_id });
-        }
+        
+   
         toastSuccess('เปลี่ยนสถานะเป็น ส่งใบกำกับภาษีเรียบร้อย');
         setMasterData(prev=>prev.filter(i=>i.id !== item.id));
       } catch (error) {

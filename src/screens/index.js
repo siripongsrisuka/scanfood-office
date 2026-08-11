@@ -51,6 +51,13 @@ import CodeRelativeScreen from "./CodeRelativeScreen";
 import TrainingScheduleScreen from "./TrainingScheduleScreen";
 import UploadStaffScreen from "./UploadStaffScreen";
 import TaxInvoiceReceiptTemplate from "./TaxInvoiceReceiptTemplate";
+import CommissionHistoryScreen from "./CommissionHistoryScreen";
+import CommissionScreen from "./CommissionScreen";
+import CrmLeadScreen from "./CrmLeadScreen";
+import ExecutiveSalesLeaderboardScreen from "./ExecutiveSalesLeaderboardScreen";
+import FacebookLeadScreen from "./FacebookLeadScreen";
+import ReportLinkCodeFalse from "./ReportLinkCodeFalse";
+import ResetPasswordScreen from "./ResetPasswordScreen";
 
 export {
     TaxInvoiceReceiptTemplate,
@@ -104,4 +111,11 @@ export {
     ImportItemStoreScreen,
     HomeScreen,
     CloneScreen,
+    CommissionHistoryScreen,
+    CommissionScreen,
+    CrmLeadScreen,
+    ExecutiveSalesLeaderboardScreen,
+    FacebookLeadScreen,
+    ReportLinkCodeFalse,
+    ResetPasswordScreen,
 };

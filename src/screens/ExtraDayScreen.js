@@ -11,8 +11,8 @@ import { db } from "../db/firestore";
 import { reverseSort } from "../Utility/sort";
 import { scanfoodAPI } from "../Utility/api";
 import { initialExtraDay } from "../configs";
-import { replyExtraDay, sendExtraDay, telegramDelete, telegramDeleteQueue } from "../Utility/telegram";
-
+import { deleteMessage, sendMessage, telegramDeleteQueue } from "../Utility/telegram";
+import { v4 as uuidv4 } from 'uuid';
 
 function ExtraDayScreen() {
     const [extraDay_Modal, setExtraDay_Modal] = useState(false);
@@ -69,13 +69,33 @@ function ExtraDayScreen() {
                 status:'pending',
                 billDate:stringYMDHMS3(new Date()),
                 chat_id,
-                chat_id_saleManager:-1003211008949
+                chat_id_saleManager:-1003211008949 // พี่หลุย
             }
             await extraDayRef.set(payload);
-            const message_id = await sendExtraDay({...payload, chat_id });
-            const message_id_saleManager = await sendExtraDay({...payload, chat_id:payload.chat_id_saleManager });
-            await extraDayRef.update({ message_id, message_id_saleManager });
-            setMasterData(prev=>[...prev,payload])
+            const extraDayMessage = {
+                        type:'extraDay',
+                        header:'4)  ขอวันใช้งาน',
+                        body:`
+ลูกค้า : ${payload.shopName}
+days : ${payload.days}
+เหตุผล : ${payload.reason}
+เซล : ${profileName}`,
+                        process:[
+                            {
+                            id:uuidv4(),
+                            name:'สถานะ : รออนุมัติ',
+                            createdAt:stringDateTimeReceipt(new Date()),
+                            }
+                        ]
+            }
+            const results = await Promise.all([
+                sendMessage({...extraDayMessage, chat_id }),
+                sendMessage({...extraDayMessage, chat_id:payload.chat_id_saleManager }),
+            ])
+            const newMessageId = results[0];
+            const newMessageIdSaleManager = results[1];
+            await extraDayRef.update({ message_id:newMessageId, message_id_saleManager:newMessageIdSaleManager, extraDayMessage });
+            setMasterData(prev=>[...prev,{...payload, message_id:newMessageId, message_id_saleManager:newMessageIdSaleManager, extraDayMessage },] );
             toastSuccess('ยื่นคำขอวันใช้งานสำเร็จ')
         } catch (error) {
             alert('เกิดข้อผิดพลาดในการยื่นคำขอวันใช้งาน')
@@ -88,17 +108,34 @@ function ExtraDayScreen() {
 
     async function approvedExtraDay(item){
         const { shopId, days, id } = item;
-        const { chat_id, chat_id_saleManager, message_id_saleManager, message_id } = current;
+        const { chat_id, chat_id_saleManager, message_id_saleManager, message_id, extraDayMessage = null } = current;
         setLoading(true);
         try {
             const { status, data } = await scanfoodAPI.post(
                 "/office/extraDay/",
                 item
             );
-            const reply_message_id = await replyExtraDay({ chat_id, message_id, status:'approved' });
-            await telegramDelete({ chat_id:chat_id_saleManager, message_id:message_id_saleManager });
-            await telegramDeleteQueue({ chat_id, message_id:reply_message_id });
-            await telegramDeleteQueue({ chat_id, message_id });
+
+            if(extraDayMessage){
+                const updatePromises = [];
+
+                const { process = [] } = extraDayMessage;
+                const newProcess = [
+                                        ...process, 
+                                        { name:`อนุมัติวันใช้งานเสร็จสิ้น`, createdAt: `${stringDateTimeReceipt(new Date())}\n*ข้อความจะถูกลบอัตโนมัติใน 12 ชั่วโมง\n✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅`, id:uuidv4() }
+                                    ]
+                updatePromises.push(sendMessage({ chat_id, ...extraDayMessage, process:newProcess }));
+                if(message_id){ // ช่องของเซล
+                    updatePromises.push(deleteMessage({ chat_id, message_id }));
+                }
+                if(message_id_saleManager){ // ช่องของผู้จัดการ
+                    updatePromises.push(deleteMessage({ chat_id:chat_id_saleManager, message_id: message_id_saleManager }));
+                }
+                const results = await Promise.all(updatePromises);
+                const newMessageId = results[0];
+               
+                await telegramDeleteQueue({ chat_id: chat_id, message_id: newMessageId });
+            }
             setMasterData(prev=>prev.filter(a=>a.id!==id) );
             toastSuccess('อนุมัติวันใช้งานสำเร็จ');
 
@@ -112,20 +149,49 @@ function ExtraDayScreen() {
     async function handleRejectExtraDay(item){
         setLoading(true);
         try {
-            const { chat_id, chat_id_saleManager, message_id_saleManager, message_id } = current;
+            const { chat_id, chat_id_saleManager, message_id_saleManager, message_id, extraDayMessage = null } = current;
             const extraDayRef = db.collection('extraDay').doc(item.id);
             await extraDayRef.update({
                 status:'rejected',
                 rejectedAt:new Date(),
             });
-            const reply_message_id = await replyExtraDay({ chat_id, message_id, status:'rejected' });
-            await telegramDelete({ chat_id:chat_id_saleManager, message_id:message_id_saleManager });
-            await telegramDeleteQueue({ chat_id, message_id:reply_message_id });
-            await telegramDeleteQueue({ chat_id, message_id });
+        
+            if(extraDayMessage){
+                const updatePromises = [];
+
+                const { process = [] } = extraDayMessage;
+                const newProcess = [
+                                        ...process, 
+                                        { name:`ปฏิเสธคำขอวันใช้งาน`, createdAt: `${stringDateTimeReceipt(new Date())}\n*ข้อความจะถูกลบอัตโนมัติใน 12 ชั่วโมง\n✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅`, id:uuidv4() }
+                                    ]
+                updatePromises.push(sendMessage({ chat_id, ...extraDayMessage, process:newProcess }));
+                if(message_id){ // ช่องของเซล
+                    updatePromises.push(deleteMessage({ chat_id, message_id }));
+                }
+                if(message_id_saleManager){ // ช่องของผู้จัดการ
+                    updatePromises.push(deleteMessage({ chat_id:chat_id_saleManager, message_id: message_id_saleManager }));
+                }
+                const results = await Promise.all(updatePromises);
+                const newMessageId = results[0];
+          
+                await telegramDeleteQueue({ chat_id: chat_id, message_id: newMessageId });
+            }
             setMasterData(prev=>prev.filter(a=>a.id!==item.id) );
             toastSuccess('ปฏิเสธคำขอวันใช้งานสำเร็จ');
         } catch (error) {
-            alert('เกิดข้อผิดพลาดในการปฏิเสธคำขอวันใช้งาน')
+            // alert('เกิดข้อผิดพลาดในการปฏิเสธคำขอวันใช้งาน')
+              console.error("handleRejectExtraDay error:", error);
+    console.error("handleRejectExtraDay error.response:", error?.response);
+    console.error("handleRejectExtraDay error.response.data:", error?.response?.data);
+    console.error("handleRejectExtraDay error.message:", error?.message);
+    console.error("handleRejectExtraDay error.stack:", error?.stack);
+
+    alert(
+      error?.response?.data?.message ||
+      error?.message ||
+      JSON.stringify(error, null, 2) ||
+      "เกิดข้อผิดพลาดในการปฏิเสธคำขอวันใช้งาน"
+    );
         } finally {
             setLoading(false);
         }

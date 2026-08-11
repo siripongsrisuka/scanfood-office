@@ -7,12 +7,13 @@ import {
   Table
 } from "react-bootstrap";
 import { db, prepareFirebaseImage, webImageDelete } from "../db/firestore";
-import { Modal_Loading, Modal_Note, Modal_OneInput, Modal_Shop } from "../modal";
+import { Modal_Loading, Modal_Note, Modal_OneInput, Modal_ReportHardware, Modal_SearchHardware, Modal_Shop } from "../modal";
 import { OneButton } from "../components";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { formatTime, toastSuccess } from "../Utility/function";
 import { cashiersEquipment, colors, distanceOptions, hostedSystems, initialNote, networkSystems, printerModes, printers, printPatterns, routerSystems, initialShopType, paymentJourneys } from "../configs";
 import { v4 as uuidv4 } from 'uuid';
+import { set } from "date-fns";
 
 const initialCustomerProfile = {
     code:'', // 00001
@@ -70,6 +71,11 @@ function CustomerProfileScreen() {
     const [currentShop, setCurrentShop] = useState(initialShop);
     const [shop_Modal, setShop_Modal] = useState(false);
     const [lastCreated, setLastCreated] = useState([]);
+    const [hardware_Modal, setHardware_Modal] = useState(false);
+    const [hardwareOrders, setHardwareOrders] = useState([]);
+    const [searchHardware_Modal, setSearchHardware_Modal] = useState(false);
+
+
 
     useEffect(()=>{
         fetchLastCreated();
@@ -337,13 +343,82 @@ function CustomerProfileScreen() {
       setLoading(false);
     }
   
+  };
+
+  async function openHardwareModal(){
+    setLoading(true);
+    try {
+      const query = await db.collection('hardwareOrder')
+        .where('linkId', '==', currentCustomer.id)
+        .get();
+      const data = query.docs.map(doc=>({
+        id:doc.id,
+        ...doc.data(),
+        timestamp:formatTime(doc.data().timestamp),
+      }));
+      setHardwareOrders(data);
+      setHardware_Modal(true);
+    } catch (error) {
+      alert(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  async function addHardwareOrder(item){
+    setSearchHardware_Modal(false);
+    const { orderNumber, id:orderId } = item;
+    setLoading(true);
+    try {
+      await db.runTransaction(async (transaction) => {
+        const orderRef = db.collection('hardwareOrder').doc(orderId);
+        const orderDoc = await transaction.get(orderRef);
+        if(!orderDoc.exists) throw 'ไม่พบคำสั่งซื้อในระบบ';
+        const { linkId } = orderDoc.data();
+        if(linkId) throw 'คำสั่งซื้อนี้ถูกเชื่อมโยงกับลูกค้ารายอื่นแล้ว';
+        const customerRef = db.collection('customerProfile').doc(currentCustomer.id);
+        const customerDoc = await transaction.get(customerRef);
+        if(!customerDoc.exists) throw 'ไม่พบรหัสลูกค้านี้ในระบบ';
+        const { shops = [] } = customerDoc.data();
+        transaction.update(orderRef, { 
+          linkId:currentCustomer.id, 
+          linkCode:true, 
+          linkShopName:currentShop.shopName,
+          linkedAt:new Date(),
+          linkBy:profileId,
+          linkByName:profileName,
+        });
+        const updatedShops = shops.map(shop=>shop.id===currentShop.id ? { ...shop, hardwares:[...(shop?.hardwares || []), orderId] } : shop);
+        transaction.update(customerRef, { shops:updatedShops, updatedAt:new Date(), updatedBy:profileId, updatedName:profileName });
+
+      });
+
+      setCurrentCustomer(prev=>({...prev, shops:prev.shops.map(shop=>shop.id===currentShop.id ? { ...shop, hardwares:[...currentShop?.hardwares || [], orderId] } : shop) }));
+
+      toastSuccess(`เชื่อมโยงคำสั่งซื้อ ${orderNumber} กับลูกค้าเรียบร้อยแล้ว`);
+    } catch (error) {
+      alert(error);
+    } finally {
+      setLoading(false);
+    }
+
   }
+
 
 
 
   return (
     <div style={styles.container} >
         <h1>ข้อมูลลูกค้า</h1>
+        <Modal_SearchHardware
+          show={searchHardware_Modal}
+          onHide={() => setSearchHardware_Modal(false)}
+          onSubmit={addHardwareOrder}
+        />
+        <Modal_ReportHardware
+          show={hardware_Modal}
+          onHide={()=>{setHardware_Modal(false)}}
+          currentDisplay={hardwareOrders}
+        />
         <Modal_Loading show={loading} />
         <Modal_Shop
           show={shop_Modal}
@@ -380,10 +455,11 @@ function CustomerProfileScreen() {
             <OneButton {...{ text:'+ เพิ่มโน๊ต', submit: ()=>{openNoteModal({})}, variant:'success' }} />
             <OneButton {...{ text:'+ ร้าน', submit: ()=>{openShop({})}, variant:'success' }} />
             {shops.map((shop,index)=>{
-              const { paymentJourney, shopName, storeSize, features, shopType, paymentGateway, router, cashiersPos, kitchenPrinters, ownerManager, note = '', shopTel } = shop;
-              return <Row onClick={()=>{openShop(shop)}} key={index} style={{ border:`1px solid ${softWhite}`, margin:'10px 0px', padding:10, borderRadius:10, backgroundColor:softWhite }} >
+              const { paymentJourney, shopName, storeSize, features, shopType, paymentGateway, router, cashiersPos, 
+                kitchenPrinters, ownerManager, note = '', shopTel, hardwares = [] } = shop;
+              return <Row  key={index} style={{ border:`1px solid ${softWhite}`, margin:'10px 0px', padding:10, borderRadius:10, backgroundColor:softWhite }} >
                       <Col sm='12' md='6' lg='4'  >
-                        <Card  style={{ padding: '1rem', marginTop: 10, minHeight:'400px' }}>
+                        <Card onClick={()=>{openShop(shop)}}  style={{ padding: '1rem', marginTop: 10, minHeight:'400px' }}>
                             <TextComponent3 text1="ชื่อร้าน :" text2={shopName} />
                             <TextComponent text1="ชื่อเจ้าของ/ผู้จัดการ :" text2={ownerManager || '-'} />
                             <TextComponent text1="เบอร์ที่ลงทะเบียน :" text2={shopTel || '-'} />
@@ -434,6 +510,23 @@ function CustomerProfileScreen() {
                                   </Card>
                                 </Col>
                       })}
+                      {/* {hardwares.map((hardware,index3)=>{
+                        const { printer, printerPattern, name, printerMode, distance, ipAddress, note } = hardware;
+                        return <Col sm='12' md='6' lg='4' key={index3} >
+                                  <Card  style={{ padding: '1rem', marginTop: 10, minHeight:'400px' }}>
+                                      <h6 style={{ backgroundColor: '#0D8266', padding:5 }} >อุปกรณ์ที่ซื้อกับเรา {index3 + 1}</h6>
+                                  </Card>
+                                </Col>
+                      })} */}
+                      <Col sm='12' md='6' lg='4' >
+                          <Card  style={{ padding: '1rem', marginTop: 10, minHeight:'400px', display:'flex', alignItems:'center', justifyContent:'center' }} >
+                              {hardwares.length > 0
+                                ? <OneButton {...{ text:`ดูประวัติอุปกรณ์ที่ซื้อจากเรา ${hardwares.length} ออเดอร์`, submit: ()=>{openHardwareModal()}, variant:'success' }} />
+                                :null
+                              }
+                              <OneButton {...{ text:`เพิ่มอุปกรณ์ที่ซื้อกับเรา`, submit: ()=>{setSearchHardware_Modal(true);setCurrentShop(shop)}, variant:'warning' }} />
+                          </Card>
+                        </Col>
                              
                     </Row>
             })}

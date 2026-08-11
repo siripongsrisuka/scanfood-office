@@ -7,8 +7,7 @@ import { SearchControl, TimeControlHardwareOrder } from "../components";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import TablePagination from '@mui/material/TablePagination';
 import { goToTop, searchMultiFunction } from "../Utility/function";
-import { Modal_WarehouseImage } from "../modal";
-import { db, prepareFirebaseImage } from "../db/firestore";
+import { db } from "../db/firestore";
 
 
 function ReportHardware() {
@@ -20,8 +19,6 @@ function ReportHardware() {
     const [rowsPerPage, setRowsPerPage] = useState(50);
     const [resultLength, setResultLength] = useState(0);
     const [search, setSearch] = useState('');
-    const [oldImageUrls, setOldImageUrls] = useState(null);
-    const [image_Modal, setImage_Modal] = useState(false);
     
 
     const handleChangePage = (event, newPage) => {
@@ -39,7 +36,7 @@ function ReportHardware() {
     useEffect(()=>{
         let result = displayHardwareOrders.filter(a=>['sent','success'].includes(a.status));
         if(search){
-          result = searchMultiFunction(result,search,['createdName'])
+          result = searchMultiFunction(result,search,['orderNumber','shopName','profileName']);
         }
         const fData = result.map((item,index)=>{return({ ...item, no:index +1 })}).filter((item,index)=>{return(index >=(page*rowsPerPage) && index <= ((page+1)*rowsPerPage)-1)})
         setCurrentDisplay(fData);
@@ -48,13 +45,30 @@ function ReportHardware() {
     },[page,rowsPerPage,displayHardwareOrders,search]);
 
 
+    async function reverseOrder(item){
+        const ok = window.confirm("ต้องการย้อนสถานะคำสั่งซื้อเป็น 'จัดเสร็จแล้ว' หรือไม่?");
+        if (!ok) return;
+        try {
+            await db.collection('hardwareOrder').doc(item.id).update({
+                status:'packed',
+                noNeedTelegram:true, // เพราะกระบวนการย้อนกลับไม่ต้องแจ้งเตือน
+            });
+
+            alert('ย้อนสถานะคำสั่งซื้อเรียบร้อยแล้ว');
+        } catch (error) {
+            console.error("Error updating document: ", error);
+            alert('เกิดข้อผิดพลาดในการย้อนสถานะคำสั่งซื้อ');
+        }
+    }
+
+
 
   return (
     <div style={styles.container} >
         <h1>ประวัติงาน</h1>
   
         <TimeControlHardwareOrder  />
-        <SearchControl {...{ placeholder:'ค้นหาด้วยผู้รับ', search, setSearch }} />
+        <SearchControl {...{ placeholder:'ค้นหาด้วยเลขที่คำสั่งซื้อ, ร้านค้า, หรือเซล', search, setSearch }} />
         <br/>
         <h4>ค้นพบ {resultLength} รายการ</h4> 
         <Table striped bordered hover responsive  variant="light"   >
@@ -86,14 +100,18 @@ function ReportHardware() {
                               ))}
                             </td>
                             <td style={styles.container4}>{profileName}</td>
-                            <td style={styles.container4}>{status}</td>
+                            {status === 'sent'
+                                ?<td onClick={()=>{reverseOrder(item)}} style={{...styles.container4, color:'blue', cursor:'pointer'}}>{status}(กดเพื่อย้อนสถานะ)</td>
+                                :<td style={styles.container4}>{status}</td>
+                            }
+                            <td onClick={()=>{reverseOrder(item)}} style={styles.container4}>{status}</td>
                             <td style={{ width:'20%', maxWidth:'300px' }}  >
                               <p style={{ maxWidth:'300px', wordWrap: 'break-word' }} >{link}</p>
                             </td>
                             <td   style={styles.container4}>
                                 {imageUrls.map((a,i)=><img key={i} src={a} alt="img" width={50} style={{ marginRight:5 }} />)}
                             </td>
-                            <td  style={styles.container4} >{comment}</td>
+                            <td  >{comment}</td>
                         </tr>
             })}
             </tbody>

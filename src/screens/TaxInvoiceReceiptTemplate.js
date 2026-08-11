@@ -15,7 +15,6 @@ import Sarabun from "../assets/fonts/Sarabun/Sarabun-Regular.ttf";
 import Bold from "../assets/fonts/Sarabun/Sarabun-Bold.ttf";
 import Prompt from "../assets/fonts/Sarabun/Prompt-Bold.ttf";
 import { formatCurrency, numberToThaiText } from "../Utility/function";
-import { stringYMDHMS3 } from "../Utility/dateTime";
 
 // =========================
 // FONT
@@ -35,18 +34,6 @@ Font.register({
   src: Prompt,
 });
 
-// =========================
-// MOCK DATA
-// =========================
-// const seller = {
-//   company: "บริษัท ช็อปแชมป์ จำกัด",
-//   branchText: "(สำนักงานใหญ่)",
-//   address1: "61/114 ชั้นที่ 2 ห้องเลขที่ 2บี ถนนพระราม 9 แขวงห้วยขวาง เขตห้วยขวาง ",
-//   address2: "กรุงเทพ 10310",
-//   taxId: "0105566020622",
-//   phone: "020556595",
-//   website: "www.shopchamp.co",
-// };
 
 const installmentRates = {
   "0": '3%',
@@ -56,51 +43,6 @@ const installmentRates = {
   "10": '11.77%',
 }
 
-const meta = {
-  invoiceNo: "INV2026030011",
-  date: "09/03/2026",
-  sellerName: "ธนัชชา พรหมบุตร",
-  contactName: "คุณจุฑาทิพย์ ช่วงเวฬุวรรณ",
-  contactPhone: "0659942666",
-  contactEmail: "ruaylonfa.center@gmail.com",
-};
-
-// const items = [
-//   {
-//     no: 1,
-//     name: "Software Scanfood Full-Package 1",
-//     details: [
-//       "QR Code (การสแกนสั่งอาหารภายในร้าน)",
-//       "Self Pickup (การสแกนสั่งอาหารภายนอกร้าน)",
-//       "Staff management (แยกสิทธิ์การใช้งานพนักงาน)",
-//     ],
-//     qty: "1",
-//     unit: "Licence",
-//     unitPrice: "4,200.00",
-//     discount: "-",
-//     total: "4,200.00",
-//   },
-// ];
-
-const summary = {
-  subtotal: "4,200.00",
-  vat: "294.00",
-  grandTotal: "4,494.00",
-  withholdingTax: "126.00",
-  paid: "4,368.00",
-  thaiText: "(สี่พันสี่ร้อยเก้าสิบสี่บาทถ้วน)",
-};
-
-const payment = {
-  method: "transfer",
-  bank: "กสิกรไทย ออมทรัพย์",
-  accountNo: "1532981103",
-  date: "09/03/2026",
-  amount: "4,368.00",
-};
-
-// ถ้ามีโลโก้จริง เปลี่ยน path ตรงนี้ได้
-const logoUrl = "/logo-shopchamp.png";
 
 // =========================
 // STYLES
@@ -416,11 +358,11 @@ const InvoiceDocument = ({ data }) => {
    const subTotal = subtotal +deliveryFee;
 
    const thaiText = numberToThaiText(net);
-
+   const date = formatDateDMY(createdAt);
 
   return (
     <Document
-      title={meta.invoiceNo}
+      title={orderNumber}
       author="Shopchamp"
       subject="ใบกำกับภาษี/ใบเสร็จรับเงิน"
     >
@@ -465,7 +407,7 @@ const InvoiceDocument = ({ data }) => {
               </View>
               <View style={styles.metaRow}>
                 <Text style={styles.metaLabel}>วันที่  </Text>
-                <Text style={styles.metaValue}>{formatDateDMY(createdAt)}  </Text>
+                <Text style={styles.metaValue}>{date}  </Text>
               </View>
               <View style={styles.metaRow}>
                 <Text style={styles.metaLabel}>ผู้ขาย  </Text>
@@ -588,11 +530,6 @@ const InvoiceDocument = ({ data }) => {
         </View>
 
 
-
-      
-
-
-
         {/* SIGNATURES */}
         <View style={styles.signaturesHeader}>
           <Text>ในนาม {vatInfo.name}  </Text>
@@ -600,11 +537,19 @@ const InvoiceDocument = ({ data }) => {
         </View>
     
         <View style={{ display:'flex', flexDirection:'row', justifyContent:'space-around',marginBottom:20,paddingVertical:10 }} >
-            <View style={{ display:'flex', flexDirection:"column", alignItems:'center' }} >
+            <View style={{ display:'flex', flexDirection:"column", alignItems:'center', height:70 }} >
+                <View style={{ height:30, display:'flex', justifyContent:'flex-end'}} >
+                  <Text style={{ padding:0 }} ></Text>
+
+                </View>
                 <Text>______________________________________</Text>
                 <Text style={{paddingVertical:3,marginTop:5, textAlign:'center'}} >ผู้สั่งซื้อสินค้า </Text>
             </View>
-            <View style={{ display:'flex', flexDirection:"column", alignItems:'center' }} >
+            <View style={{ display:'flex', flexDirection:"column", alignItems:'center', height:70 }} >
+                <View style={{ height:30, display:'flex', justifyContent:'flex-end'}} >
+                  <Text style={{ padding:0 }} ></Text>
+
+                </View>
                 <Text>______________________________________</Text>
                 <Text style={{paddingVertical:3,marginTop:5, textAlign:'center'}} >วันที่ </Text>
             </View>
@@ -615,13 +560,22 @@ const InvoiceDocument = ({ data }) => {
               :null
             }
             
-            <View style={{ display:'flex', flexDirection:"column", alignItems:'center' }} >
-                <Text>______________________________________</Text>
+            <View style={{ display:'flex', flexDirection:"column", alignItems:'center', height:70 }} >
+                <View style={{ height:30, display:'flex', justifyContent:'flex-end'}} >
+                  <Image src={'/signature.png'} style={{ width:60, height:30, marginBottom:-10 }} />
+
+                </View>
+                <Text >______________________________________</Text>
                 <Text style={{paddingVertical:3,marginTop:5, textAlign:'center'}} >ผู้อนุมัติ </Text>
             </View>
-            <View style={{ display:'flex', flexDirection:"column", alignItems:'center' }} >
+            <View style={{ display:'flex', flexDirection:"column", alignItems:'center', height:70 }} >
+                <View style={{ height:30, display:'flex', justifyContent:'flex-end'}} >
+                  <Text style={{ padding:0 }} >{date}</Text>
+
+                </View>
+                
                 <Text>______________________________________</Text>
-                <Text style={{paddingVertical:3,marginTop:5, textAlign:'center'}} >วันที่ </Text>
+                <Text style={{paddingVertical:3,marginTop:5 }} >วันที่ </Text>
             </View>
         </View>
       </Page>

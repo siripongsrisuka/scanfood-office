@@ -15,7 +15,6 @@ import {
   OverlayTrigger,
   Tooltip
 } from "react-bootstrap";
-import { sendWarehouse, telegramDelete } from "../Utility/telegram";
 import { db } from "../db/firestore";
 
 function getWeeksOfCurrentYearIncludeCurrent() {
@@ -82,8 +81,6 @@ console.log(weeks);
     <div style={styles.container} >
       <h1>Performance</h1>
       <Button onClick={test} >test</Button>
-      <Button onClick={()=>{sendWarehouse({ chat_id:"-1003891934173" })}} >sendWarehouse</Button>
-      <Button onClick={()=>{telegramDelete({ chat_id:"-1003891934173", message_id:12 })}} >delete</Button>
       <Table striped bordered hover responsive  variant="light"   >
             <thead  >
             <tr>

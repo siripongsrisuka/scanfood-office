@@ -23,13 +23,14 @@ function OfficeScreen() {
   const { profile } = useSelector((state)=> state.profile);
   const { id:profileId } = profile;
   const { office : {  humanRight }  } = useSelector((state)=> state.office);
+  const currentVersion = 'V.4.0.4';
 
   useEffect(() => {  // เอาไว้กำหนด display ของ sidebar
     // Function to update the window width state
     dispatch(fetchOffice());
     dispatch(fetchWarehouse())
 
-
+    
 
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
@@ -107,7 +108,9 @@ function OfficeScreen() {
                             }} >&emsp;<i class="bi bi-box-arrow-left"></i>&emsp;ออกจากระบบ</Dropdown.Item>
                         </Dropdown>&emsp;&emsp;&emsp;&emsp;
                       </div>
-                      <h6 onClick={()=>window.location.reload()} >V.3 รีเฟรช</h6>
+                      <div onClick={()=>window.location.reload()} style={{ padding:10, backgroundColor:softWhite, borderRadius:20, cursor:'pointer' }}  >
+                        <h6 >{currentVersion} รีเฟรช</h6>
+                      </div>
                       <div onClick={()=>{setShort(false)}} style={styles.container4} > 
                         <i class="bi bi-list"></i>
                       </div>
@@ -126,7 +129,7 @@ function OfficeScreen() {
                     <div style={styles.container8} >
                       <div onClick={()=>{setShort(true)}} style={styles.container9} > 
                         <i class="bi bi-list"></i>
-                        <h6  >V.3 </h6>
+                        <h6  >{currentVersion} </h6>
                       </div>
                       <img style={styles.container10} src="/logo512.png" />
                        

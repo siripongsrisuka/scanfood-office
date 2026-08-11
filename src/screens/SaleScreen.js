@@ -33,6 +33,7 @@ function SaleScreen() {
 
 
     const sales = useMemo(()=>{
+        // return humanRight.filter(a=>a.team)
         return humanRight.filter(a=>a.team && !a.saleManagerTeam)
     },[humanRight]);
 
@@ -41,7 +42,7 @@ function SaleScreen() {
     //------------------------เกี่ยวกับ Lead ------------------------------
     const [leads, setLeads] = useState([]);// จำนวน lead ทั้งหมด
     const [currentLead, setCurrentLead] = useState(initialLead);
-    const { id:leadId, shopId, shopName, name, status:leadStatus } = currentLead;
+    const { id:customerId, shopId, shopName, name, status:leadStatus, leadId = '' } = currentLead;
     const [lead_Modal, setLead_Modal] = useState(false);
 
     //------------------------เกี่ยวกับ ใบเสนอราคา ------------------------------
@@ -108,11 +109,11 @@ function SaleScreen() {
         if(leadStatus !=='waiting') return alert('แก้ไขไม่ได้')
         setLoading(true);
         try {
-            if(leadId){
-                const leadRef = db.collection('customer').doc(leadId);
+            if(customerId){
+                const leadRef = db.collection('customer').doc(customerId);
                 await leadRef.update(currentLead);
                 setLeads(prev=>prev.map(item=>
-                    item.id === leadId
+                    item.id === customerId
                         ?currentLead
                         :item
                 ));
@@ -153,6 +154,7 @@ function SaleScreen() {
         );
         return data
     }
+    
 
     // 200%
     async function handleQuotation(payload){
@@ -188,7 +190,8 @@ function SaleScreen() {
                 shopId:`sale:${autoPaymentRef.id}`,
                 amount:Number(amount.toFixed(2)),
                 ref2:'auto',
-            }
+            };
+
             const body = paymentType === 'posxpay'
                 ?{...base, channelType:'posxpay', serial:'WQRN002405000023', token:process.env.REACT_APP_API_TOKEN }
                 :paymentType === 'kbank'
@@ -196,15 +199,19 @@ function SaleScreen() {
                 :paymentType === 'beamScanfood'
                 ?{...base, channelType:'beamLink', installments, paymentType:'beamScanfood' }
                 :{...base, channelType:'beamLink', installments, paymentType:'beamShopchamp'  }
-            const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,body);
-            const { 
-                chargeId:thisChargeId,
-                qrCode:thisQrCode,
-            } = data?.data;
-            qrCode = thisQrCode;
-            if(paymentType==='posxpay'){
-                chargeId = thisChargeId;
+            
+            if(paymentType!=='kbank'){
+                const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,body);
+                const { 
+                    chargeId:thisChargeId,
+                    qrCode:thisQrCode,
+                } = data?.data;
+                qrCode = thisQrCode;
+                if(paymentType==='posxpay'){
+                    chargeId = thisChargeId;
+                }
             }
+            
 
             const paymentData = {
                 ...currentQuotation,
@@ -222,19 +229,19 @@ function SaleScreen() {
                 saleName:profileName,
                 process:paymentType==='posxpay'?"request":"preManual", // request, cancel, success, paid
                 team,
-                customerId:leadId,
+                customerId,
+                leadId,
                 name,
                 id:autoPaymentRef.id,
                 requestDate, 
                 requestBillDate:stringYMDHMS3(requestDate),
                 chat_id,
-                chat_id_saleManager:-1003891934173, // หลุย 
+                chat_id_saleManager:-1003891934173, // บุษบา 
                 chat_id_taxManager:-1003871427406, // ต้น
                 };
 
             const addOnData = await db.runTransaction(async (transaction) => {
                 let orderNumber = '';
-                let taxProcess = null;
                 const docNumberRef = db.collection("admin").doc('documentNumber');
                 const docNumberDoc = await transaction.get(docNumberRef);
 
@@ -270,40 +277,55 @@ function SaleScreen() {
                 transaction.update(docNumberRef, { value:newValue, timestamp: new Date() });
            
                 orderNumber = receiptNumber
-                if(['2','3'].includes(taxStep)){
-                    taxProcess = 'waiting';
-                }
+             
                 transaction.set(autoPaymentRef,{
                     ...paymentData,
-                    taxProcess,
                     orderNumber
                 })
                 return {
-                    taxProcess,
                     orderNumber
                 }
             });
 
-            if(paymentType==='posxpay'){
-                const [ data1, data2 ] = await Promise.all([
-                    send({...paymentData, chat_id }),
-                    send({...paymentData, chat_id:paymentData.chat_id_saleManager }),
-                ])
-                const { message_id } = data1
-                const { message_id:message_id_saleManager } = data2
-                await db.collection('autoPayment').doc(autoPaymentRef.id).update({
-                    message_id,
-                    message_id_saleManager
-                });
-                toastSuccess('สร้างบิลสำเร็จ รอชำระเงิน');
-            }
+            // if(paymentType==='posxpay'){
+            //     const [ data1, data2 ] = await Promise.all([
+            //         send({...paymentData, chat_id }),
+            //         send({...paymentData, chat_id:paymentData.chat_id_saleManager }),
+            //     ])
+            //     const { message_id } = data1
+            //     const { message_id:message_id_saleManager } = data2
+            //     await db.collection('autoPayment').doc(autoPaymentRef.id).update({
+            //         message_id,
+            //         message_id_saleManager
+            //     });
+            //     toastSuccess('สร้างบิลสำเร็จ รอชำระเงิน');
+            // }
             setMini_Modal(true);    
             const current = {...paymentData,...addOnData}
             setCurrentQuotation(current)
        
             setQuotations(prev=>[current,...prev]);
         } catch (error) {
-            alert(error.message);
+            // alert(error.message);
+            console.error("handleQuotation error:", error);
+            console.error("error.message:", error?.message);
+            console.error("error.code:", error?.code);
+            console.error("error.response?.status:", error?.response?.status);
+            console.error("error.response?.data:", error?.response?.data);
+            console.error("error.stack:", error?.stack);
+
+            alert(
+                JSON.stringify(
+                    {
+                        message: error?.message,
+                        code: error?.code,
+                        status: error?.response?.status,
+                        data: error?.response?.data,
+                    },
+                    null,
+                    2
+                )
+            );
         } finally {
             setLoading(false);
         }
@@ -339,10 +361,10 @@ function SaleScreen() {
                 const updatedField = {
                     shopId:id, shopName:name, storeSize
                 }
-                const customerRef = db.collection('customer').doc(leadId);
+                const customerRef = db.collection('customer').doc(customerId);
                 await customerRef.update(updatedField);
                 setLeads(prev=>prev.map(item=>
-                    item.id === leadId
+                    item.id === customerId
                         ?{
                             ...item,...updatedField
                         }
@@ -362,6 +384,7 @@ function SaleScreen() {
       const option = options.find(a=>a.value === value)
         setOption(option);
     };
+    
 
 
   return (
@@ -420,7 +443,6 @@ function SaleScreen() {
             setCurrent={setCurrentLead}
             submit={handleLead}
             disabled={currentLead.status !=='waiting'}
-
         />
         <Modal_Loading show={loading} />
         {optionId==='1'

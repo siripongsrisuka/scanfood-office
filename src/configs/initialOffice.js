@@ -62,6 +62,24 @@ export default [
       id:'302'
     },
     {
+      topic: '3.2.2 เซลค่าคอมมิชชั่น',
+      icon: 'bi-speedometer',
+      to:'commission',
+      id:'302'
+    },
+    {
+      topic: '3.2.3 Executive Sales Leaderboard',
+      icon: 'bi-speedometer',
+      to:'executiveSalesLeaderboard',
+      id:'301'
+    },
+    {
+      topic: '3.2.4 Commission History',
+      icon: 'bi-speedometer',
+      to:'commissionHistory',
+      id:'302'
+    },
+    {
       topic: '3.3 ร้านใหม่',
       icon: 'bi-speedometer',
       to:'newShop',
@@ -104,6 +122,19 @@ export default [
       to:'hardwareHistory',
       id:'309'
     },
+    {
+      topic: '3.10 Leads',
+      icon: 'bi-speedometer',
+      to:'lead',
+      id:'302'
+    },
+    {
+      topic: '3.11 เซลที่ยังไม่ผูก Code อุปกรณ์',
+      icon: 'bi-speedometer',
+      to:'reportLinkCodeFalse',
+      id:'302'
+    },
+
 
 
     
@@ -257,7 +288,18 @@ export default [
       to: 'uploadStaff',
       id:'128'
     },
-
+    {
+      topic: '6.12 รีเซ็ตรหัสผ่าน',
+      icon: 'bi-speedometer',
+      to: 'resetPassword',
+      id:'128'
+    },
+    {
+      topic: '6.13 CRM Lead',
+      icon: 'bi-speedometer',
+      to: 'crmLead',
+      id:'128'
+    },
     {
       topic: '6.99 kbankReport',
       icon: 'bi-speedometer',

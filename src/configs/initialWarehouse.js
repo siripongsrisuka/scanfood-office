@@ -10,4 +10,5 @@ export default {
     stock:'',
     stockSetStatus:false, 
     stockSet:[],
+    sharing:0
 }

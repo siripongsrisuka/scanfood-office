@@ -103,8 +103,8 @@ function Modal_Quotation({
         vat = beforeVat * 0.07; // บวกราคาขึ้นอีก 7% ถ้าลูกค้าต้องการใบกำกับภาษีแบบอิเล็กทรอนิกส์(E-Tax)
     };
 
-    if(juristic === '1' && softwarePrice>0 && ['2','3'].includes(taxStep)){
-        withholdingTax = softwarePrice * 0.03; // หักภาษี ณ ที่จ่าย 3% สำหรับนิติบุคคลที่ซื้อซอฟต์แวร์
+    if(juristic === '1' && softwarePrice>0  && ['2','3'].includes(taxStep)){
+        withholdingTax = (softwarePrice + extraCharge) * 0.03; // หักภาษี ณ ที่จ่าย 3% สำหรับนิติบุคคลที่ซื้อซอฟต์แวร์
     }
     const net = beforeVat + vat - withholdingTax;
 
@@ -478,7 +478,7 @@ function Modal_Quotation({
                                         name="branch"
                                         placeholder="สาขา(ถ้าไม่ใช่สำนักงานใหญ่ให้กรอกชื่อสาขา)"
                                         value={vatBranch}
-                                        onChange={(event)=>{setCurrent({...current,vatInfo:{...vatInfo,vatBranch:event.target.value}})}}
+                                        onChange={(event)=>{setCurrent({...current,vatInfo:{...vatInfo,branch:event.target.value}})}}
                                     />
                                 </Col>
                                 :null

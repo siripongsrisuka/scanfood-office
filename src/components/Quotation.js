@@ -8,6 +8,10 @@ import { colors } from "../configs";
 import { Modal_FlatlistSearchShop, Modal_FlatListTwoColumn } from "../modal";
 import { scanfoodAPI } from "../Utility/api";
 import { db, prepareFirebaseImage } from "../db/firestore";
+import { v4 as uuidv4 } from 'uuid';
+import { stringDateTimeReceipt } from "../Utility/dateTime";
+import { sendMessage } from "../Utility/telegram";
+import { useDispatch } from "react-redux";
 
 const { softWhite } = colors;
 
@@ -46,6 +50,7 @@ function Quotation({
     leads,
     setFull_Modal
 }) {
+    const dispatch = useDispatch();
     const {  id:customerId,   } = currentLead;
     const { id:quotationId, withholdingTax = 0, hardware = []  } = currentQuotation;
     const [paymentAction_Modal, setPaymentAction_Modal] = useState(false);
@@ -75,6 +80,7 @@ function Quotation({
     };
 
     function openOptions(item){
+
         setCurrentQuotation(item)
         setPaymentAction_Modal(true);
         const { process } = item;
@@ -102,6 +108,7 @@ function Quotation({
             default:
                 // request and manual 
                 options = quotationOptions.filter(a=>['2','2.1','3','4'].includes(a.id))
+                // options = quotationOptions.filter(a=>['2','2.1','3','4','5'].includes(a.id))
                 break;
         };
         setOptions(options)
@@ -205,7 +212,7 @@ function Quotation({
                 const orderRef = db.collection('autoPayment').doc(currentQuotation.id);
                 const orderDoc = await transaction.get(orderRef);
                 const { process } = orderDoc.data();
-                if(!['request','manual','preManual'].includes(process)) throw new Error(`ยกเลิกสถานะนี้ไม่ได้นะ : ${process}`);
+                if(!['request','manual','preManual','failed'].includes(process)) throw new Error(`ยกเลิกสถานะนี้ไม่ได้นะ : ${process}`);
                 transaction.update(orderRef,{ process:'cancel' })
             });
             setQuotations(prev=>prev.map(item=>
@@ -213,6 +220,7 @@ function Quotation({
                     ?{ ...item, process:'cancel' }
                     :item
             ));
+            
             toastSuccess('ยกเลิกใบเสนอราคาสำเร็จ')
         } catch (error) {
             alert(error);
@@ -227,12 +235,40 @@ function Quotation({
         setLoading(true);
         try {
             const  manualPaidImage = await prepareFirebaseImage(imageId,'/saleEvident/','evident');
-            await db.runTransaction( async (transaction)=>{
+            const autoPaymentDoc = await db.runTransaction( async (transaction)=>{
                 const autoPaymentRef = db.collection('autoPayment').doc(id);
                 const autoPaymentDoc = await transaction.get(autoPaymentRef);
                 const { process,  } = autoPaymentDoc.data();
-                if(process !=='preManual') throw new Error('รายการนี้ไม่ใช่ preManual แล้ว ไม่สามรถแนบได้อีก');
-                transaction.update(autoPaymentRef,{ manualPaidImage, process:'manual' })
+                if(process !=='preManual') throw new Error('รายการนี้ไม่ใช่ preManual แล้ว ไม่สามารถแนบได้อีก');
+                transaction.update(autoPaymentRef,{ manualPaidImage, process:'manual', manualPaidAt:new Date() });
+                return autoPaymentDoc.data();
+            });
+            const { orderNumber, saleName, net, chat_id, chat_id_saleManager } = autoPaymentDoc;
+            const manualApproveMessage = {
+                        type:'manualApprove',
+                        header:'3) อนุมัติการชำระเงินแบบแมนนวล',
+                        body:`
+                เลขที่ออเดอร์ : ${orderNumber}
+                เซล : ${saleName}
+                ยอดชำระ : ${formatCurrency(net)}`,
+                        process:[
+                            {
+                            id:uuidv4(),
+                            name:'สถานะ : รออนุมัติ',
+                            createdAt:stringDateTimeReceipt(new Date()),
+                            }
+                        ]
+            }
+            const results = await Promise.all([
+                sendMessage({...manualApproveMessage, chat_id }),
+                sendMessage({...manualApproveMessage, chat_id:chat_id_saleManager }),
+            ])
+            const newMessageId = results[0];
+            const newMessageIdSaleManager = results[1];
+            await db.collection('autoPayment').doc(id).update({
+                message_id:newMessageId,
+                message_id_saleManager:newMessageIdSaleManager,
+                manualApproveMessage
             });
             setQuotations(prev=>prev.map(item=>
                 item.id === id
@@ -242,12 +278,77 @@ function Quotation({
             toastSuccess('เพิ่มหลักฐานชะระเงินสำเร็จ')
             // อัปเดต state ตรงนี้
         } catch (error) {
-            alert(error);
+            // alert(error.message);
+            console.error("handleQuotation error:", error);
+            console.error("error.message:", error?.message);
+            console.error("error.code:", error?.code);
+            console.error("error.response?.status:", error?.response?.status);
+            console.error("error.response?.data:", error?.response?.data);
+            console.error("error.stack:", error?.stack);
+
+            alert(
+                JSON.stringify(
+                    {
+                        message: error?.message,
+                        code: error?.code,
+                        status: error?.response?.status,
+                        data: error?.response?.data,
+                    },
+                    null,
+                    2
+                )
+            );
         } finally {
             setLoading(false);
         }
         
-    }
+    };
+
+        // 200%
+        // 1. ตรวจสอบสถานะออเดอร์อีกครั้งผ่าน API ของสแกนฟู้ด
+        // 2. ถ้าออเดอร์ยังคงสถานะ failed ให้แจ้งเตือนผู้ใช้ว่าออเดอร์นี้ไม่สำเร็จและไม่สามารถอนุมัติได้
+        // 3. ถ้าออเดอร์เปลี่ยนเป็น success ให้แจ้งเตือนผู้ใช้ว่าออเดอร์นี้สำเร็จแล้วและจะถูกอนุมัติทันที และอัพเดตสถานะในระบบเป็น success
+      async function checkFailedOrder(currentQuotation){
+        
+        const ok = window.confirm("ต้องการตรวจสอบสถานะออเดอร์นี้อีกครั้งหรือไม่?");
+        if (!ok) return;
+        const { id, process, chargeId } = currentQuotation;
+        if(process !=='failed') return null;
+        setLoading(true);
+        try {
+              const response = await scanfoodAPI.post('/gateway/payment/inquireQr',
+                {
+                  chargeId,  // for inquiry
+                  channelType:'posxpay',
+                  token:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZXJjaGFudElkIjoxMDQ3M30.P42rmcK6gLFCcf6x88rgpMx4hRGPPgDh4hgbreuCTaw', // for webhook 
+                }
+              );
+              if(response?.data?.success){
+                  const { status, data } = await scanfoodAPI.post(
+                      "/gateway/webhook/posxpay/",
+                      {
+                          "test":"pack",
+                          "ref2":"auto",
+                          "ref1":`sale:${id}`
+                      }
+                  );
+                  if(status===200 && data?.success){
+                    toastSuccess('ตรวจสอบออเดอร์สำเร็จ ออเดอร์นี้จะถูกอนุมัติทันที ');
+                    setQuotations(prev=>prev.map(item=>
+                        item.id === currentQuotation.id
+                            ?{
+                                ...item,process:'success'
+                            }
+                            :item
+                    ))
+                  }
+              } 
+        } catch (error) {
+          alert(error?.response?.data?.message || error.message || error || 'เกิดข้อผิดพลาด');
+        } finally {
+          setLoading(false);
+        }
+      };
 
   return (
     <div>
@@ -274,10 +375,14 @@ function Quotation({
         {quotations.map((item)=>{
             const { name, shopName, net, process } = item;
             const { name:processName, color } = processMap[process]??'ไม่ระบุสถานะ';
-            return <Row onClick={()=>{openOptions(item)}} key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
-                        <Col xs='12' sm='6'  >{name}[{shopName}]</Col>
-                        <Col xs='6' sm='3'  >{formatCurrency(net)}</Col>
-                        <Col xs='6' sm='3'  ><button style={{backgroundColor:color, padding:5, minWidth:'150px', borderRadius:20}} >{processName}</button></Col>
+            return <Row  key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
+                        <Col xs='12' sm='6' onClick={()=>{openOptions(item)}}  >{name}[{shopName}]</Col>
+                        <Col xs='6' sm='3' onClick={()=>{openOptions(item)}}  >{formatCurrency(net)}</Col>
+                        {process==='failed'
+                            ?<Col xs='6' sm='3' onClick={()=>{checkFailedOrder(item)}}  ><button style={{backgroundColor:color, padding:5, minWidth:'150px', borderRadius:20}} >{processName}(กดเพื่อตรวจซ้ำ)</button></Col>
+                            :<Col xs='6' sm='3' onClick={()=>{openOptions(item)}}  ><button style={{backgroundColor:color, padding:5, minWidth:'150px', borderRadius:20}} >{processName}</button></Col>
+                        }
+                        
                     </Row>
         })}
     </div>

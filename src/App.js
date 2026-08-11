@@ -51,7 +51,14 @@ import {
   CodeRelativeScreen,
   TrainingScheduleScreen,
   UploadStaffScreen,
-  TaxInvoiceReceiptTemplate
+  TaxInvoiceReceiptTemplate,
+  CommissionScreen,
+  ExecutiveSalesLeaderboardScreen,
+  CommissionHistoryScreen,
+  ResetPasswordScreen,
+  CrmLeadScreen,
+  FacebookLeadScreen,
+  ReportLinkCodeFalse
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
 import { login } from './redux/authSlice';
@@ -96,7 +103,8 @@ function App() {
           <Route path='/' element={<HomeScreen/>} />
 
           <Route path='/office' element={<OfficeScreen/>} >
-            <Route index  element={<SaleScreen/>} />
+            <Route index  element={<FacebookLeadScreen/>} />
+            {/* <Route index  element={<SaleScreen/>} /> */}
             <Route path='staff' element={<StaffScreen/>} />
             <Route path='clone' element={<CloneScreen/>} />
             <Route path='importItem' element={<ImportItemStoreScreen/>} />
@@ -147,6 +155,13 @@ function App() {
             <Route path='trainingSchedule' element={<TrainingScheduleScreen/>} />
             <Route path='uploadStaff' element={<UploadStaffScreen/>} />
             <Route path='taxInvoice' element={<TaxInvoiceReceiptTemplate/>} />
+            <Route path='commission' element={<CommissionScreen/>} />
+          <Route path='executiveSalesLeaderboard' element={<ExecutiveSalesLeaderboardScreen/>} />
+          <Route path='commissionHistory' element={<CommissionHistoryScreen/>} />
+          <Route path='resetPassword' element={<ResetPasswordScreen/>} />
+          <Route path='crmLead' element={<CrmLeadScreen/>} />
+          <Route path='lead' element={<FacebookLeadScreen/>} />
+          <Route path='reportLinkCodeFalse' element={<ReportLinkCodeFalse/>} />
           </Route>
       </Routes>
       </div>

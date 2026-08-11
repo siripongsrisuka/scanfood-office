@@ -37,6 +37,14 @@ import Lead from "./Lead";
 import Memo from "./Memo";
 import LicenseCheck from "./LicenseCheck";
 import HardwareCheck from "./HardwareCheck";
+import CrmAssignSaleModal from "./CrmAssignSaleModal";
+import CrmFilters from "./CrmFilters";
+import CrmLeadTable from "./CrmLeadTable";
+import CrmPurchaseModal from "./CrmPurchaseModal";
+import CrmRemarkDrawer from "./CrmRemarkDrawer";
+import CrmSummaryCards from "./CrmSummaryCards";
+import CrmTimelineDrawer from "./CrmTimelineDrawer";
+import FacebookSearchBar from "./FacebookSearchBar";
 
 export {
     HardwareCheck,
@@ -77,5 +85,13 @@ export {
     MasterCheckBox,
     FloatingArea,
     InputArea,
-    RedStar
+    RedStar,
+    CrmAssignSaleModal,
+    CrmFilters,
+    CrmLeadTable,
+    CrmPurchaseModal,
+    CrmRemarkDrawer,
+    CrmSummaryCards,
+    CrmTimelineDrawer,
+    FacebookSearchBar,
 };

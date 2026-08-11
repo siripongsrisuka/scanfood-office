@@ -5,22 +5,30 @@ import {
 import { db, prepareFirebaseImage, webImageDelete } from "../db/firestore";
 import { CategoryRender, SearchControl } from "../components";
 import {  Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput, Modal_WarehouseImage } from "../modal";
-import { formatTime, searchMultiFunction, toastSuccess } from "../Utility/function";
+import { formatTime, isApprover, searchMultiFunction, toastSuccess } from "../Utility/function";
 import { normalSort } from "../Utility/sort";
 import { stringDateTimeReceipt } from "../Utility/dateTime";
-import { scanfoodAPI } from "../Utility/api";
-import { telegramDelete, telegramDeleteQueue } from "../Utility/telegram";
-
+import { deleteMessage, sendMessage, telegramDeleteQueue } from "../Utility/telegram";
+import { useSelector } from "react-redux";
+import { v4 as uuidv4 } from 'uuid';
 
 const deliveryOptions = {
     'normal':'DHL',
     'fast':'Lalamove',
     'self':'รับที่บริษัท'
 };
+const deliveryOptions2 = [
+    { id:'normal', name:"DHL" },
+    { id:'fast', name:"Lalamove" },
+    { id:'self', name:"รับที่บริษัท" }
+]
 
 const statusMap = {
     'prepare':'รอจัด',
     'packed':'จัดเสร็จแล้ว',
+    'sent':'ส่งแล้ว',
+    'success':'สำเร็จ',
+    'cancel':'ยกเลิก'
 }
 
 const statusOptions = [
@@ -30,6 +38,7 @@ const statusOptions = [
 ];
 
 function WarehouseJobScreen() {
+    const { profile:{ id:profileId } } = useSelector(state=>state.profile);
     const [current, setCurrent] = useState({ imageUrls: [], comment:'' });
     const [loading, setLoading] = useState(false);
     const [search, setSearch] = useState('');
@@ -42,6 +51,7 @@ function WarehouseJobScreen() {
     const [link, setLink] = useState('');
     const [oldImageUrls, setOldImageUrls] = useState(null);
     const [image_Modal, setImage_Modal] = useState(false);
+    const [route_Modal, setRoute_Modal] = useState(false);
 
 
     const options = useMemo(()=>{
@@ -105,85 +115,99 @@ function WarehouseJobScreen() {
     async function handleStatus(item){
         setStatus_Modal(false);
         setLoading(true);
-        const { id:orderId, link } = current;
+        const { id:orderId } = current;
         const { status:thisStatus } = item;
         try {
-            const telegram = await db.runTransaction( async (transaction)=>{
+            const orderData = await db.runTransaction( async (transaction)=>{
                 const orderRef = db.collection('hardwareOrder').doc(orderId);
                 const orderDoc = await transaction.get(orderRef);
                 const { status:currentStatus } = orderDoc.data();
                 if(['success','cancel'].includes(currentStatus)) throw new Error(`สถานะ : ${currentStatus} แก้ไขไม่ได้`);
-                transaction.update(orderRef,{ status:thisStatus });
+                if(thisStatus === 'sent'){ // หลังส่งแล้ว เซลจะต้องไปเลือกผูกกับข้อ 4.3
+                    transaction.update(orderRef,{ status:thisStatus, linkCode:false });
+                } else {
+                    transaction.update(orderRef,{ status:thisStatus });
+                }
+                
                 return orderDoc.data()
             });
-            const { chat_id, chat_id_warehouse, message_id, message_id_warehouse, reply_message_id, reply_message_id_warehouse } = telegram;
-            let newReplyId = '';
-            let newReplyIdWarehouse = '';
-            if(chat_id && message_id){
-          
-               
-                const { status, data } = await scanfoodAPI.post(
-                    "/telegram/office/reply/",
-                    {
-                        "channelType":"warehouse",
-                        "chat_id":chat_id,
-                        "message_id": message_id,
-                        "status":thisStatus,
-                        "link":link
-                    }
-                );
-                const { message_id:xxx } = data;
-                newReplyId = xxx;
-                 if(thisStatus === 'sent'){
-                    // ลบต้นฉบับ
-                    await telegramDeleteQueue({ chat_id, message_id });
-                    // ลบ reply ล่าสุด
-                    await telegramDeleteQueue({ chat_id, message_id:xxx });
-                    
-                } 
-            
-            }
-            if(chat_id_warehouse && message_id_warehouse){
-                if(thisStatus === 'sent'){
-                    await telegramDelete({ chat_id: chat_id_warehouse, message_id: message_id_warehouse });
-               
-                } else {
-                    const { status, data } = await scanfoodAPI.post(
-                        "/telegram/office/reply/",
-                        {
-                            "channelType":"warehouse",
-                            "chat_id":chat_id_warehouse,
-                            "message_id": message_id_warehouse,
-                            "status":thisStatus,
-                            "link":link
-                        }
-                    );
-                    const { message_id:xxx } = data;
-                    newReplyIdWarehouse = xxx;
+            const { chat_id, chat_id_warehouse, message_id, message_id_warehouse, telegram = [], noNeedTelegram = false } = orderData;
+            const warehousePayload = telegram.find(a=>a.type === 'warehouse');
+            if(warehousePayload && !noNeedTelegram){
+                const { process = [] } = warehousePayload;
+                const newProcess = thisStatus==='sent' // สถานะสุดท้ายถ้าเป็นส่งแล้วจะมีข้อความบอกว่าข้อความจะถูกลบอัตโนมัติใน 12 ชั่วโมง แต่ถ้าไม่ใช่ส่งแล้วจะไม่มีข้อความนั้น
+                    ?[
+                        ...process, 
+                        { name:`${statusMap[thisStatus]}`, createdAt: `${stringDateTimeReceipt(new Date())}\n*ข้อความจะถูกลบอัตโนมัติใน 12 ชั่วโมง\n✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅✅`, id:uuidv4() }
+                    ]
+                    :[
+                        ...process, 
+                        { name:statusMap[thisStatus], createdAt: stringDateTimeReceipt(new Date()), id:uuidv4() }
+                    ]
+
+                const updatePromises = [];
+
+                updatePromises.push(sendMessage({ chat_id, ...warehousePayload, process:newProcess }));
+
+                if(thisStatus !=='sent'){ // เพราะถ้าสถานะส่งแล้ว คลังไม่ต้องรับรู้ แค่ลบอย่างเดียวก็พอ
+                    updatePromises.push(sendMessage({ chat_id: chat_id_warehouse, ...warehousePayload, process:newProcess }));
                 }
+
+                if(chat_id && message_id){ // ช่องของเซล
+                    updatePromises.push(deleteMessage({ chat_id, message_id }));
+                }
+                if(chat_id_warehouse && message_id_warehouse){ // ช่องของคลัง
+                    updatePromises.push(deleteMessage({ chat_id: chat_id_warehouse, message_id: message_id_warehouse }));
+                }
+                const results = await Promise.all(updatePromises);
+                const newMessageId = results[0];
+                const newMessageIdWarehouse = results[1];
+                if(thisStatus ==='sent'){
+                    // ลบของ sale
+                    await telegramDeleteQueue({ chat_id: chat_id, message_id: newMessageId });
              
+                    
+                }
+                const orderRef = db.collection('hardwareOrder').doc(orderId);
+                const newTelegram = orderData.telegram.map(a=>{
+                        if(a.type === 'warehouse'){
+                            return {
+                                ...a,
+                                process:newProcess
+                            }
+                        }
+                        return a;
+                })
+                await orderRef.update({
+                    telegram: newTelegram,
+                    message_id:newMessageId, 
+                    message_id_warehouse:thisStatus === 'sent' ? null : newMessageIdWarehouse
+                });
+                setMasterData(prev=>prev.map(item=>
+                    item.id === orderId
+                        ?{
+                            ...item,
+                            status:thisStatus,
+                            telegram: newTelegram,
+                            message_id:newMessageId, 
+                            message_id_warehouse:thisStatus === 'sent' ? null : newMessageIdWarehouse
+                        }
+                        :item
+                ))
+            } else {
+                setMasterData(prev=>prev.map(item=>
+                    item.id === orderId
+                        ?{
+                            ...item,
+                            status:thisStatus,
+                        }
+                        :item
+                ))
             }
-            const orderRef = db.collection('hardwareOrder').doc(orderId);
-            await orderRef.update({
-                reply_message_id: newReplyId,
-                reply_message_id_warehouse: newReplyIdWarehouse
-            });
-            if(reply_message_id){
-                await telegramDelete({ chat_id, message_id: reply_message_id });
-            }
-            if(reply_message_id_warehouse){
-                await telegramDelete({ chat_id: chat_id_warehouse, message_id: reply_message_id_warehouse });
-            }
+            
+     
             toastSuccess('อัปเดตสถานะสำเร็จ');
-            setMasterData(prev=>prev.map(item=>
-                item.id === orderId
-                    ?{
-                        ...item,status:thisStatus,
-                        reply_message_id: newReplyId,
-                        reply_message_id_warehouse: newReplyIdWarehouse
-                    }
-                    :item
-            ))
+            
 
         } catch (error) {
             alert(error);
@@ -202,9 +226,9 @@ function WarehouseJobScreen() {
     async function handleLink(){
         setLink_Modal(false);
         setLoading(true);
-        const { id:orderId, status:thisStatus } = current;
+        const { id:orderId } = current;
         try {
-            const telegram = await db.runTransaction( async (transaction)=>{
+            const orderData = await db.runTransaction( async (transaction)=>{
                 const orderRef = db.collection('hardwareOrder').doc(orderId);
                 const orderDoc = await transaction.get(orderRef);
                 const { status:currentStatus } = orderDoc.data();
@@ -213,58 +237,73 @@ function WarehouseJobScreen() {
                 return orderDoc.data()
             });
 
-            const { chat_id, chat_id_warehouse, message_id, message_id_warehouse, reply_message_id, reply_message_id_warehouse } = telegram;
-            let newReplyId = '';
-            let newReplyIdWarehouse = '';
-            if(chat_id && message_id){
-                const { status, data } = await scanfoodAPI.post(
-                    "/telegram/office/reply/",
-                    {
-                        "channelType":"warehouse",
-                        "chat_id":chat_id,
-                        "message_id": message_id,
-                        "status":thisStatus,
-                        "link":link
-                    }
-                );
-                const { message_id:xxx } = data;
-                newReplyId = xxx;
+            const { telegram = [] } = orderData;
+            const warehousePayload = telegram.find(a=>a.type === 'warehouse');
+            const { 
+                chat_id, 
+                chat_id_warehouse, 
+                message_id, 
+                message_id_warehouse, 
+            } = orderData;
+
+            if(warehousePayload && !orderData?.noNeedTelegram){ // ถ้าไม่มี noNeedTelegram แปลว่าแม้จะมี warehousePayload แต่ก็ไม่ต้องแจ้งเตือน เพราะกระบวนการอัปเดตลิงค์บางครั้งอาจจะมาจากการแก้ไขสถานะที่มีการตั้ง noNeedTelegram ไว้แล้ว
+                const { process = [] } = warehousePayload;
+                const newProcess = [
+                        ...process, 
+                        { name:`ลิงค์ส่งสินค้า`, createdAt: `${stringDateTimeReceipt(new Date())}\n${link}`, id:uuidv4() }
+                ]
+                const updatePromises = [];
+
+                updatePromises.push(sendMessage({ chat_id, ...warehousePayload, process:newProcess }));
+                updatePromises.push(sendMessage({ chat_id: chat_id_warehouse, ...warehousePayload, process:newProcess }));
+                if(chat_id && message_id){ // ช่องของเซล
+                    updatePromises.push(deleteMessage({ chat_id, message_id }));
+                }
+                if(chat_id_warehouse && message_id_warehouse){ // ช่องของคลัง
+                    updatePromises.push(deleteMessage({ chat_id: chat_id_warehouse, message_id: message_id_warehouse }));
+                }
+                const results = await Promise.all(updatePromises);
+                const newMessageId = results[0];
+                const newMessageIdWarehouse = results[1];
+                const orderRef = db.collection('hardwareOrder').doc(orderId);
+                const newTelegram = orderData.telegram.map(a=>{
+                        if(a.type === 'warehouse'){
+                            return {
+                                ...a,
+                                process:newProcess
+                            }
+                        }
+                        return a;
+                })
+                await orderRef.update({
+                    telegram: newTelegram,
+                    message_id:newMessageId, 
+                    message_id_warehouse:newMessageIdWarehouse
+                });
+                setMasterData(prev=>prev.map(item=>
+                    item.id === orderId
+                        ?{
+                            ...item,
+                            link,
+                            telegram: newTelegram,
+                            message_id:newMessageId, 
+                            message_id_warehouse:newMessageIdWarehouse
+                        }
+                        :item
+                ))
+            } else {
+                setMasterData(prev=>prev.map(item=>
+                    item.id === orderId
+                        ?{
+                            ...item,
+                            link,
+                        }
+                        :item
+                ))
             }
-            if(chat_id_warehouse && message_id_warehouse){
-                const { status, data } = await scanfoodAPI.post(
-                    "/telegram/office/reply/",
-                    {
-                        "channelType":"warehouse",
-                        "chat_id":chat_id_warehouse,
-                        "message_id": message_id_warehouse,
-                        "status":thisStatus,
-                        "link":link
-                    }
-                );
-                const { message_id:xxx } = data;
-                newReplyIdWarehouse = xxx;
-            }
-            const orderRef = db.collection('hardwareOrder').doc(orderId);
-            await orderRef.update({
-                reply_message_id: newReplyId,
-                reply_message_id_warehouse: newReplyIdWarehouse
-            });
-            if(reply_message_id){
-                await telegramDelete({ chat_id, message_id: reply_message_id });
-            }
-            if(reply_message_id_warehouse){
-                await telegramDelete({ chat_id: chat_id_warehouse, message_id: reply_message_id_warehouse });
-            }
+
             toastSuccess('อัปเดตลิงค์สำเร็จ');
-            setMasterData(prev=>prev.map(item=>
-                item.id === orderId
-                    ?{
-                        ...item,link,
-                        reply_message_id: newReplyId,
-                        reply_message_id_warehouse: newReplyIdWarehouse
-                    }
-                    :item
-            ));
+  
             setLink('');
         } catch (error) {
             alert(error)
@@ -315,9 +354,44 @@ function WarehouseJobScreen() {
         }
     };
 
+    function openRoute(item){
+        setCurrent(item)
+        setRoute_Modal(true)
+    };
+
+    async function handleRoute(item){
+        if(!isApprover(profileId))return alert('คุณไม่มีสิทธิ์แก้ไข')
+        setRoute_Modal(false);
+        setLoading(true);
+        const { id:orderId } = current;
+        const { id:deliveryType } = item;
+        try {
+            const orderRef = db.collection('hardwareOrder').doc(orderId);
+            await orderRef.update({ deliveryType });
+            setMasterData(prev=>prev.map(a=>{
+                return a.id === orderId
+                    ?{...a, deliveryType }
+                    :a
+            }))
+            toastSuccess('อัปเดตรูปแบบการจัดส่งสำเร็จ');
+        } catch (error) {
+            alert(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
 
   return (
     <div style={styles.container} >
+        <Modal_FlatListTwoColumn
+            show={route_Modal}
+            onHide={()=>{setRoute_Modal(false)}}
+            header='เส้นทางการจัดส่ง'
+            value={deliveryOptions2}
+            onClick={handleRoute}
+        />
         <Modal_WarehouseImage
             show={image_Modal}
             onHide={()=>{setImage_Modal(false)}}
@@ -368,7 +442,7 @@ function WarehouseJobScreen() {
         {display.map((item, index) => {
             const { orderNumber, status, timestamp, profileName, product, deliveryType = 'normal', 
                 note = '', link, imageUrls = [], comment = '', nameSername = '', address = '', tel = '' } = item;
-            return <tr  style={{cursor: 'pointer'}} key={index}  >
+            return <tr onClick={()=>{console.log(item.id)}} style={{cursor: 'pointer'}} key={index}  >
                     <td  style={styles.text3}>
                         {stringDateTimeReceipt(timestamp)}<br/>
                         <b>#{orderNumber}</b>
@@ -391,7 +465,7 @@ function WarehouseJobScreen() {
                         }
                         
                     </td>
-                    <td  style={styles.container4} >{deliveryOptions[deliveryType]}</td>
+                    <td onClick={()=>{openRoute(item)}}  style={styles.container4} >{deliveryOptions[deliveryType]}<i class="bi bi-pen-fill"></i></td>
                     
                     <td onClick={()=>{openStatus(item)}} style={styles.container4} >{statusMap[status]}<i class="bi bi-pen-fill"></i></td>
                     <td onClick={()=>{openLink(item)}}  style={styles.container4}>{link}</td>

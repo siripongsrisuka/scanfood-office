@@ -108,8 +108,19 @@ const ThaiQrQuotationCard = ({
 
       <div style={styles.qrWrapper}>
         <div style={styles.qrBox}>
-          <QRCodeSVG value={qrCode} size={220} level="M" includeMargin />
-          <p>สแกนเพื่อชำระเงิน</p>
+          {qrCode
+            ?<QRCodeSVG value={qrCode} size={220} level="M" includeMargin />
+            :<img
+              src="/kshop.jpg" 
+              style={{ width: 250 }}
+              alt="placeholder"
+            />
+          }
+            {qrCode
+              ?<p>สแกนเพื่อชำระเงิน</p>
+              :null
+            }
+          
         </div>
       </div>
     </div>

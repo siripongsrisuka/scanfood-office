@@ -4,9 +4,61 @@ import { toast } from 'react-toastify';
 import { db } from '../db/firestore';
 import initialCustomer from '../configs/initialCustomer';
 
+function calculateLeadScore(lead) {
+  let score = 0;
+
+  // ร้านใหญ่
+  if (lead.size === "small") score += 1;
+  else if (lead.size === "medium") score += 4;
+  else if (lead.size === "large") score += 8;
+  else if (lead.size === "xlarge") score += 10;
+
+  // POS / Intent
+  if (lead.posIntent === "never") score += 0;
+  else if (lead.posIntent === "used_before") score += 4;
+  else if (lead.posIntent === "looking") score += 7;
+  else if (lead.posIntent === "switching") score += 10;
+  else if (lead.posIntent === "switching_with_pain") score += 12;
+
+  // หลายสาขา
+  if (lead.branchCount === 1) score += 0;
+  else if (lead.branchCount === 2) score += 4;
+  else if (lead.branchCount >= 3 && lead.branchCount <= 5) score += 7;
+  else if (lead.branchCount >= 6 && lead.branchCount <= 10) score += 9;
+  else if (lead.branchCount > 10) score += 10;
+
+  return score;
+}
+
+function scoreToValue(score) {
+  if (score >= 24) return 22000;
+  if (score >= 18) return 15000;
+  if (score >= 10) return 8000;
+  return 0;
+}
+
 export function isApprover (profileId){
-  return ['cZ7XkJeZzNOrr5HEZKEPgAjtMrx2'].includes(profileId)
+  return ['cZ7XkJeZzNOrr5HEZKEPgAjtMrx2','xL8vqnyJ8OfkVpHJBPJvEei2D3B3'].includes(profileId)
 };
+
+export function normalizeThaiPhone(phone) {
+  if (!phone) return "";
+
+  // เอาเฉพาะตัวเลขกับ +
+  let cleaned = phone.replace(/[^\d+]/g, "");
+
+  // ถ้าเป็น +66 → แปลงเป็น 0
+  if (cleaned.startsWith("+66")) {
+    return "0" + cleaned.slice(3);
+  }
+
+  // ถ้าเป็น 66 เฉยๆ → แปลงเป็น 0
+  if (cleaned.startsWith("66")) {
+    return "0" + cleaned.slice(2);
+  }
+
+  return cleaned;
+}
 
 export function numberToThaiText(num) {
   if (isNaN(num)) return "";
@@ -112,6 +164,11 @@ export   async function fetchHardware(profileId){
         .where('profileId','==',profileId)
         .where('status','in',['prepare','packed'])
         .get();
+
+    const queryLinkCode = await db.collection('hardwareOrder')
+        .where('profileId','==',profileId)
+        .where('linkCode','==',false)
+        .get();
     
     const results = query.docs.map(doc=>{
         const { timestamp, ...rest } = doc.data();
@@ -121,7 +178,16 @@ export   async function fetchHardware(profileId){
             id:doc.id,
         }
     });
-    return normalSort('timestamp',results)
+    const resultsLinkCode = queryLinkCode.docs.map(doc=>{
+        const { timestamp, ...rest } = doc.data();
+        return {
+            ...rest,
+            timestamp:formatTime(timestamp),
+            id:doc.id,
+        }
+    });
+
+    return normalSort('timestamp',[...results, ...resultsLinkCode])
 };
 export  async function fetchSoftware(profileId){
    const query = await db.collection('packageOrder')

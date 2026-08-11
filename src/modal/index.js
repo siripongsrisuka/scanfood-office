@@ -34,6 +34,10 @@ import Modal_WarehouseImage from "./Modal_WarehouseImage";
 import Modal_Note from "./Modal_Note";
 import Modal_Shop from "./Modal_Shop";
 import Modal_QuotationFull from "./Modal_QuotationFull";
+import Modal_ContactValue from "./Modal_ContactValue";
+import Modal_FacebookLead from "./Modal_FacebookLead";
+import Modal_ReportHardware from "./Modal_ReportHardware";
+import Modal_SearchHardware from "./Modal_SearchHardware";
 
 export { 
     Modal_QuotationFull,
@@ -70,5 +74,9 @@ export {
     Modal_Requirement,
     Modal_FlatlistSearchShop,
     Modal_Login,
-    Modal_FindHuman
+    Modal_FindHuman,
+    Modal_ContactValue,
+    Modal_FacebookLead,
+    Modal_ReportHardware,
+    Modal_SearchHardware,
 };

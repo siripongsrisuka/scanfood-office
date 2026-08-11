@@ -83,9 +83,10 @@ function Modal_Arrange({
       <Table striped bordered hover responsive  variant="light"   >
             <thead  >
             <tr  >
-                <th style={styles.container4}>ลำดับ</th>
-                <th style={styles.container5}>รูปภาพ</th>
-                <th style={styles.container5}>รายการ</th>
+                <th style={styles.container4}>ชื่อ</th>
+                <th style={styles.container5}>เบอร์โทร</th>
+                <th style={styles.container5}>อีเมล</th>
+                <th style={styles.container5}>ตำแหน่ง</th>
             </tr>
             </thead>
             <tbody  >

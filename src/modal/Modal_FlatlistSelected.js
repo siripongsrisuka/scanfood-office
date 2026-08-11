@@ -34,11 +34,11 @@ function Modal_FlatlistSelected({
         <h4>ค้นพบ {display.length} รายการ</h4>
         <Row style={styles.container4} >
             {display?.map((item,index)=>{
-                const status = selected.includes(item)
+                const status = selected.includes(item.id)
                 return(
                   <Col key={index} sm='12' md='6'  style={styles.container} >
                     <Button onClick={()=>{onClick(item)}} variant={status?'dark':'light'} style={styles.container2} >
-                      {item}
+                      {item.name}
                     </Button>
                   </Col>
                 )

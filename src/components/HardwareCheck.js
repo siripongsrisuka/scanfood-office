@@ -56,8 +56,13 @@ function HardwareCheck({
             />
             <h4>ทั้งหมด : {hardwares.length} รายการ</h4>
             {hardwares.map((item)=>{
-                const { name, shopName, note } = item;
-                return <Row onClick={()=>{openHardware(item)}}  key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
+                const { name, shopName, note, orderNumber, status ='' } = item;
+                return status==='sent'
+                        ?<Row  key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative', backgroundColor:'#ffc175' }} >
+                            <Col xs='12' sm='6'  >{name}[{shopName}]{orderNumber} รอผูกกับ 4.3</Col>
+                            <Col xs='6' sm='3'  >{note}</Col>
+                        </Row>
+                        :<Row onClick={()=>{openHardware(item)}}  key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
                             <Col xs='12' sm='6'  >{name}[{shopName}]</Col>
                             <Col xs='6' sm='3'  >{note}</Col>
                         </Row>

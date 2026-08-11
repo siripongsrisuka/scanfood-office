@@ -62,6 +62,17 @@ export const inboundSlice = createSlice({
   name: 'inbound',
   initialState,
   reducers: {
+    updateNormalFieldInbound: (state, action) => {
+        const { id, updatedField } = action.payload
+        let item = state.inbounds.find(a=>a.id === id);
+        if(item){
+            Object.assign(item, updatedField)
+        }
+        let item2 = state.displayInbounds.find(a=>a.id === id);
+        if(item2){
+            Object.assign(item2, updatedField)
+        }
+    }, 
     clearInbound: state => {
       state.inbounds = [];
       state.billDates = [];
@@ -107,7 +118,8 @@ export const {
   clearInbound, 
   updateInbounds, 
   updateStartDate, 
-  updateEndDate
+  updateEndDate,
+  updateNormalFieldInbound
 } = inboundSlice.actions
 
 export default inboundSlice.reducer

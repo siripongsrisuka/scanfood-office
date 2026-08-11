@@ -10,7 +10,7 @@ import {
 } from "react-bootstrap";
 import { colors, initialAlert } from "../configs";
 import { FooterButton, ImageSize, InputArea, InputText, OneButton, RootImage } from "../components";
-import { twoDigitNumber, } from "../Utility/function";
+import { isGodIt, twoDigitNumber, } from "../Utility/function";
 import Modal_Alert from "./Modal_Alert";
 import Modal_NewCrop from "./Modal_NewCrop";
 import Modal_OneInput from "./Modal_OneInput";
@@ -34,13 +34,17 @@ function Modal_Warehouse({
   current,
   setCurrent,
 }) {
+
     const { warehouse } = useSelector(state=>state.warehouse);
-    const { imageId, name, detail, price, status, limit, stockSetStatus = false, stockSet = [] } = current;
+    const { profile } = useSelector(state=>state.profile);
+    const { id:profileId } = profile;
+    const { imageId, name, detail, price, status, limit, stockSetStatus = false, stockSet = [], sharing } = current;
     const [alert_Modal, setAlert_Modal] = useState(initialAlert);
     const { status:alertStatus, content:alertContent, onClick, variant } = alert_Modal;
     const [image_Modal, setImage_Modal] = useState(false);
     const [imgSrc, setImgSrc] = useState('');
     const fileInputRef = useRef(null);
+
 
     const [stockSet_Modal, setStockSet_Modal] = useState(false);
     const [availableStockSets, setAvailableStockSets] = useState([]);
@@ -335,6 +339,16 @@ function Modal_Warehouse({
               onChange={(event)=>{setCurrent({...current,limit:twoDigitNumber(event.target.value)})}}
               value={limit}
               style={{maxWidth:'400px'}}
+            />
+        </Col>
+        <Col sm='12'>
+            <InputText
+              name='5. การแบ่งปัน'
+              placeholder="จำนวน"
+              onChange={(event)=>{setCurrent({...current,sharing:twoDigitNumber(event.target.value)})}}
+              value={sharing}
+              style={{maxWidth:'400px'}}
+              disabled={!isGodIt(profileId)}
             />
         </Col>
   
