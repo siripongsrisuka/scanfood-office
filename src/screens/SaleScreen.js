@@ -10,6 +10,7 @@ import { HardwareCheck, Lead, LicenseCheck, Memo, Quotation, SlideOptions } from
 import { scanfoodAPI } from "../Utility/api";
 import {  stringReceiptNumber, stringYMDHMS3 } from "../Utility/dateTime";
 import { colors, initialLead, initialQuotation } from "../configs";
+import { PAYMENT_REQUEST_QR_PATH, POSXPAY_TOKEN } from "../configs/paymentApi";
 import { fetchCustomer, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fetchSoftware, toastSuccess } from "../Utility/function";
 
 const { greenSanta, blue } = colors;
@@ -193,7 +194,7 @@ function SaleScreen() {
             };
 
             const body = paymentType === 'posxpay'
-                ?{...base, channelType:'posxpay', serial:'WQRN002405000023', token:process.env.REACT_APP_API_TOKEN }
+                ?{...base, channelType:'posxpay', serial:'WQRN002405000023', token:POSXPAY_TOKEN }
                 :paymentType === 'kbank'
                 ?{...base, channelType:'kbank', qrType:'3', merchantId:'KB000002246521' }
                 :paymentType === 'beamScanfood'
@@ -201,7 +202,7 @@ function SaleScreen() {
                 :{...base, channelType:'beamLink', installments, paymentType:'beamShopchamp'  }
             
             if(paymentType!=='kbank'){
-                const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,body);
+                const { status, data } = await scanfoodAPI.post(PAYMENT_REQUEST_QR_PATH,body);
                 const { 
                     chargeId:thisChargeId,
                     qrCode:thisQrCode,

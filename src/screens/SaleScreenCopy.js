@@ -19,6 +19,7 @@ import { OneButton, SlideOptions } from "../components";
 import { scanfoodAPI } from "../Utility/api";
 import { stringDateTimeReceipt, stringFullDate, stringReceiptNumber, stringYMDHMS3, yearMonth } from "../Utility/dateTime";
 import initialCustomer from "../configs/initialCustomer";
+import { PAYMENT_REQUEST_QR_PATH, POSXPAY_TOKEN } from "../configs/paymentApi";
 import { colors, initialProcess, initialQuotation } from "../configs";
 import { fetchCustomer, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fetchSoftware, fetchSuccessCases, fetchWaste, formatCurrency, formatTime, isGodIt, toastSuccess, wait } from "../Utility/function";
 import initialShopType from "../configs/initialShopType";
@@ -386,12 +387,12 @@ function SaleScreen() {
                 let chargeId = '';
                 let qrCode = '';
                 if(!manualPaid){
-                    const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,{ 
+                    const { status, data } = await scanfoodAPI.post(PAYMENT_REQUEST_QR_PATH,{
                         channelType:'posxpay',
                         shopId:`sale:${autoPaymentRef.id}`,
                         amount,
                         serial:'WQRN002405000023',
-                        token:process.env.REACT_APP_API_TOKEN,
+                        token:POSXPAY_TOKEN,
                         ref2:'auto'
                     });
 

@@ -4,6 +4,7 @@ import {
 } from "react-bootstrap";
 import { Modal_FlatlistSearchShop, Modal_Loading, Modal_Qrcode } from "../modal";
 import { colors, initialShop, initialStoreSize } from "../configs";
+import { PAYMENT_REQUEST_QR_PATH, POSXPAY_TOKEN } from "../configs/paymentApi";
 import { MdRadioButtonUnchecked, MdRadioButtonChecked } from 'react-icons/md'; // replace with correct MaterialCommunityIcons mapping
 import { db } from "../db/firestore";
 import { diffDaysFloor, formatCurrency, formatTime, isGodIt, summary, toastSuccess } from "../Utility/function";
@@ -131,12 +132,12 @@ function UpgradeStoreSizeScreen() {
                 orderNumber = stringReceiptNumber(value+1);
 
                 const upgradeRef = db.collection('autoUpgradeSize').doc();
-                const { status, data } = await scanfoodAPI.post(process.env.REACT_APP_API_URL,{ 
+                const { status, data } = await scanfoodAPI.post(PAYMENT_REQUEST_QR_PATH,{
                     channelType:'posxpay',
                     shopId:`upgrade:${upgradeRef.id}`,
                     amount,
                     serial:'WQRN002405000023',
-                    token:process.env.REACT_APP_API_TOKEN,
+                    token:POSXPAY_TOKEN,
                     ref2:'auto'
                 });
     
