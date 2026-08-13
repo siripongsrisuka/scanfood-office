@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
-  Button,
   Form,
   Row,
   Col,
@@ -15,7 +14,6 @@ import {
   OverlayTrigger,
   Tooltip
 } from "react-bootstrap";
-import { db } from "../db/firestore";
 
 function getWeeksOfCurrentYearIncludeCurrent() {
   const result = [];
@@ -67,20 +65,14 @@ console.log(weeks);
 
 
 
-  async function test(){
-    await db.runTransaction( async (transaction)=>{
-      const adminRef = db.collection('admin').doc('package');
-      const adminDoc = await transaction.get(adminRef);
-      const { value } = adminDoc.data();
-      transaction.update(adminRef, { value: [...value,value[4]] })
-    })
-    alert('done')
-  }
+  // ❌ ถอดปุ่ม `test` ออกแล้ว 2026-08-14 — มันรัน transaction.update บน admin/package
+  //    แบบ append (`value: [...value, value[4]]`) = เพิ่มแถวแพ็กเกจซ้ำเข้าตารางราคา production
+  //    ถูกกดไปแล้วจริงบน production (แถว member ซ้ำอยู่ในฐาน) · ไม่มีที่อื่นเรียกฟังก์ชันนี้
+  //    ⇒ ห้ามเอากลับมา · งานเขียนข้อมูลราคาต้องมีจอ/ขั้นยืนยันของตัวเอง ไม่ใช่ปุ่มชื่อ test
 
   return (
     <div style={styles.container} >
       <h1>Performance</h1>
-      <Button onClick={test} >test</Button>
       <Table striped bordered hover responsive  variant="light"   >
             <thead  >
             <tr>

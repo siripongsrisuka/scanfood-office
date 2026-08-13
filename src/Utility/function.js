@@ -649,7 +649,12 @@ export function findDay(packageId){
   const language = new Set(['19','21', '22','24', '25', '27'])
   const premium = new Set(['28', '29', '30','31', '32', '33'])
   const member = new Set(['34', '35', '36', '37','38','39'])
-  
+  // 🔒 crm ต้องมีตรงนี้ — ขาดไป = รหัส 40/41/42 ตกไป default 'qrcode'
+  //    ⇒ ลูกค้าจ่ายค่า CRM แล้วได้สิทธิ์ qrcode (เกิดจริง · แก้ 2026-08-14)
+  //    ก๊อปคู่แฝด = scanfood_server/functions/helpers/functions.js `exports.findDay`
+  //    ตรึงให้ตรงกันด้วย scanfood-center/gate/__tests__/package-permission-map-parity.test.js
+  const crm = new Set(['40', '41', '42'])
+
   if(months.has(packageId)){
     day = 31
   } else { // years
@@ -666,7 +671,9 @@ export function findDay(packageId){
     packageType = 'premium';
   } else if(member.has(packageId)){
     packageType = 'member';
-  } 
+  } else if(crm.has(packageId)){
+    packageType = 'crm';
+  }
 
 
   return { day, packageId, packageType }
