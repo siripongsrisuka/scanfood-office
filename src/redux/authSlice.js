@@ -34,19 +34,33 @@ export const signin = createAsyncThunk(
       
     }catch(err){
         console.log("Error Code:"+err.code+"\nMessage:"+err.message)
+        // 🔒 ทุกสาขาต้องมีข้อความ — **ห้ามมี default ที่เงียบ**
+        //   เดิม switch นี้ไม่มี `default:` ⇒ รหัส error ที่ไม่อยู่ใน 4 เคส (เช่น `auth/invalid-credential`
+        //   ที่ Firebase คืนมาเมื่อเปิด Email enumeration protection · หรือเน็ตหลุด) = กดแล้ว **ไม่มีอะไรเกิดขึ้นเลย**
+        //   ผู้ใช้แยกไม่ออกระหว่าง "จอค้าง" กับ "รหัสผิด" ⇒ อาการเดียวกับบั๊กที่เพิ่งแก้ไป
         switch(err.code){
             case 'auth/invalid-email':
-                alert('อีเมลนี้ไม่พบในเครื่อข่ายอินเตอร์เน็ต')
+                alert('รูปแบบอีเมลไม่ถูกต้อง')
                 break;
             case 'auth/user-disabled':
                 alert('บัญชีผู้ใช้งานนี้ถูกระงับ')
                 break;
             case 'auth/user-not-found':
-                alert('ไม่พบบัญชีผู้ใช้งานในระบบ')
+            case 'auth/wrong-password':
+            case 'auth/invalid-credential':
+            case 'auth/invalid-login-credentials':
+                // Firebase รวมเคส "ไม่มีบัญชี" กับ "รหัสผิด" ให้เป็นรหัสเดียวเมื่อเปิดกันการไล่ถามอีเมล
+                // ⇒ ข้อความต้องรวมเช่นกัน (แยกเมื่อไหร่ = จอล็อกอินกลายเป็นช่องถามว่าอีเมลไหนมีบัญชี)
+                alert('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
                 break;
-            case 'auth/wrong-password': //เกิดเฉพาะเมื่ออะไรที่ใช้อีเมลล์ซ้ำ
-                alert('รหัสผ่านผิด กรุณาลองใหม่อีกครั้ง')
+            case 'auth/too-many-requests':
+                alert('ลองผิดหลายครั้งเกินไป กรุณารอสักครู่แล้วลองใหม่')
                 break;
+            case 'auth/network-request-failed':
+                alert('เชื่อมต่ออินเทอร์เน็ตไม่ได้ กรุณาตรวจสอบสัญญาณแล้วลองใหม่')
+                break;
+            default:
+                alert('เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่อีกครั้ง'+(err?.code?' ('+err.code+')':''))
         }
     }
     console.log('user')

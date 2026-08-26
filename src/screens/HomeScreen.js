@@ -10,7 +10,6 @@ import { resetPassword, signin } from '../redux/authSlice';
 import { Modal_OneInput, Modal_Splash } from "../modal";
 import { fetchNormalProfile } from "../redux/profileSlice";
 import { db } from "../db/firestore";
-import { scanfoodAPI } from "../Utility/api";
 import { toastSuccess } from "../Utility/function";
 
 
@@ -74,24 +73,22 @@ async function handleProfile(profileId){
 }
 
 
-const checkRegisterUser = async() => {
+// ── 🔴 ห้ามถามเซิร์ฟเวอร์ก่อนว่า "อีเมลนี้มีบัญชีไหม" ──────────────────────────────────
+//   เดิม: GET `/users/checkEmailRegister/:email` → มี uid ค่อย `signin`
+//   เส้นนั้น **ถูกปิดหัวไปแล้ว** (scanfood_server › apis/users.js · DEV-1012 · 2026-08-24)
+//   = ตอบ `200 {}` เหมือนกันทุกกรณี เพราะมันเป็นช่องให้คนนอกไล่ถามว่าอีเมลไหนเป็นลูกค้าเรา
+//   ⇒ จอนี้อ่านไม่เจอ `uid` แล้วเหมาว่า "ยังไม่ได้สมัคร" ⇒ **แอดมินตัวจริงก็เข้าไม่ได้**
+//   (ใบ DEV-1012 census ผู้เรียกไว้ 3 เว็บ + RN — **ไม่ได้นับ repo นี้** จึงหลุดมา)
+//
+//   ท่าที่ถูก = ยิง `signin` ตรง แล้วให้ Firebase Auth เป็นคนบอกว่าผิดตรงไหน
+//   (รหัสผิด · ไม่มีบัญชี · ถูกระงับ · เน็ตหลุด — แยกกันคนละข้อความใน `authSlice.signin`)
+//   ❌ ห้ามเอาขั้นถามอีเมลกลับมา ไม่ว่าด้วยเหตุผลใด (ทางเดียวกับ owner/franchise/member ที่ตัดไปแล้ว)
+const handleLogin = async() => {
   setLoading(true)
-await scanfoodAPI.get('/users/checkEmailRegister/'+formData?.email.trim()).then(objRes=>{
-  const emailUserUid = objRes?.data?.uid;
-
-  if(emailUserUid){
-    dispatch(signin(formData))
-    setLoading(false)
-  }else{ // Register other app, but not registed vender
-    setLoading(false)
-    alert('กรุณาสมัครสมาชิกเพื่อเข้าใช้งานระบบ');
-  }  
-
-}).catch(err=>{ // Not found user
-    setLoading(false)
-    alert('กรุณาสมัครสมาชิกเพื่อเข้าใช้งานระบบ');
-  console.log(err);
-});
+  const result = await dispatch(signin(formData));
+  // สำเร็จ = `currentUser` ขยับ → useEffect ข้างบนพาไป `handleProfile` เอง (มัน `setLoading(false)` ให้ใน finally)
+  // ล้มเหลว = `signin` แจ้งข้อความเองแล้ว ที่นี่แค่ปิดสแปลชไม่ให้ค้าง
+  if(!result?.payload?.user?.uid) setLoading(false)
 }
 
 
@@ -147,7 +144,7 @@ await scanfoodAPI.get('/users/checkEmailRegister/'+formData?.email.trim()).then(
                     <label >Password</label>
                 </Form.Floating>
                 {!!formData.email && !!formData.password
-                    ?<Button onClick={()=>{checkRegisterUser()}}  style={styles.container5} >เข้าสู่ระบบ</Button>
+                    ?<Button onClick={()=>{handleLogin()}}  style={styles.container5} >เข้าสู่ระบบ</Button>
                     :<Button onClick={()=>{alert('กรุณาใส่ข้อมูลให้ครบถ้วน')}}  style={styles.container5} >เข้าสู่ระบบ</Button>
                 }
                 <br/>
