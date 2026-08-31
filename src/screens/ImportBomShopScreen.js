@@ -1,35 +1,27 @@
 import React, { useState, useRef } from "react";
 import ExcelJS from "exceljs";
-import { db } from "../db/firestore";
 import { Table, Row, Col } from "react-bootstrap";
 import { colors } from "../configs";
 import { Modal_FlatlistSearchShop, Modal_Loading } from "../modal";
 import { v4 as uuidv4 } from 'uuid';
-import { findInArray, toastSuccess } from "../Utility/function";
-import firebase from 'firebase/app';
+import { toastSuccess } from "../Utility/function";
+import { scanfoodAPI } from "../Utility/api";
+import { cellValue, importErrorText, OFFICE_IMPORT } from "../Utility/officeImport";
 import { CardComponent, OneButton } from "../components";
 import { stringFullDate } from "../Utility/dateTime";
 
 const { theme3 } = colors;
 const initialShop = { id:'', name:'', BOMCategory:[], createdDate:new Date() };
-const initialBOM = {
-    shopId:'',
-    name:'',
-    category:[],
-    unit:[],
-    cost:{id:'',cost:''},
-    stock:0,  // ตามหน่วยย่อยที่สุด
-    minimumStock:{qty:'',status:false,id:''},
-    franchiseId:'',
-};
 
 
 const ImportBomShopScreen = () => {
   const [products, setProducts] = useState([]);
   const [search_Modal, setSearch_Modal] = useState(false);
   const [shop, setShop] = useState(initialShop)
-  const { id:shopId, name, BOMCategory:smartCategory, createdDate } = shop;
-  const [category, setCategory] = useState([]);
+  const { id:shopId, name, createdDate } = shop;
+  // 🔁 รหัสรอบนำเข้า — ตั้ง 1 ครั้งตอนเลือกไฟล์ แล้วใช้ตัวเดิมตลอดจนกว่าจะสำเร็จ
+  //    ⇒ กดซ้ำ/เน็ตหลุดแล้วยิงใหม่ = server รู้ว่าเป็นรอบเดิม ไม่สร้างของซ้ำ (DEV-1266)
+  const [importId, setImportId] = useState('');
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -49,28 +41,18 @@ const ImportBomShopScreen = () => {
             worksheet.eachRow((row, rowNumber) => {
             if (rowNumber > 1) { // Skip header
                 extractedProducts.push({
-                    name: row.getCell(1).value||'', // Assuming name in column A
-                    smallestUnit: row.getCell(2).value||'', // Assuming name in column A
-                    category: row.getCell(3).value||'', // Assuming name in column A
-                    safetyStock: row.getCell(4).value||'', // Assuming name in column A
-                    stock: row.getCell(5).value||'', // Assuming name in column A
-                    cost: row.getCell(6).value||'', // Assuming name in column A
+                    name: cellValue(row.getCell(1).value), // Assuming name in column A
+                    smallestUnit: cellValue(row.getCell(2).value), // Assuming name in column A
+                    category: cellValue(row.getCell(3).value), // Assuming name in column A
+                    safetyStock: cellValue(row.getCell(4).value), // Assuming name in column A
+                    stock: cellValue(row.getCell(5).value), // Assuming name in column A
+                    cost: cellValue(row.getCell(6).value), // Assuming name in column A
                 });
             }
             });
 
             setProducts([...extractedProducts]); // Now update the state
-                let catSet = new Set();
-                let cat = [];
-
-                for (const item of extractedProducts) {
-                    if (!catSet.has(item.category) && item.category) {
-                        catSet.add(item.category);
-                        cat.push({ id: uuidv4(), category: item.category });
-                    }
-                }
-            setCategory(cat)
-
+            setImportId(uuidv4()); // รอบใหม่ = ไฟล์ใหม่ (หมวดถูกรวมฝั่ง server ตามชื่อ ไม่ต้องแจก id ที่นี่แล้ว)
         };
 
         reader.readAsArrayBuffer(file);
@@ -93,70 +75,26 @@ const ImportBomShopScreen = () => {
 
         const ok = window.confirm(`คุณต้องการเพิ่มสินค้าทั้งหมด ${products.length} รายการ ไปยังร้าน ${name} ใช่หรือไม่?`)
         if(!ok) return;
-    
+
+        // 🔒 DEV-1266: จอนี้ **ไม่เขียน Firestore เองแล้ว** — ส่งแถวดิบให้ server ตรวจ/เขียนทั้งชุด
+        //   server = ตัวที่ตรวจชนิด/ช่วงค่าต่อแถว · กันยิงซ้ำด้วย importId · เปิด ledger + ป้าย `_lastMove`
+        //   ⇒ แถวเน่าแถวเดียว = ไม่มีอะไรถูกเขียนเลย และข้อความบอกเลขแถวใน Excel ให้ไปแก้
         try {
             setLoading(true);
-            const batch = db.batch();
-    
-            // Process products concurrently
-            const productPromises = products.map(async ({ name, smallestUnit, safetyStock, category: thisCategory, cost, stock }, index) => {
-                const unitId = uuidv4()
-
-                const newItem = {
-                    ...initialBOM,
-                    name,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    shopId,
-                    stock
-                };
-                if(thisCategory){
-                    const categoryId = findInArray(category, 'category', thisCategory)?.id;
-                    newItem.category = [categoryId]
-                }
-                if(smallestUnit){
-                    newItem.unit = [{amount:'1',id:unitId, baseId:unitId, name:smallestUnit }]
-                }
-                if(safetyStock){
-                    newItem.minimumStock = { qty:safetyStock, status:true, id:unitId }
-                }
-                if(cost){
-                    newItem.cost = { id:'', cost }
-                }
-    
-                batch.set(db.collection('bom').doc(), newItem);
+            const { data } = await scanfoodAPI.post(OFFICE_IMPORT.bomShop, {
+                importId,
+                shopId,
+                rows: products,
             });
-    
-            await Promise.all(productPromises);
-    
-            // Process categories
-            if (category.length > 0) {
-                const newCategories = category.map(({ id, category }) => ({
-                    aboveId: [],
-                    level: 1,
-                    id,
-                    name: category,
-                }));
-    
-                let updatedShopCategory = [...smartCategory];
-                const firstLevelCategory = updatedShopCategory.find(a => a.level === 1);
-    
-                if (firstLevelCategory) {
-                    firstLevelCategory.value = [...firstLevelCategory.value, ...newCategories];
-                } else {
-                    updatedShopCategory.push({ level: 1, value: newCategories });
-                }
-                batch.update(db.collection('shop').doc(shopId), { BOMCategory: updatedShopCategory });
-            }
-    
-            // Commit batch operation
-            await batch.commit();
-            console.log('Batch write successful');
-    
+
             setProducts([]);
-            setShop(initialShop)
-            toastSuccess()
+            setShop(initialShop);
+            setImportId('');
+            toastSuccess(data && data.duplicate
+                ? 'ไฟล์นี้ถูกอัปโหลดไปแล้ว (ไม่ได้เพิ่มซ้ำ)'
+                : `เพิ่มวัตถุดิบสำเร็จ ${(data && data.created) || 0} รายการ`);
         } catch (error) {
-            alert('Error adding products:', error);
+            alert(importErrorText(error));
         } finally {
             setLoading(false);
         }

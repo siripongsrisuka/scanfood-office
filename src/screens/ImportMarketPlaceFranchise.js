@@ -1,14 +1,14 @@
 import React, { useState, useRef } from "react";
 import ExcelJS from "exceljs";
-import { db, prepareFirebaseImage } from "../db/firestore";
+import { prepareFirebaseImage } from "../db/firestore";
 import { Table,
   Row, Col
  } from "react-bootstrap";
-import { initialWarehouseItem } from "../configs";
 import { Modal_FlatlistSearchFranchise, Modal_Loading } from "../modal";
 import { v4 as uuidv4 } from 'uuid';
-import { minusMinutes, plusSecond } from "../Utility/dateTime";
-import { findInArray, toastSuccess } from "../Utility/function";
+import { toastSuccess } from "../Utility/function";
+import { scanfoodAPI } from "../Utility/api";
+import { cellValue, importErrorText, OFFICE_IMPORT } from "../Utility/officeImport";
 import { CardComponent, OneButton } from "../components";
 
 const initialShop = { id:'', name:'', warehouseCategory:[] }
@@ -17,8 +17,9 @@ const ImportMarketPlaceFranchise = () => {
   const [products, setProducts] = useState([]);
   const [search_Modal, setSearch_Modal] = useState(false);
   const [shop, setShop] = useState(initialShop)
-  const { id:franchiseId, name, warehouseCategory:smartCategory } = shop;
-  const [category, setCategory] = useState([]);
+  const { id:franchiseId, name } = shop;
+  // 🔁 รหัสรอบนำเข้า (DEV-1266) — ตั้งตอนเลือกไฟล์ · ยิงซ้ำด้วยรหัสเดิม = server ไม่สร้างของซ้ำ
+  const [importId, setImportId] = useState('');
   const [loading, setLoading] = useState(false);
     const fileInputRef = useRef(null);
 
@@ -105,18 +106,18 @@ const ImportMarketPlaceFranchise = () => {
             worksheet.eachRow((row, rowNumber) => {
             if (rowNumber > 1) { // Skip header
                 extractedProducts.push({
-                    sku: row.getCell(1).value||'', // Assuming name in column A
-                    barcode: row.getCell(2).value||'', // Assuming name in column A
-                    name: row.getCell(3).value||'', // Assuming name in column A
-                    category: row.getCell(4).value||'', // Assuming name in column A
-                    unit: row.getCell(5).value||'', // Assuming name in column A
-                    weight: row.getCell(6).value||'', // Assuming name in column A
-                    price: row.getCell(7).value||'', // Assuming name in column A
-                    discount: row.getCell(8).value||'', // Assuming name in column A
-                    point: row.getCell(9).value||'', // Assuming name in column A
-                    minimum: row.getCell(10).value||'', // Assuming name in column A
-                    maximum: row.getCell(11).value||'', // Assuming name in column A
-                    stock: row.getCell(12).value||'', // Assuming name in column A
+                    sku: cellValue(row.getCell(1).value), // Assuming name in column A
+                    barcode: cellValue(row.getCell(2).value), // Assuming name in column A
+                    name: cellValue(row.getCell(3).value), // Assuming name in column A
+                    category: cellValue(row.getCell(4).value), // Assuming name in column A
+                    unit: cellValue(row.getCell(5).value), // Assuming name in column A
+                    weight: cellValue(row.getCell(6).value), // Assuming name in column A
+                    price: cellValue(row.getCell(7).value), // Assuming name in column A
+                    discount: cellValue(row.getCell(8).value), // Assuming name in column A
+                    point: cellValue(row.getCell(9).value), // Assuming name in column A
+                    minimum: cellValue(row.getCell(10).value), // Assuming name in column A
+                    maximum: cellValue(row.getCell(11).value), // Assuming name in column A
+                    stock: cellValue(row.getCell(12).value), // Assuming name in column A
                     image: '',
                 });
             }
@@ -133,17 +134,7 @@ const ImportMarketPlaceFranchise = () => {
                 
                 await Promise.all(imagePromises); // Wait for all images to be processed
                 setProducts([...extractedProducts]); // Now update the state
-                let catSet = new Set();
-                let cat = [];
-
-                for (const item of extractedProducts) {
-                    if (!catSet.has(item.category) && item.category) {
-                        catSet.add(item.category);
-                        cat.push({ id: uuidv4(), category: item.category });
-                    }
-                }
-                setCategory(cat)
-
+                setImportId(uuidv4()); // รอบใหม่ = ไฟล์ใหม่ (หมวดถูกรวมฝั่ง server ตามชื่อ)
             });
         };
 
@@ -162,84 +153,40 @@ const ImportMarketPlaceFranchise = () => {
         if (products.length === 0) {
             return alert('กรุณาใส่ไฟล์ excel');
         }
+        if(!franchiseId) return alert('กรุณาเลือกแฟรนไชส์');
+
         const ok = window.confirm(`คุณต้องการเพิ่มสินค้าทั้งหมด ${products.length} รายการ ไปยังร้าน ${name} ใช่หรือไม่?`)
         if(!ok) return;
+
+        // 🔒 DEV-1266: จอนี้เคยเขียน `warehouseItem` **พร้อม stock** ตรงจากเบราว์เซอร์
+        //   = เดินอ้อม STOCK GUARD ของ `/claude/franchise/warehouseItem/manage` ทั้งดุ้น
+        //   ตอนนี้ยิงเข้า server ที่ตรวจต่อแถว + กันยิงซ้ำด้วย importId
+        //   · รูปยังอัปขึ้น Storage ที่ฝั่งนี้เหมือนเดิม (แปลงขนาด/บีบอัดในเบราว์เซอร์) แล้วส่งไปแค่ `imageId`
         try {
             setLoading(true);
-            const batch = db.batch();
-            const date = minusMinutes(new Date(), 10);
-    
-            // Process products concurrently
-            const productPromises = products.map(async ({ 
-                name, price, category: thisCategory, detail, image, sku,
-                barcode, unit, weight, discount, point, minimum, maximum, stock
-            }, index) => {
-                const imageId = image ? await prepareFirebaseImage(image, '/scanfoodMenu/', `${franchiseId}${index+1}`) : image;
-                
-                
-                const newItem = {
-                    ...initialWarehouseItem,
-                    sku,
-                    barcode,
-                    name,
-                    price,
-                    detail: detail || '',
-                    timestamp: plusSecond(date, 3 * index),
-                    franchiseId,
-                    imageId,
-                    unit,
-                    weight,
-                    discount,
-                    point,
-                    minimum,
-                    maximum,
-                    stock,
-                    saleStatus:'available'
-                };
 
-                if(thisCategory){
-                    const categoryId = findInArray(category, 'category', thisCategory)?.id;
-                    newItem.category = [{
-                        aboveId: [],
-                        level: 1,
-                        id:categoryId,
-                        name: thisCategory,
-                    }]
-                }
-                batch.set(db.collection('warehouseItem').doc(), newItem);
+            const rows = await Promise.all(products.map(async (item, index) => {
+                const imageId = item.image
+                    ? await prepareFirebaseImage(item.image, '/scanfoodMenu/', `${franchiseId}${index+1}`)
+                    : '';
+                const { image, ...rest } = item;
+                return { ...rest, imageId };
+            }));
+
+            const { data } = await scanfoodAPI.post(OFFICE_IMPORT.warehouseItem, {
+                importId,
+                franchiseId,
+                rows,
             });
-    
-            await Promise.all(productPromises);
-    
-            // Process categories
-            if (category.length > 0) {
-                const newCategories = category.map(({ id, category }) => ({
-                    aboveId: [],
-                    level: 1,
-                    id,
-                    name: category,
-                }));
-    
-                let updatedShopCategory = [...smartCategory];
-                const firstLevelCategory = updatedShopCategory.find(a => a.level === 1);
-    
-                if (firstLevelCategory) {
-                    firstLevelCategory.value = [...firstLevelCategory.value, ...newCategories];
-                } else {
-                    updatedShopCategory.push({ level: 1, value: newCategories });
-                }
-                batch.update(db.collection('franchise').doc(franchiseId), { warehouseCategory: updatedShopCategory });
-            }
-    
-            // Commit batch operation
-            await batch.commit();
-            console.log('Batch write successful');
-    
+
             setProducts([]);
             setShop(initialShop);
-            toastSuccess('เพิ่มสินค้าสำเร็จ');
+            setImportId('');
+            toastSuccess(data && data.duplicate
+                ? 'ไฟล์นี้ถูกอัปโหลดไปแล้ว (ไม่ได้เพิ่มซ้ำ)'
+                : `เพิ่มสินค้าสำเร็จ ${(data && data.created) || 0} รายการ`);
         } catch (error) {
-            console.error('Error adding products:', error);
+            alert(importErrorText(error));
         } finally {
             setLoading(false);
         }
