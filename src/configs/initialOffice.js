@@ -219,6 +219,7 @@ export default [
     },
     {
       label: '6. ทีม Tech ขั้นเทพ',
+      movedTo: 'retired', // ยุบทั้งกลุ่ม 6 ออกจากเมนู 2026-09-24 (Pack สั่ง: "ยุบข้อ 6 ทิ้งได้เลย · มีที่ scanoffice แล้วค่อยๆ ตัดที่นี่ออก กันสับสน") · คง topic ไว้ให้ด่าน check-live-parity · route ยังอยู่
     },
     
     {
@@ -272,6 +273,7 @@ export default [
     },
     {
       topic: '6.8 เปลี่ยนไม่มีโต๊ะเป็นมีโต๊ะ',
+      movedTo: 'retired', // ยุบทั้งกลุ่ม 6 ออกจากเมนู 2026-09-24 (Pack สั่ง: "ยุบข้อ 6 ทิ้งได้เลย · มีที่ scanoffice แล้วค่อยๆ ตัดที่นี่ออก กันสับสน") · คง topic ไว้ให้ด่าน check-live-parity · route ยังอยู่
       icon: 'bi-speedometer',
       to: 'transform',
       id:'128'
@@ -307,12 +309,14 @@ export default [
     },
     {
       topic: '6.13 CRM Lead',
+      movedTo: 'retired', // ยุบทั้งกลุ่ม 6 ออกจากเมนู 2026-09-24 (Pack สั่ง: "ยุบข้อ 6 ทิ้งได้เลย · มีที่ scanoffice แล้วค่อยๆ ตัดที่นี่ออก กันสับสน") · คง topic ไว้ให้ด่าน check-live-parity · route ยังอยู่
       icon: 'bi-speedometer',
       to: 'crmLead',
       id:'128'
     },
     {
       topic: '6.99 kbankReport',
+      movedTo: 'retired', // ยุบทั้งกลุ่ม 6 ออกจากเมนู 2026-09-24 (Pack สั่ง: "ยุบข้อ 6 ทิ้งได้เลย · มีที่ scanoffice แล้วค่อยๆ ตัดที่นี่ออก กันสับสน") · คง topic ไว้ให้ด่าน check-live-parity · route ยังอยู่
       icon: 'bi-speedometer',
       to: 'kbankReport',
       id:'128'
