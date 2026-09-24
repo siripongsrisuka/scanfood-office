@@ -339,18 +339,21 @@ export default [
     // },
     {
       topic: '7.1 ส่งอีเมล Kbank',
+      movedTo: 'scanoffice', // ปิดเมนู 2026-09-24 (Pack: ย้ายกลุ่ม 7 ทั้งแถบ · มีที่ scanoffice แล้วตัดออก) — ไป scanoffice › CS › ส่งเมลให้ร้าน · คง topic ไว้ให้ด่าน check-live-parity
       icon: 'bi-speedometer',
       to: 'emailKbank',
       id:'701'
     },
     {
       topic: '7.2 ส่งอีเมล ขอหมายเลขเครื่อง POS',
+      movedTo: 'scanoffice', // ปิดเมนู 2026-09-24 (Pack: ย้ายกลุ่ม 7 ทั้งแถบ) — ไป scanoffice › CS › ส่งเมลให้ร้าน (เนื้อเมล tax) · คง topic ไว้ให้ด่าน check-live-parity
       icon: 'bi-speedometer',
       to: 'emailTax',
       id:'702'
     },
     {
       topic: '7.3 ส่งอีเมล เครื่องปริ้น',
+      movedTo: 'retired', // เลิกใช้ 2026-09-24 — จอเก่าเป็นสำเนา 7.2 ส่งเมลผิดเรื่อง · Pack ตัดถาวร 2026-09-22 · คง topic ไว้ให้ด่าน check-live-parity
       icon: 'bi-speedometer',
       to: 'emailPrinter',
       id:'703'

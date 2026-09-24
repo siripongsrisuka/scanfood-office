@@ -17,6 +17,10 @@ export const MOVED_TO_SCANOFFICE = {
   changeTable: { topic: "6.10 เปลี่ยนโต๊ะ", tab: "เปลี่ยนจำนวนโต๊ะ", route: "store-size" },
   uploadStaff: { topic: "6.11 อัปโหลดพนักงาน", tab: "สร้างบัญชีพนักงาน", route: "staff-account" },
   resetPassword: { topic: "6.12 รีเซ็ตรหัสผ่าน", tab: "เปลี่ยนรหัสผ่าน", route: "password-reset" },
+  // 7.1-7.3 (2026-09-24 · Pack สั่งย้ายกลุ่ม 7) — ไปกลุ่ม CS ไม่ใช่ทีม Tech ⇒ ระบุ group + url เต็ม
+  emailKbank: { topic: "7.1 ส่งอีเมล Kbank", group: "CS", tab: "ส่งเมลให้ร้าน (เนื้อเมล Kbank)", url: "https://scanoffice.web.app/cs/email-send" },
+  emailTax: { topic: "7.2 ส่งอีเมล ขอหมายเลขเครื่อง POS", group: "CS", tab: "ส่งเมลให้ร้าน (เนื้อเมลสรรพากร)", url: "https://scanoffice.web.app/cs/email-send" },
+  emailPrinter: { topic: "7.3 ส่งอีเมล เครื่องปริ้น", group: "CS", tab: "ส่งเมลให้ร้าน (เมนูนี้เลิกใช้แล้ว — เลือกเนื้อเมลที่ต้องการแทน)", url: "https://scanoffice.web.app/cs/email-send" },
 };
 
 const SCANOFFICE = "https://scanoffice.web.app/admin/configs/";
@@ -24,12 +28,12 @@ const SCANOFFICE = "https://scanoffice.web.app/admin/configs/";
 function MovedToScanofficeScreen({ from }) {
   const m = MOVED_TO_SCANOFFICE[from];
   if (!m) return null;
-  const url = SCANOFFICE + m.route;
+  const url = m.url || SCANOFFICE + m.route;
   return (
     <div style={{ padding: 24, maxWidth: 640 }}>
       <h4 style={{ marginBottom: 12 }}>เมนู "{m.topic}" ย้ายไปแล้ว</h4>
       <p style={{ marginBottom: 8 }}>
-        ย้ายไป <b>scanoffice › ทีม Tech › {m.tab}</b>
+        ย้ายไป <b>scanoffice › {m.group || "ทีม Tech"} › {m.tab}</b>
       </p>
       <p style={{ marginBottom: 16, color: "#666" }}>
         เว็บนี้ปิดเมนูนี้แล้ว — ของใหม่มีพรีวิวก่อนทำจริง กันกดซ้ำ และเก็บประวัติทุกครั้ง

@@ -128,12 +128,12 @@ function App() {
             <Route path='questionHistory' element={<QuestionHistoryScreen/>} />
             <Route path='customerProfile' element={<CustomerProfileScreen/>} />
             <Route path='oneMonthShop' element={<OneMonthShopScreen/>} />
-            <Route path='emailKbank' element={<EmailKbankScreen/>} />
-            <Route path='emailTax' element={<EmailTaxScreen/>} />
+            <Route path='emailKbank' element={<MovedToScanofficeScreen from='emailKbank'/>} />
+            <Route path='emailTax' element={<MovedToScanofficeScreen from='emailTax'/>} />
             <Route path='manualPaid' element={<ManualPaidScreen/>} />
             <Route path='packageHistory' element={<PackageHistoryScreen/>} />
             <Route path='hardwareHistory' element={<HardwareHistoryScreen/>} />
-            <Route path='emailPrinter' element={<EmailPrinterScreen/>} />
+            <Route path='emailPrinter' element={<MovedToScanofficeScreen from='emailPrinter'/>} />
             <Route path='eTax' element={<ETaxScreen/>} />
             <Route path='eTaxHistory' element={<ETaxHistoryScreen/>} />
             <Route path='changeTable' element={<MovedToScanofficeScreen from='changeTable'/>} />
