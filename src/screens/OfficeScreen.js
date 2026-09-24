@@ -51,6 +51,7 @@ function OfficeScreen() {
   const { sideBar, listDisplay } = useMemo(()=>{
       let sideBar = initialOffice;
       const { rights } = humanRight.find(a=>a.id===profileId) || { rights:[] }
+      sideBar = sideBar.filter(a=>!a.movedTo) // เมนูที่ย้ายไป scanoffice แล้ว = ไม่แสดง
       sideBar = sideBar.filter(a=>a.label || rights.includes(a.id))
     return {
       sideBar,

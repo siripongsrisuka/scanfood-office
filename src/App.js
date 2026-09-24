@@ -1,13 +1,9 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// เมนู 6.1-6.6 ย้ายไป scanoffice ทีม Tech (2026-09-24 · Pack เคาะ 4a) — route เดิมเหลือหน้าแจ้งย้าย
+import MovedToScanofficeScreen from './screens/MovedToScanofficeScreen';
 import { 
   HomeScreen,
-  CloneScreen,
-  ImportItemStoreScreen,
-  ImportItemFranchiseScreen,
-  ImportBomFranchiseScreen,
-  ImportBomShopScreen,
-  ImportMarketPlaceFranchise,
   SoftwareHistory,
   TransformTable,
   TransferExpireScreen,
@@ -106,9 +102,9 @@ function App() {
             <Route index  element={<FacebookLeadScreen/>} />
             {/* <Route index  element={<SaleScreen/>} /> */}
             <Route path='staff' element={<StaffScreen/>} />
-            <Route path='clone' element={<CloneScreen/>} />
-            <Route path='importItem' element={<ImportItemStoreScreen/>} />
-            <Route path='importBomShop' element={<ImportBomShopScreen/>} />
+            <Route path='clone' element={<MovedToScanofficeScreen from='clone'/>} />
+            <Route path='importItem' element={<MovedToScanofficeScreen from='importItem'/>} />
+            <Route path='importBomShop' element={<MovedToScanofficeScreen from='importBomShop'/>} />
             <Route path='kbankReport' element={<KbankReportScreen/>} />
             <Route path='warehouse' element={<WarehouseScreen/>} />
             <Route path='approveSoftware' element={<ApproveSoftwareScreen/>} />
@@ -126,9 +122,9 @@ function App() {
             <Route path='reportInbound' element={<ReportInbound/>} />
             <Route path='reportHardware' element={<ReportHardware/>} />
             <Route path='newShop' element={<NewShopDashboard/>} />
-            <Route path='importItemFranchise' element={<ImportItemFranchiseScreen/>} />
-            <Route path='importBomFranchise' element={<ImportBomFranchiseScreen/>} />
-            <Route path='importMarketPlaceFranchise' element={<ImportMarketPlaceFranchise/>} />
+            <Route path='importItemFranchise' element={<MovedToScanofficeScreen from='importItemFranchise'/>} />
+            <Route path='importBomFranchise' element={<MovedToScanofficeScreen from='importBomFranchise'/>} />
+            <Route path='importMarketPlaceFranchise' element={<MovedToScanofficeScreen from='importMarketPlaceFranchise'/>} />
             <Route path='question' element={<QuestionScreen/>} />
             <Route path='diagnosis' element={<DiagnosisScreen/>} />
             <Route path='transferOwner' element={<TransferOwnerScreen/>} />

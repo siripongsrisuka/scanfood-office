@@ -225,36 +225,42 @@ export default [
       topic: '6.1 คัดลอกร้าน',
       icon: 'bi-speedometer',
       to: 'clone',
+      movedTo: 'scanoffice', // ปิดเมนูแล้ว 2026-09-24 (Pack เคาะ 4a) — ย้ายไป scanoffice ทีม Tech · ซ่อนจาก sidebar แต่คง topic ไว้ให้ด่าน check-live-parity
       id:'128'
     },
     {
       topic: '6.2 อัปโหลดสินค้าร้านเดี่ยว',
       icon: 'bi-speedometer',
       to: 'importItem',
+      movedTo: 'scanoffice', // ปิดเมนูแล้ว 2026-09-24 (Pack เคาะ 4a) — ย้ายไป scanoffice ทีม Tech · ซ่อนจาก sidebar แต่คง topic ไว้ให้ด่าน check-live-parity
       id:'128'
     },
     {
       topic: '6.3 อัปโหลดวัตถุดิบร้านเดี่ยว',
       icon: 'bi-speedometer',
       to: 'importBomShop',
+      movedTo: 'scanoffice', // ปิดเมนูแล้ว 2026-09-24 (Pack เคาะ 4a) — ย้ายไป scanoffice ทีม Tech · ซ่อนจาก sidebar แต่คง topic ไว้ให้ด่าน check-live-parity
       id:'128'
     },
     {
       topic: '6.4 อัปโหลดสินค้าแฟรนไชส์',
       icon: 'bi-speedometer',
       to: 'importItemFranchise',
+      movedTo: 'scanoffice', // ปิดเมนูแล้ว 2026-09-24 (Pack เคาะ 4a) — ย้ายไป scanoffice ทีม Tech · ซ่อนจาก sidebar แต่คง topic ไว้ให้ด่าน check-live-parity
       id:'128'
     },
     {
       topic: '6.5 อัปโหลดวัตถุดิบแฟรนไชส์',
       icon: 'bi-speedometer',
       to: 'importBomFranchise',
+      movedTo: 'scanoffice', // ปิดเมนูแล้ว 2026-09-24 (Pack เคาะ 4a) — ย้ายไป scanoffice ทีม Tech · ซ่อนจาก sidebar แต่คง topic ไว้ให้ด่าน check-live-parity
       id:'128'
     },
     {
       topic: '6.6 อัปโหลด Marketplace',
       icon: 'bi-speedometer',
       to: 'importMarketPlaceFranchise',
+      movedTo: 'scanoffice', // ปิดเมนูแล้ว 2026-09-24 (Pack เคาะ 4a) — ย้ายไป scanoffice ทีม Tech · ซ่อนจาก sidebar แต่คง topic ไว้ให้ด่าน check-live-parity
       id:'128'
     },
     {

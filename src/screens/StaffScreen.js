@@ -38,7 +38,7 @@ function StaffScreen() {
     const sideBar = useMemo(()=>{
       let sideBar = initialOffice
 
-      return sideBar.filter(a=>!a.label)
+      return sideBar.filter(a=>!a.label && !a.movedTo) // เมนูที่ย้ายไป scanoffice แล้ว = ไม่ต้องแจกสิทธิ์
     },[])
 
   
