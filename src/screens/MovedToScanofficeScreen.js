@@ -1,6 +1,6 @@
 import React from "react";
 
-// หน้าแจ้งย้าย — เมนู 6.1-6.6 ปิดบนเว็บนี้แล้ว (OFFICE-0044..0047 · DEV-1632 ③ · Pack เคาะ 4a 2026-09-24)
+// หน้าแจ้งย้าย — เมนู 6.1-6.7 · 6.9-6.12 ปิดบนเว็บนี้แล้ว (OFFICE-0044..0047 · OFFICE-0055..0059 · DEV-1632 ③ · Pack เคาะ 4a 2026-09-24)
 // route เดิมยังเปิดได้ (bookmark/ลิงก์เก่า) แต่พาไปแท็บใหม่บน scanoffice ทีม Tech แทนจอเก่า
 // จอเก่า (CloneScreen.js · Import*.js) ยังอยู่ในโค้ด แต่ไม่มี route ไหนพาไปแล้ว
 // — 6.1 เดิมยิง legacy `/shop/cloneShop` ที่ปิดแล้ว (ตอบ 410)
@@ -11,6 +11,12 @@ export const MOVED_TO_SCANOFFICE = {
   importItemFranchise: { topic: "6.4 อัปโหลดสินค้าแฟรนไชส์", tab: "อัปสินค้าแฟรนไชส์", route: "product-franchise" },
   importBomFranchise: { topic: "6.5 อัปโหลดวัตถุดิบแฟรนไชส์", tab: "อัปวัตถุดิบแฟรนไชส์", route: "bom-franchise" },
   importMarketPlaceFranchise: { topic: "6.6 อัปโหลด Marketplace", tab: "อัปสินค้า Marketplace แฟรนไชส์", route: "marketplace" },
+  // 6.7 · 6.9-6.12 (OFFICE-0055..0059 · 2026-09-24) — 6.8 ไม่ย้าย (Pack 3b)
+  transferExpire: { topic: "6.7 ย้ายวันใช้งาน", tab: "ย้ายวันใช้งาน", route: "shop-days-move" },
+  transferOwner: { topic: "6.9 เปลี่ยนสิทธิ์ Owner", tab: "เปลี่ยนเจ้าของร้าน", route: "shop-owner" },
+  changeTable: { topic: "6.10 เปลี่ยนโต๊ะ", tab: "เปลี่ยนจำนวนโต๊ะ", route: "store-size" },
+  uploadStaff: { topic: "6.11 อัปโหลดพนักงาน", tab: "สร้างบัญชีพนักงาน", route: "staff-account" },
+  resetPassword: { topic: "6.12 รีเซ็ตรหัสผ่าน", tab: "เปลี่ยนรหัสผ่าน", route: "password-reset" },
 };
 
 const SCANOFFICE = "https://scanoffice.web.app/admin/configs/";

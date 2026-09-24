@@ -267,6 +267,7 @@ export default [
       topic: '6.7 ย้ายวันใช้งาน',
       icon: 'bi-speedometer',
       to: 'transferExpire',
+      movedTo: 'scanoffice', // ปิดเมนูแล้ว 2026-09-24 (Pack เคาะ 4a) — ย้ายไป scanoffice ทีม Tech · ซ่อนจาก sidebar แต่คง topic ไว้ให้ด่าน check-live-parity
       id:'128'
     },
     {
@@ -279,6 +280,7 @@ export default [
       topic: '6.9 เปลี่ยนสิทธิ์ Owner',
       icon: 'bi-speedometer',
       to: 'transferOwner',
+      movedTo: 'scanoffice', // ปิดเมนูแล้ว 2026-09-24 (Pack เคาะ 4a) — ย้ายไป scanoffice ทีม Tech · ซ่อนจาก sidebar แต่คง topic ไว้ให้ด่าน check-live-parity
       id:'128'
     },
 
@@ -286,18 +288,21 @@ export default [
       topic: '6.10 เปลี่ยนโต๊ะ',
       icon: 'bi-speedometer',
       to: 'changeTable',
+      movedTo: 'scanoffice', // ปิดเมนูแล้ว 2026-09-24 (Pack เคาะ 4a) — ย้ายไป scanoffice ทีม Tech · ซ่อนจาก sidebar แต่คง topic ไว้ให้ด่าน check-live-parity
       id:'128'
     },
     {
       topic: '6.11 อัปโหลดพนักงาน',
       icon: 'bi-speedometer',
       to: 'uploadStaff',
+      movedTo: 'scanoffice', // ปิดเมนูแล้ว 2026-09-24 (Pack เคาะ 4a) — ย้ายไป scanoffice ทีม Tech · ซ่อนจาก sidebar แต่คง topic ไว้ให้ด่าน check-live-parity
       id:'128'
     },
     {
       topic: '6.12 รีเซ็ตรหัสผ่าน',
       icon: 'bi-speedometer',
       to: 'resetPassword',
+      movedTo: 'scanoffice', // ปิดเมนูแล้ว 2026-09-24 (Pack เคาะ 4a) — ย้ายไป scanoffice ทีม Tech · ซ่อนจาก sidebar แต่คง topic ไว้ให้ด่าน check-live-parity
       id:'128'
     },
     {

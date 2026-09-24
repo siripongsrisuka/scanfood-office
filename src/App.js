@@ -1,12 +1,11 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// เมนู 6.1-6.6 ย้ายไป scanoffice ทีม Tech (2026-09-24 · Pack เคาะ 4a) — route เดิมเหลือหน้าแจ้งย้าย
+// เมนู 6.1-6.7 · 6.9-6.12 ย้ายไป scanoffice ทีม Tech (2026-09-24 · Pack เคาะ 4a) — route เดิมเหลือหน้าแจ้งย้าย · 6.8 ไม่ย้าย (Pack 3b)
 import MovedToScanofficeScreen from './screens/MovedToScanofficeScreen';
 import { 
   HomeScreen,
   SoftwareHistory,
   TransformTable,
-  TransferExpireScreen,
   QuestionScreen,
   DiagnosisScreen,
   KbankReportScreen,
@@ -24,7 +23,6 @@ import {
   ReportInbound,
   ReportHardware,
   NewShopDashboard,
-  TransferOwnerScreen,
   ExtraDayScreen,
   ExtraDayHistory,
   QuestionHistoryScreen,
@@ -38,7 +36,6 @@ import {
   EmailPrinterScreen,
   ETaxHistoryScreen,
   ETaxScreen,
-  ChangeTableScreen,
   KbankScreen,
   SourceScreen,
   PaymentFailedScreen,
@@ -46,12 +43,10 @@ import {
   SubscriptionScreen,
   CodeRelativeScreen,
   TrainingScheduleScreen,
-  UploadStaffScreen,
   TaxInvoiceReceiptTemplate,
   CommissionScreen,
   ExecutiveSalesLeaderboardScreen,
   CommissionHistoryScreen,
-  ResetPasswordScreen,
   CrmLeadScreen,
   FacebookLeadScreen,
   ReportLinkCodeFalse
@@ -111,7 +106,7 @@ function App() {
             <Route path='sale' element={<SaleScreen/>} />
             <Route path='upgrade' element={<UpgradeStoreSizeScreen/>} />
             <Route path='upgradeHistory' element={<UpgradeStoreSizeHistory/>} />
-            <Route path='transferExpire' element={<TransferExpireScreen/>} />
+            <Route path='transferExpire' element={<MovedToScanofficeScreen from='transferExpire'/>} />
             <Route path='transform' element={<TransformTable/>} />
             <Route path='softwareHistory' element={<SoftwareHistory/>} />
             <Route path='saleManager' element={<SaleManagerScreen/>} />
@@ -127,7 +122,7 @@ function App() {
             <Route path='importMarketPlaceFranchise' element={<MovedToScanofficeScreen from='importMarketPlaceFranchise'/>} />
             <Route path='question' element={<QuestionScreen/>} />
             <Route path='diagnosis' element={<DiagnosisScreen/>} />
-            <Route path='transferOwner' element={<TransferOwnerScreen/>} />
+            <Route path='transferOwner' element={<MovedToScanofficeScreen from='transferOwner'/>} />
             <Route path='extraDay' element={<ExtraDayScreen/>} />
             <Route path='extraDayHistory' element={<ExtraDayHistory/>} />
             <Route path='questionHistory' element={<QuestionHistoryScreen/>} />
@@ -141,7 +136,7 @@ function App() {
             <Route path='emailPrinter' element={<EmailPrinterScreen/>} />
             <Route path='eTax' element={<ETaxScreen/>} />
             <Route path='eTaxHistory' element={<ETaxHistoryScreen/>} />
-            <Route path='changeTable' element={<ChangeTableScreen/>} />
+            <Route path='changeTable' element={<MovedToScanofficeScreen from='changeTable'/>} />
             <Route path='kbank' element={<KbankScreen/>} />
             <Route path='source' element={<SourceScreen/>} />
             <Route path='paymentFailed' element={<PaymentFailedScreen/>} />
@@ -149,12 +144,12 @@ function App() {
             <Route path='subscription' element={<SubscriptionScreen/>} />
             <Route path='codeRelative' element={<CodeRelativeScreen/>} />
             <Route path='trainingSchedule' element={<TrainingScheduleScreen/>} />
-            <Route path='uploadStaff' element={<UploadStaffScreen/>} />
+            <Route path='uploadStaff' element={<MovedToScanofficeScreen from='uploadStaff'/>} />
             <Route path='taxInvoice' element={<TaxInvoiceReceiptTemplate/>} />
             <Route path='commission' element={<CommissionScreen/>} />
           <Route path='executiveSalesLeaderboard' element={<ExecutiveSalesLeaderboardScreen/>} />
           <Route path='commissionHistory' element={<CommissionHistoryScreen/>} />
-          <Route path='resetPassword' element={<ResetPasswordScreen/>} />
+          <Route path='resetPassword' element={<MovedToScanofficeScreen from='resetPassword'/>} />
           <Route path='crmLead' element={<CrmLeadScreen/>} />
           <Route path='lead' element={<FacebookLeadScreen/>} />
           <Route path='reportLinkCodeFalse' element={<ReportLinkCodeFalse/>} />
