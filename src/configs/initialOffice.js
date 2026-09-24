@@ -360,24 +360,28 @@ export default [
     },
     {
       topic: '7.4 เพิ่มโต๊ะ',
+      movedTo: 'scanoffice', // ปิดเมนู 2026-09-25 (Pack: ย้ายกลุ่ม 7 ทั้งแถบ · มีที่ scanoffice แล้วตัดออก) · คง topic ไว้ให้ด่าน check-live-parity
       icon: 'bi-speedometer',
       to: 'upgrade',
       id:'704'
     },
     {
       topic: '7.5 ประวัติเพิ่มโต๊ะ',
+      movedTo: 'scanoffice', // ปิดเมนู 2026-09-25 (Pack: ย้ายกลุ่ม 7 ทั้งแถบ · มีที่ scanoffice แล้วตัดออก) · คง topic ไว้ให้ด่าน check-live-parity
       icon: 'bi-speedometer',
       to: 'upgradeHistory',
       id:'705'
     },
     {
       topic: '7.6 kbank',
+      movedTo: 'scanoffice', // ปิดเมนู 2026-09-25 (Pack: ย้ายกลุ่ม 7 ทั้งแถบ · มีที่ scanoffice แล้วตัดออก) · คง topic ไว้ให้ด่าน check-live-parity
       icon: 'bi-speedometer',
       to: 'kbank',
       id:'706'
     },
     {
       topic: '7.7 สื่อต่างๆ',
+      movedTo: 'scanoffice', // ปิดเมนู 2026-09-25 (Pack: ย้ายกลุ่ม 7 ทั้งแถบ · มีที่ scanoffice แล้วตัดออก) · คง topic ไว้ให้ด่าน check-live-parity
       icon: 'bi-speedometer',
       to: 'source',
       id:'707'

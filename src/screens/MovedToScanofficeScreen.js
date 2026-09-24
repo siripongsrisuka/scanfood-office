@@ -21,6 +21,12 @@ export const MOVED_TO_SCANOFFICE = {
   emailKbank: { topic: "7.1 ส่งอีเมล Kbank", group: "CS", tab: "ส่งเมลให้ร้าน (เนื้อเมล Kbank)", url: "https://scanoffice.web.app/cs/email-send" },
   emailTax: { topic: "7.2 ส่งอีเมล ขอหมายเลขเครื่อง POS", group: "CS", tab: "ส่งเมลให้ร้าน (เนื้อเมลสรรพากร)", url: "https://scanoffice.web.app/cs/email-send" },
   emailPrinter: { topic: "7.3 ส่งอีเมล เครื่องปริ้น", group: "CS", tab: "ส่งเมลให้ร้าน (เมนูนี้เลิกใช้แล้ว — เลือกเนื้อเมลที่ต้องการแทน)", url: "https://scanoffice.web.app/cs/email-send" },
+  // 7.4-7.7 + 6.99 (2026-09-25 · Pack สั่งย้ายกลุ่ม 7 ทั้งแถบ)
+  upgrade: { topic: "7.4 เพิ่มโต๊ะ", group: "ทีม Tech", tab: "ปรับขนาดร้าน (เพิ่มโต๊ะ)", url: "https://scanoffice.web.app/admin/configs/store-size-upgrade" },
+  upgradeHistory: { topic: "7.5 ประวัติเพิ่มโต๊ะ", group: "ทีม Tech", tab: "ประวัติปรับขนาดร้าน", url: "https://scanoffice.web.app/admin/configs/store-size-upgrade-history" },
+  kbank: { topic: "7.6 kbank", group: "CS", tab: "เคส KBank", url: "https://scanoffice.web.app/cs/kbank-cases" },
+  source: { topic: "7.7 สื่อต่างๆ", group: "เมนูหลัก", tab: "สื่อต่างๆ", url: "https://scanoffice.web.app/media" },
+  kbankReport: { topic: "6.99 kbankReport", group: "ทีม Tech", tab: "รายงาน KBank", url: "https://scanoffice.web.app/admin/configs/kbank-report" },
 };
 
 const SCANOFFICE = "https://scanoffice.web.app/admin/configs/";

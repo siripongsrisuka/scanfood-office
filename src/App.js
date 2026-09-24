@@ -100,12 +100,12 @@ function App() {
             <Route path='clone' element={<MovedToScanofficeScreen from='clone'/>} />
             <Route path='importItem' element={<MovedToScanofficeScreen from='importItem'/>} />
             <Route path='importBomShop' element={<MovedToScanofficeScreen from='importBomShop'/>} />
-            <Route path='kbankReport' element={<KbankReportScreen/>} />
+            <Route path='kbankReport' element={<MovedToScanofficeScreen from='kbankReport'/>} />
             <Route path='warehouse' element={<WarehouseScreen/>} />
             <Route path='approveSoftware' element={<ApproveSoftwareScreen/>} />
             <Route path='sale' element={<SaleScreen/>} />
-            <Route path='upgrade' element={<UpgradeStoreSizeScreen/>} />
-            <Route path='upgradeHistory' element={<UpgradeStoreSizeHistory/>} />
+            <Route path='upgrade' element={<MovedToScanofficeScreen from='upgrade'/>} />
+            <Route path='upgradeHistory' element={<MovedToScanofficeScreen from='upgradeHistory'/>} />
             <Route path='transferExpire' element={<MovedToScanofficeScreen from='transferExpire'/>} />
             <Route path='transform' element={<TransformTable/>} />
             <Route path='softwareHistory' element={<SoftwareHistory/>} />
@@ -137,8 +137,8 @@ function App() {
             <Route path='eTax' element={<ETaxScreen/>} />
             <Route path='eTaxHistory' element={<ETaxHistoryScreen/>} />
             <Route path='changeTable' element={<MovedToScanofficeScreen from='changeTable'/>} />
-            <Route path='kbank' element={<KbankScreen/>} />
-            <Route path='source' element={<SourceScreen/>} />
+            <Route path='kbank' element={<MovedToScanofficeScreen from='kbank'/>} />
+            <Route path='source' element={<MovedToScanofficeScreen from='source'/>} />
             <Route path='paymentFailed' element={<PaymentFailedScreen/>} />
             <Route path='customerSuccessShift' element={<CustomerSuccessShiftScreen/>} />
             <Route path='subscription' element={<SubscriptionScreen/>} />
