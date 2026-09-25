@@ -1,0 +1,502 @@
+{
+  "_doc": "เคสร่วมของ leadChannel.js ทั้ง 2 สำเนา (server + scanfood-office) · สัญญา lanes/dev/source/contract-channel-dashboard.md §1-§3 · แก้ที่ server แล้ว cp ทับฝั่ง office",
+  "channel": [
+    {
+      "why": "§1.1 Meta instant form (formId มีค่า · adId ว่างตามของจริงในฐาน)",
+      "lead": {
+        "source": "facebook_instant_form",
+        "formId": "1627521341732071",
+        "adId": "",
+        "campaignId": ""
+      },
+      "want": "facebook"
+    },
+    {
+      "why": "§1.1 adId",
+      "lead": {
+        "adId": "123"
+      },
+      "want": "facebook"
+    },
+    {
+      "why": "§1.1 campaignId",
+      "lead": {
+        "campaignId": "9"
+      },
+      "want": "facebook"
+    },
+    {
+      "why": "§1.1 platform ig",
+      "lead": {
+        "platform": "IG"
+      },
+      "want": "facebook"
+    },
+    {
+      "why": "§1.1 ชนะ utm",
+      "lead": {
+        "formId": "1",
+        "utm_source": "google"
+      },
+      "want": "facebook"
+    },
+    {
+      "why": "§1.2 gclid ชั้นบน",
+      "lead": {
+        "gclid": "abc"
+      },
+      "want": "google-search"
+    },
+    {
+      "why": "§1.2 gbraid ในก้อน attribution (ฟอร์มเว็บ)",
+      "lead": {
+        "createdBy": "web-form",
+        "attribution": {
+          "gbraid": "x"
+        }
+      },
+      "want": "google-search"
+    },
+    {
+      "why": "§1.2 wbraid",
+      "lead": {
+        "attribution": {
+          "wbraid": "x"
+        }
+      },
+      "want": "google-search"
+    },
+    {
+      "why": "§1.2 gclid ชนะ utm chatgpt",
+      "lead": {
+        "gclid": "g",
+        "utm_source": "chatgpt"
+      },
+      "want": "google-search"
+    },
+    {
+      "why": "§1.2 fbclid",
+      "lead": {
+        "attribution": {
+          "fbclid": "f"
+        }
+      },
+      "want": "facebook"
+    },
+    {
+      "why": "§1.3 utm chatgpt (check ③)",
+      "lead": {
+        "createdBy": "web-form",
+        "attribution": {
+          "utm_source": "chatgpt"
+        }
+      },
+      "want": "chatgpt"
+    },
+    {
+      "why": "§1.3 utm openai ตัวใหญ่",
+      "lead": {
+        "utm_source": "OpenAI"
+      },
+      "want": "chatgpt"
+    },
+    {
+      "why": "§1.3 utm google",
+      "lead": {
+        "utm_source": "google"
+      },
+      "want": "google-search"
+    },
+    {
+      "why": "§1.3 utm line",
+      "lead": {
+        "utm_source": "line"
+      },
+      "want": "line"
+    },
+    {
+      "why": "§1.3 utm tiktok",
+      "lead": {
+        "utm_source": "tiktok"
+      },
+      "want": "tiktok"
+    },
+    {
+      "why": "§1.3 utm instagram",
+      "lead": {
+        "utm_source": "instagram"
+      },
+      "want": "facebook"
+    },
+    {
+      "why": "§1.3 utm meta (สัญญา 9fb7c50)",
+      "lead": {
+        "createdBy": "web-form",
+        "attribution": {
+          "utm_source": "meta"
+        }
+      },
+      "want": "facebook"
+    },
+    {
+      "why": "§1.3 utm apple",
+      "lead": {
+        "utm_source": "apple"
+      },
+      "want": "apple-search"
+    },
+    {
+      "why": "§1.3 utm googleplay",
+      "lead": {
+        "utm_source": "googleplay"
+      },
+      "want": "google-app"
+    },
+    {
+      "why": "§1.3 utm play",
+      "lead": {
+        "utm_source": "play"
+      },
+      "want": "google-app"
+    },
+    {
+      "why": "§1.4 ฟอร์มเว็บ utm แปลก",
+      "lead": {
+        "createdBy": "web-form",
+        "attribution": {
+          "utm_source": "test"
+        }
+      },
+      "want": "website"
+    },
+    {
+      "why": "§1.4 ฟอร์มเว็บไม่มีอะไร",
+      "lead": {
+        "createdBy": "web-form"
+      },
+      "want": "website"
+    },
+    {
+      "why": "§1.4 ฟอร์มเก่า registerLead",
+      "lead": {
+        "event_source_url": "https://scanfood.co/x",
+        "utm_source": ""
+      },
+      "want": "website"
+    },
+    {
+      "why": "§1.3.5 line_engagement (ฐานจริง 67 ใบ) → line",
+      "lead": {
+        "source": "line_engagement"
+      },
+      "want": "line"
+    },
+    {
+      "why": "§1.3.5 facebook_engagement (ฐานจริง 57 ใบ) → facebook",
+      "lead": {
+        "source": "facebook_engagement",
+        "channel": ""
+      },
+      "want": "facebook"
+    },
+    {
+      "why": "§1.5 ว่าง",
+      "lead": {},
+      "want": "unknown"
+    },
+    {
+      "why": "§1.5 null",
+      "lead": null,
+      "want": "unknown"
+    },
+    {
+      "why": "§1.3.5 facebook_call (ฐานจริง 4 ใบ) → facebook",
+      "lead": {
+        "source": "facebook_call"
+      },
+      "want": "facebook"
+    },
+    {
+      "why": "§1.3.5 app_engagement (ฐานจริง 6 ใบ) → unknown",
+      "lead": {
+        "source": "app_engagement"
+      },
+      "want": "unknown"
+    },
+    {
+      "why": "§1.3.5 instant form formId ว่าง adId ว่าง (ฐานจริง 25 ใบ) → facebook",
+      "lead": {
+        "source": "facebook_instant_form",
+        "formId": "",
+        "adId": "",
+        "campaignId": ""
+      },
+      "want": "facebook"
+    },
+    {
+      "why": "§1.1 formId ว่างแต่ platform fb → facebook",
+      "lead": {
+        "formId": "",
+        "platform": "fb"
+      },
+      "want": "facebook"
+    },
+    {
+      "why": "§1.3 utm ชนะ source คีย์มือ",
+      "lead": {
+        "source": "line_engagement",
+        "utm_source": "tiktok"
+      },
+      "want": "tiktok"
+    },
+    {
+      "why": "§1.3.5 source ตัวใหญ่",
+      "lead": {
+        "source": "LINE_engagement"
+      },
+      "want": "line"
+    },
+    {
+      "why": "§1.3.5 ชนะฟอร์มเว็บ",
+      "lead": {
+        "source": "facebook_engagement",
+        "createdBy": "web-form"
+      },
+      "want": "facebook"
+    },
+    {
+      "why": "§1.5 source อื่นที่ไม่รู้จัก",
+      "lead": {
+        "source": "walk_in"
+      },
+      "want": "unknown"
+    }
+  ],
+  "status": [
+    [
+      "registered",
+      "not_contacted"
+    ],
+    [
+      "waiting",
+      "not_contacted"
+    ],
+    [
+      "in_progress",
+      "contacting"
+    ],
+    [
+      "contacted",
+      "contacting"
+    ],
+    [
+      "not_interested",
+      "rejected"
+    ],
+    [
+      "purchased",
+      "closed"
+    ],
+    [
+      "not_contacted",
+      "not_contacted"
+    ],
+    [
+      "contacting",
+      "contacting"
+    ],
+    [
+      "unreachable",
+      "unreachable"
+    ],
+    [
+      "rejected",
+      "rejected"
+    ],
+    [
+      "closed",
+      "closed"
+    ],
+    [
+      "weird",
+      null
+    ],
+    [
+      null,
+      null
+    ],
+    [
+      "",
+      null
+    ]
+  ],
+  "contacted": [
+    {
+      "why": "timeline contact (server contactLead)",
+      "lead": {
+        "status": "contacted",
+        "timeline": [
+          {
+            "type": "contact"
+          }
+        ]
+      },
+      "want": true
+    },
+    {
+      "why": "timeline contacted",
+      "lead": {
+        "status": "contacting",
+        "timeline": [
+          {
+            "type": "contacted"
+          }
+        ]
+      },
+      "want": true
+    },
+    {
+      "why": "in_progress ล้วน (โทรไม่ติด) ไม่นับ",
+      "lead": {
+        "status": "in_progress",
+        "timeline": [
+          {
+            "type": "register"
+          },
+          {
+            "type": "in_progress"
+          }
+        ]
+      },
+      "want": false
+    },
+    {
+      "why": "rejected นับ",
+      "lead": {
+        "status": "not_interested",
+        "timeline": []
+      },
+      "want": true
+    },
+    {
+      "why": "closed นับ",
+      "lead": {
+        "status": "closed"
+      },
+      "want": true
+    },
+    {
+      "why": "unreachable ไม่นับ",
+      "lead": {
+        "status": "unreachable",
+        "timeline": [
+          {
+            "type": "unreachable"
+          }
+        ]
+      },
+      "want": false
+    }
+  ],
+  "paid": [
+    [
+      "packageOrder",
+      "success",
+      true
+    ],
+    [
+      "packageOrder",
+      "request",
+      true
+    ],
+    [
+      "packageOrder",
+      "cancel",
+      false
+    ],
+    [
+      "packageOrder",
+      "order",
+      false
+    ],
+    [
+      "hardwareOrder",
+      "prepare",
+      true
+    ],
+    [
+      "hardwareOrder",
+      "packed",
+      true
+    ],
+    [
+      "hardwareOrder",
+      "sending",
+      true
+    ],
+    [
+      "hardwareOrder",
+      "sent",
+      true
+    ],
+    [
+      "hardwareOrder",
+      "success",
+      true
+    ],
+    [
+      "hardwareOrder",
+      "cancel",
+      false
+    ],
+    [
+      "hardwareOrder",
+      "order",
+      false
+    ],
+    [
+      "hardwareOrder",
+      "request",
+      false
+    ],
+    [
+      "autoPayment",
+      "success",
+      false
+    ]
+  ],
+  "closedWithBills": [
+    {
+      "why": "สถานะ purchased ไม่มีบิล",
+      "lead": {
+        "status": "purchased"
+      },
+      "paid": false,
+      "want": true
+    },
+    {
+      "why": "ค้าง contacted แต่มีบิลจ่ายแล้ว → นับ closed",
+      "lead": {
+        "status": "contacted"
+      },
+      "paid": true,
+      "want": true
+    },
+    {
+      "why": "contacted ไม่มีบิล",
+      "lead": {
+        "status": "contacted"
+      },
+      "paid": false,
+      "want": false
+    },
+    {
+      "why": "rejected แต่มีบิลจ่ายแล้ว → นับ closed",
+      "lead": {
+        "status": "not_interested"
+      },
+      "paid": true,
+      "want": true
+    }
+  ]
+}
