@@ -143,7 +143,7 @@ function App() {
             <Route path='customerSuccessShift' element={<CustomerSuccessShiftScreen/>} />
             <Route path='subscription' element={<SubscriptionScreen/>} />
             <Route path='codeRelative' element={<CodeRelativeScreen/>} />
-            <Route path='trainingSchedule' element={<TrainingScheduleScreen/>} />
+            <Route path='trainingSchedule' element={<MovedToScanofficeScreen from='trainingSchedule'/>} />
             <Route path='uploadStaff' element={<MovedToScanofficeScreen from='uploadStaff'/>} />
             <Route path='taxInvoice' element={<TaxInvoiceReceiptTemplate/>} />
             <Route path='commission' element={<CommissionScreen/>} />

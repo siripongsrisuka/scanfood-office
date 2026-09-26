@@ -27,6 +27,8 @@ export const MOVED_TO_SCANOFFICE = {
   kbank: { topic: "7.6 kbank", group: "CS", tab: "เคส KBank", url: "https://scanoffice.web.app/cs/kbank-cases" },
   source: { topic: "7.7 สื่อต่างๆ", group: "เมนูหลัก", tab: "สื่อต่างๆ", url: "https://scanoffice.web.app/media" },
   kbankReport: { topic: "6.99 kbankReport", group: "ทีม Tech", tab: "รายงาน KBank", url: "https://scanoffice.web.app/admin/configs/kbank-report" },
+  // 7.8 (2026-09-26 · Pack: ลบข้อ 7-8 ออก)
+  trainingSchedule: { topic: "7.8 จองคิวทอง", group: "CRM", tab: "จองคิว training", url: "https://scanoffice.web.app/training/queue" },
 };
 
 const SCANOFFICE = "https://scanoffice.web.app/admin/configs/";

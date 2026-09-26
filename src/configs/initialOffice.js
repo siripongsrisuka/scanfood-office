@@ -323,7 +323,7 @@ export default [
     },
     {
       label: '7. ฟีเจอร์ส่วนกลาง',
-      
+      movedTo: 'scanoffice', // ปิดเมนู 2026-09-26 (Pack: ลบข้อ 7-8 ออก · ย้ายไป scanoffice แล้ว) · คง topic ไว้ให้ด่าน check-live-parity
     },
     // {
     //   topic: '7.1 แจ้งคัดลอกร้าน',
@@ -388,6 +388,7 @@ export default [
     },
     {
       topic: '7.8 จองคิวทอง',
+      movedTo: 'scanoffice', // ปิดเมนู 2026-09-26 (Pack: ลบข้อ 7-8 ออก · ย้ายไป scanoffice แล้ว) · คง topic ไว้ให้ด่าน check-live-parity · ไป scanoffice › CRM › จองคิว training
       icon: 'bi-speedometer',
       to: 'trainingSchedule',
       id:'708'
@@ -397,9 +398,11 @@ export default [
    
     {
         label: '8. พนักงาน',
+        movedTo: 'scanoffice', // ปิดเมนู 2026-09-26 (Pack: ลบข้อ 7-8 ออก · ย้ายไป scanoffice แล้ว) · คง topic ไว้ให้ด่าน check-live-parity
       },
       {
         topic: '8.1 กำหนดสิทธิ์',
+        movedTo: 'scanoffice', // ปิดเมนู 2026-09-26 (Pack: ลบข้อ 7-8 ออก · ย้ายไป scanoffice แล้ว) · คง topic ไว้ให้ด่าน check-live-parity · route `staff` ยังเปิดตรงได้ (แจกสิทธิ์เมนูที่เหลือบนเว็บนี้)
         icon: 'bi-speedometer',
         to: 'staff',
         id:'723'
