@@ -15,7 +15,7 @@ import {
 } from "react-bootstrap";
 import { Modal_ContactValue, Modal_FacebookLead, Modal_FlatlistSelected, Modal_FlatListTwoColumn, Modal_Loading, Modal_OneInput } from "../modal";
 import { firstDayOfMonth, setTimeEnd, setTimeStart, stringDateTimeReceipt, stringYMDHMS3 } from "../Utility/dateTime";
-import { db, firebase } from "../db/firestore";
+import { db } from "../db/firestore";
 import { FacebookSearchBar, OneButton, SearchControl } from "../components";
 import { formatTime, isGodIt, normalizeThaiPhone, searchMultiFunction, toastSuccess } from "../Utility/function";
 import { normalSort } from "../Utility/sort";
@@ -31,38 +31,31 @@ import {
 import SearchIcon from "@rsuite/icons/Search";
 import { scanfoodAPI } from "../Utility/api";
 import { initialLead } from "../configs";
-// DEV-1642 — สถานะ 5 ค่า + ช่องทางที่มา + ปิดการขาย = ผูกบิล (สัญญา lanes/dev/source/contract-channel-dashboard.md §1-§3)
-import { CHANNEL_KEYS, CHANNEL_LABEL, STATUS_KEYS, STATUS_LABEL, channelOf, normalizeStatus, isContacted } from "../Utility/leadChannel";
-import { planClose, planStatus, leadRevenue, billSummaryByLead, effectiveStatus, BILL_COLLECTIONS } from "../Utility/leadClose";
-import Modal_CloseLeadBill from "../modal/Modal_CloseLeadBill";
 import { MdLteMobiledata } from "react-icons/md";
 import { id, ta } from "date-fns/locale";
 import { set } from "date-fns";
 
-// สถานะ 5 ค่า (§2) · ค่าเก่าในฐาน (registered/in_progress/contacted/purchased/not_interested) แมปผ่าน normalizeStatus
 const leadOptions = [
     { label:"ทั้งหมด", value:"all" },
-    ...STATUS_KEYS.map(value=>({ label:STATUS_LABEL[value], value })),
+    { label:"ยังไม่ติดต่อ", value:"registered" },
+    { label:"กำลังติดต่อ", value:"in_progress" },
+    { label:"ติดต่อแล้ว", value:"contacted" },
+    { label:"ซื้อแล้ว", value:"purchased" },
+    { label:"ไม่สนใจ", value:"not_interested" },
 ];
 
 const timelineMap = {
     'register':'📝',
     'in_progress':'📞',
     'contact':'✅',
-    'contacted':'✅',
     'purchased':'💰',
-    'purchase':'💰',
-    'not_interested':'❌',
-    // ค่าใหม่ของ DEV-1642
-    'not_contacted':'📝',
-    'contacting':'📞',
-    'unreachable':'📵',
-    'rejected':'❌',
-    'closed':'💰',
+    'not_interested':'❌'
 }
 
-// ตัวเลือกเปลี่ยนสถานะ = 5 ค่า (§2) · "ปิดการขาย" เปิดหน้าผูกบิล · "ติดต่ออยู่" ครั้งแรก = บันทึกการติดต่อผ่าน server เดิม (Meta Contact + customer)
-const timelineOptions = STATUS_KEYS.map(id=>({ name:STATUS_LABEL[id], id }));
+const timelineOptions = [
+    { name:"กำลังติดต่อ", id:"in_progress" },
+    { name:"ติดต่อแล้ว", id:"contacted" },
+];
 
 const tagOptions = [
     { name:"เปิดร้านใหม่ ไม่พร้อมซื้ออุปกรณ์", id:"po", },
@@ -111,15 +104,11 @@ function FacebookLeadScreen() {
     const [leadStatus_Modal, setLeadStatus_Modal] = useState(false);
     const [currentLeadStatus, setCurrentLeadStatus] = useState('all');
     const [currentTag, setCurrentTag] = useState('all');
-    const [close_Modal, setClose_Modal] = useState(false);
-    const [billMap, setBillMap] = useState({}); // leadId → { revenue, hasPaidBill } จากบิลที่ผูก ก ∪ ข (DEV-1642 §3)
-    // สถานะที่จอโชว์/นับ = ตัวเดียวกับ dashboard (isClosedWithBills) · มีบิลจ่ายแล้วแต่สถานะค้าง = นับปิดการขาย (ไม่เขียนฐาน)
-    const statusOf = (item) => effectiveStatus(item, billMap[item.id]?.hasPaidBill === true);
 
 
-    const { statDisplay, channel, channelCount, leadStatusDisplay, tagDisplay } = useMemo(()=>{
+    const { statDisplay, channel, leadStatusDisplay, tagDisplay } = useMemo(()=>{
         const stat = leadOptions.map(option=>{
-            let count = currentSale==='all' ? masterDisplay.filter(item=>statusOf(item).key === option.value).length : masterDisplay.filter(item=>statusOf(item).key === option.value && item.saleId === currentSale).length;
+            let count = currentSale==='all' ? masterDisplay.filter(item=>item.status === option.value).length : masterDisplay.filter(item=>item.status === option.value && item.saleId === currentSale).length;
             if(option.value === 'all') count = currentSale==='all' ? masterDisplay.length : masterDisplay.filter(item=>item.saleId === currentSale).length;
             const percent = currentSale==='all' ? (count/masterDisplay.length)*100 : (count/masterDisplay.filter(item=>item.saleId === currentSale).length)*100;
             return {
@@ -129,7 +118,7 @@ function FacebookLeadScreen() {
             }
         })
         //leadStatusOptions
-        const contactedStatus = masterDisplay.filter(item=>isContacted(item));
+        const contactedStatus = masterDisplay.filter(item=>item.status === 'contacted');
         const leadStatusDisplay = [{ id:"all", name:"ทั้งหมด" },...leadStatusOptions].map(option=>{
             let count = currentSale==='all' ? contactedStatus.filter(item=>item.leadStatus === option.id).length : contactedStatus.filter(item=>item.leadStatus === option.id && item.saleId === currentSale).length;
             if(option.id === 'all') count = currentSale==='all' ? contactedStatus.length : contactedStatus.filter(item=>item.saleId === currentSale).length;
@@ -153,12 +142,6 @@ function FacebookLeadScreen() {
             }
         })
 
-        // ช่องทางที่มา 9 แถว (§1) — นับเฉพาะที่มี lead
-        const channelCount = CHANNEL_KEYS.map(key=>({
-            key,
-            name:CHANNEL_LABEL[key],
-            count:masterDisplay.filter(item=>channelOf(item) === key && (currentSale==='all' || item.saleId === currentSale)).length,
-        })).filter(a=>a.count>0);
         const channel = [
             { id:'instantForm', length: masterDisplay.filter(item=>item.source === 'facebook_instant_form').length, name:'I' },
             { id:'facebook_engagement', length: masterDisplay.filter(item=>item.source === 'facebook_engagement').length, name:'M' },
@@ -169,33 +152,32 @@ function FacebookLeadScreen() {
         return {
             statDisplay:stat,
             channel,
-            channelCount,
             leadStatusDisplay,
             tagDisplay
         };
-    },[masterDisplay,currentSale,billMap])
+    },[masterDisplay,currentSale])
 
     const { score } = useMemo(()=>{
         let score = sales.map(item=>{
             return { 
                 ...item, 
                 score: masterDisplay.filter(a=>a.saleId === item.id).length,
-                 register: masterDisplay.filter(a=>a.saleId === item.id && statusOf(a).key === 'not_contacted').length,
-                 in_progress: masterDisplay.filter(a=>a.saleId === item.id && statusOf(a).key === 'contacting').length,
-                 unreachable: masterDisplay.filter(a=>a.saleId === item.id && statusOf(a).key === 'unreachable').length,
-                 purchased: masterDisplay.filter(a=>a.saleId === item.id && statusOf(a).key === 'closed').length,
-                 not_interested: masterDisplay.filter(a=>a.saleId === item.id && statusOf(a).key === 'rejected').length,
+                 register: masterDisplay.filter(a=>a.saleId === item.id && a.status === 'registered').length,
+                 in_progress: masterDisplay.filter(a=>a.saleId === item.id && a.status === 'in_progress').length,
+                 contact: masterDisplay.filter(a=>a.saleId === item.id && a.status === 'contacted').length,
+                 purchased: masterDisplay.filter(a=>a.saleId === item.id && a.status === 'purchased').length,
+                 not_interested: masterDisplay.filter(a=>a.saleId === item.id && a.status === 'not_interested').length,
             }
         });
 
             score = normalSort('score', score);
             return { score }
-    },[sales,masterDisplay,billMap])
+    },[sales,masterDisplay])
     
     useEffect(()=>{
         let filtered = masterDisplay;
         if(currentStatus!=='all'){
-            filtered = filtered.filter(item=>statusOf(item).key === currentStatus);
+            filtered = filtered.filter(item=>item.status === currentStatus);
         }
         if(currentSale!=='all'){
             filtered = filtered.filter(item=>item.saleId === currentSale);
@@ -212,7 +194,7 @@ function FacebookLeadScreen() {
             filtered = searchMultiFunction(filtered,search, ['fullName', 'phone', 'email', 'leadId']);
         }
         setCurrentDisplay(filtered);
-    },[masterDisplay, currentStatus, currentSale, search, currentLeadStatus, currentTag, billMap])
+    },[masterDisplay, currentStatus, currentSale, search, currentLeadStatus, currentTag])
 
     useEffect(()=>{
         const today = new Date();
@@ -244,7 +226,6 @@ function FacebookLeadScreen() {
                 }
             });
             setMasterDisplay(normalSort('createdTime', leads))
-            loadRevenue(leads);
             toastSuccess('อัปเดตข้อมูลเรียบร้อย')
         } catch (error) {
             console.error("Error fetching leads:", error);
@@ -253,36 +234,6 @@ function FacebookLeadScreen() {
         }
     }
 
-
-    // บิลของ lead บนจอ = อ่านเป็นก้อน (ไม่ใช่ทีละ lead): autoPayment ที่มี leadId 1 คิวรี + บิลตาม id ทีละ 10 (เพดาน `in` ของ SDK v8)
-    //   บิลอ่านสดทุกครั้ง (สถานะเปลี่ยนได้หลังผูก เช่นถูกยกเลิก) · สูตรรวม = leadClose.billSummaryByLead
-    async function loadRevenue(leads){
-        try {
-            const onScreen = new Set(leads.map(a=>a.id));
-            const apSnap = await db.collection("autoPayment").where("leadId", ">", "").get();
-            const apDocs = apSnap.docs.map(d=>d.data()).filter(a=>onScreen.has(a.leadId)).map(a=>({ leadId:a.leadId, reference:a.reference || [] }));
-            const ids = new Set();
-            apDocs.forEach(a=>a.reference.forEach(r=>typeof r === 'string' && r && !r.includes('/') && ids.add(r)));
-            leads.forEach(a=>(a.billRefs || []).forEach(r=>r && r.id && ids.add(r.id)));
-            const idList = [...ids];
-            const billsById = new Map();
-            const chunks = [];
-            for (let i = 0; i < idList.length; i += 10) chunks.push(idList.slice(i, i + 10));
-            await Promise.all(BILL_COLLECTIONS.flatMap(col=>chunks.map(async (chunk)=>{
-                const snap = await db.collection(col).where(firebase.firestore.FieldPath.documentId(), "in", chunk).get();
-                snap.forEach(d=>billsById.set(`${col}/${d.id}`, { collection:col, id:d.id, data:d.data() }));
-            })));
-            const summary = billSummaryByLead({ leads, apDocs, billsById });
-            setBillMap(prev=>{
-                const next = { ...prev };
-                leads.forEach(a=>{ delete next[a.id]; });
-                summary.forEach((v, k)=>{ next[k] = v; });
-                return next;
-            });
-        } catch (error) {
-            console.error("Error loading lead bills:", error);
-        }
-    }
 
     async function handleConfirm({ id, value }){
         setContact_Modal(false)
@@ -338,6 +289,7 @@ function FacebookLeadScreen() {
 
     async function updateTimeline(lead){
         if(!lead.saleId) return alert('ยังไม่มีเซลล์ assigned กรุณาเลือกเซลล์ก่อน')
+        if(lead.status==='contacted') return alert('ไม่สามารถแก้ไขสถานะได้ เนื่องจากติดต่อแล้ว')
         setLead(lead);
         setTimeline_Modal(true);
         // const { status } = lead;
@@ -345,38 +297,40 @@ function FacebookLeadScreen() {
 
     async function handleTimelineAction(value){
         setTimeline_Modal(false);
-        if(normalizeStatus(lead.status) === value.id) return alert(`สถานะเป็น "${value.name}" อยู่แล้ว`);
-        if(value.id === 'closed'){ // ปิดการขาย = ต้องผูกบิลอย่างน้อย 1 ใบ (§3)
-            setClose_Modal(true);
-            return;
-        }
         const ok = window.confirm(`ยืนยันสถานะ : ${value.name} หรือไม่?`)
         if(!ok) return;
-        // ติดต่อได้ครั้งแรก = เส้นเดิมของ server (ส่ง Contact ให้ Meta + สร้าง customer ให้หน้า Sale เปิดบิลต่อได้)
-        if(value.id === 'contacting' && !lead?.metaEvents?.contactSent){
+        if(value.id === 'contacted'){
             setContact_Modal(true);
             return;
         }
 
+        // โทรแล้วไม่ติด
         const leadRef = db.collection("leads").doc(leadId);
         try {
-            const leadUpdate = await db.runTransaction(async (transaction) => {
+            const timeline = await db.runTransaction(async (transaction) => {
                 const doc = await transaction.get(leadRef);
                 if (!doc.exists) {
                     throw new Error("Lead does not exist!");
                 }
-                const plan = planStatus({ lead:doc.data(), next:value.id, now:new Date(), by:profileId });
-                if(!plan.ok) throw new Error(plan.error);
-                transaction.update(leadRef, plan.leadUpdate);
-                return plan.leadUpdate;
+                const currentTimeline = doc.data().timeline || [];
+                const newTimelineEntry = {
+                    type: value.id,
+                    timestamp: new Date()
+                };
+                const timeline = [...currentTimeline, newTimelineEntry];
+                transaction.update(leadRef, {
+                    status: value.id,
+                    timeline: timeline
+                });
+                return timeline;
             });
-            const fomrattedTimeline = leadUpdate.timeline.map(a=>({...a,timestamp:formatTime(a.timestamp)}))
+            const fomrattedTimeline = timeline.map(a=>({...a,timestamp:formatTime(a.timestamp)}))
             setMasterDisplay(prev=>{
                 const newLeads = prev.map(item=>{
                     if(item.id === lead.id){
                         return {
                             ...item,
-                            status:leadUpdate.status,
+                            status:value.id,
                             timeline:fomrattedTimeline
                         }
                     }
@@ -389,41 +343,6 @@ function FacebookLeadScreen() {
             alert(error);
         }
 
-    };
-
-    // ปิดการขาย: เขียนบิล (leadId) + lead (closed · billRefs · timeline) ใน transaction เดียว · ตรวจซ้ำกับค่าสดในฐาน
-    async function handleCloseLead(selectedBills){
-        setClose_Modal(false);
-        setLoading(true);
-        const leadRef = db.collection("leads").doc(leadId);
-        try {
-            const result = await db.runTransaction(async (transaction) => {
-                const leadDoc = await transaction.get(leadRef);
-                if (!leadDoc.exists) throw new Error("Lead does not exist!");
-                const fresh = [];
-                for (const b of selectedBills) {
-                    const ref = db.collection(b.collection).doc(b.id);
-                    const d = await transaction.get(ref);
-                    if (!d.exists) throw new Error(`ไม่พบบิล ${b.data?.orderNumber || b.id}`);
-                    fresh.push({ collection:b.collection, id:b.id, data:d.data() });
-                }
-                const plan = planClose({ leadDocId:leadId, lead:leadDoc.data(), bills:fresh, now:new Date(), by:profileId });
-                if(!plan.ok) throw new Error(plan.error);
-                plan.billUpdates.forEach(u=>transaction.update(db.collection(u.collection).doc(u.id), u.update));
-                transaction.update(leadRef, plan.leadUpdate);
-                return { leadUpdate:plan.leadUpdate, revenue:leadRevenue(fresh) };
-            });
-            const { leadUpdate, revenue } = result;
-            setMasterDisplay(prev=>normalSort('createdTime', prev.map(item=>item.id === leadId
-                ? { ...item, status:leadUpdate.status, billRefs:leadUpdate.billRefs, timeline:leadUpdate.timeline.map(a=>({...a,timestamp:formatTime(a.timestamp)})) }
-                : item)));
-            loadRevenue([{ id:leadId, billRefs:leadUpdate.billRefs }]);
-            toastSuccess(`ปิดการขายเรียบร้อย · ยอดบิลที่เลือก ${revenue.toLocaleString()} บาท`)
-        } catch (error) {
-            alert(error);
-        } finally {
-            setLoading(false);
-        }
     };
     const [sale_Modal, setSale_Modal] = useState(false);
     function openSale(item){
@@ -546,7 +465,7 @@ function FacebookLeadScreen() {
 
 
     function openLeadStatus(item){
-        if(!isContacted(item)) return alert('สามารถแก้ไขสถานะได้เฉพาะ lead ที่ติดต่อแล้วเท่านั้น')
+        if(item.status !== 'contacted') return alert('สามารถแก้ไขสถานะได้เฉพาะ lead ที่ติดต่อแล้วเท่านั้น')
         if(profileId !== 'ebhtbWII6TUanBMqS7bBHIQ1aws2') return alert('คุณไม่ใช่คุณหลุยส์ ไม่สามารถแก้ไขสถานะได้')
         setLead(item);
         setLeadStatus_Modal(true);
@@ -586,7 +505,7 @@ function FacebookLeadScreen() {
     const [tag_Modal, setTag_Modal] = useState(false);
     const [selected, setSelected] = useState([]);
     function openTag(item){
-        if(!isContacted(item)) return alert('สามารถแก้ไขสถานะได้เฉพาะ lead ที่ติดต่อแล้วเท่านั้น')
+        if(item.status !== 'contacted') return alert('สามารถแก้ไขสถานะได้เฉพาะ lead ที่ติดต่อแล้วเท่านั้น')
         if(profileId !== 'ebhtbWII6TUanBMqS7bBHIQ1aws2') return alert('คุณไม่ใช่คุณหลุยส์ ไม่สามารถแก้ไขสถานะได้อีกเหมือนกัน')
         setLead(item);
         setTag_Modal(true);
@@ -688,8 +607,8 @@ function FacebookLeadScreen() {
                                 src={item.imageId}
                             />
                             <p style={{ padding:0, margin:0}} >{item.name} : {item.score}</p>
-                            <p style={{ padding:0, margin:0}} >{timelineMap['not_contacted']} | {timelineMap['contacting']} | {timelineMap['unreachable']} | {timelineMap['rejected']} | {timelineMap['closed']}</p>
-                            <p style={{ padding:0, margin:0}} >{item.register} | {item.in_progress} | {item.unreachable} | {item.not_interested} | {item.purchased}</p>
+                            <p style={{ padding:0, margin:0}} >{timelineMap['register']} | {timelineMap['in_progress']} | {timelineMap['contact']} | {timelineMap['purchased']}</p>
+                            <p style={{ padding:0, margin:0}} >{item.register} | {item.in_progress} | {item.contact} | {item.purchased}</p>
                     </div>
                 })}
         </div>
@@ -733,7 +652,13 @@ function FacebookLeadScreen() {
             setCurrent={setLead}
             submit={handleLead}
         />
-        {/* เดิมมี modal ชุดนี้ซ้อน 2 ตัวที่เปิดพร้อมกัน (หัว "เลือก Lead Status" + "เลือกสถานะ") — เหลือตัวเดียว */}
+        <Modal_FlatListTwoColumn
+            header={'เลือก Lead Status'}
+            show={timeline_Modal}
+            onHide={()=>{setTimeline_Modal(false)}}
+            value={timelineOptions}
+            onClick={handleTimelineAction}
+        />
         <Modal_FlatListTwoColumn
             header={'เลือกสถานะ'}
             show={timeline_Modal}
@@ -749,12 +674,6 @@ function FacebookLeadScreen() {
             onClick={handleAssignSale}
         />
         <Modal_Loading show={loading} />
-        <Modal_CloseLeadBill
-            show={close_Modal}
-            lead={lead}
-            onHide={()=>{setClose_Modal(false)}}
-            onConfirm={handleCloseLead}
-        />
         <Modal_ContactValue
             open={contact_Modal}
             onClose={() => setContact_Modal(false)}
@@ -796,19 +715,11 @@ function FacebookLeadScreen() {
                 ))}
             </Form.Select>
             {channel.map(option=>(
-                <div key={option.id} style={{ width: '3rem', cursor:'pointer', backgroundColor:'#f8f9fa', padding:10 }} >
+                <div style={{ width: '3rem', cursor:'pointer', backgroundColor:'#f8f9fa', padding:10 }} >
                         {option.name} {option.length}
                     </div>
             ))}
             
-        </div>
-        <div style={{ display:'flex', gap:'0.5rem', flexWrap:'wrap', marginBottom:'0.5rem' }} >
-            <span style={{ alignSelf:'center' }} >ช่องทางที่มา :</span>
-            {channelCount.map(option=>(
-                <span key={option.key} style={{ backgroundColor:'#eef6ff', padding:'4px 10px', borderRadius:12 }} >
-                    {option.name} {option.count}
-                </span>
-            ))}
         </div>
         <div style={{ display:'flex', gap:'1rem', flexWrap:'wrap' }} >
             {statDisplay.map(option=>{
@@ -838,9 +749,7 @@ function FacebookLeadScreen() {
             </thead>
             <tbody  >
             {currentDisplay.map((item, index) => {
-                const { tag = [], leadStatus = '', id, fullName, email, phone, contactPeriod, saleId = '', status, contactValue = '', timeline = [], businessSize = '', source = '', note = '', billRefs = [] } = item;
-                const shown = statusOf(item);
-                const revenue = billMap[id]?.revenue;
+                const { tag = [], leadStatus = '', id, fullName, email, phone, contactPeriod, saleId = '', status, contactValue = '', purchaseValue = '', timeline = [], businessSize = '', source = '', note = '' } = item;
                 const saleName = saleId?saleMap.get(saleId):'ยังไม่ระบุ';
                 const leadStatusImage = leadStatus==='cold'?"/cold.png":leadStatus==='warm'?"/warm.png":leadStatus==='hot'?"/hot.png":leadStatus==='dog'?"/dog.png":"/cow.png";
                 return <tr   key={id} >
@@ -866,24 +775,9 @@ function FacebookLeadScreen() {
                                 </p>
                                 <p style={{ padding:0, margin:0 }} >ขนาดธุรกิจ : {businessSize}</p>
                                 <p style={{ padding:0, margin:0 }} >แหล่งที่มา : {source}</p>
-                                <p style={{ padding:0, margin:0 }} >ช่องทาง : {CHANNEL_LABEL[channelOf(item)]}</p>
-                                {billRefs.length > 0 || revenue !== undefined
+                                {contactValue||purchaseValue
                                     ?<p style={{ margin: 0 }}>
-                                        ยอดขายจริง{billRefs.length > 0 ? ` (${billRefs.map(r=>r.orderNumber||r.id).join(', ')})` : ''}
-                                    <span style={{ backgroundColor: '#c8f7c5', padding: '4px 8px', borderRadius: 6, marginLeft: 6, fontWeight: 600 }} >
-                                        {revenue === undefined ? '…' : `${revenue.toLocaleString()} บาท`}
-                                    </span>
-                                    </p>
-                                    :item.purchaseValue
-                                    ?<p style={{ margin: 0 }}>
-                                        {/* ใบเก่า: server บวกยอดจาก autoPayment ให้เอง (purchaseValue) — ยังไม่ได้ผูกบิลผ่าน "ปิดการขาย" */}
-                                        ยอดจากระบบชำระเงิน (ยังไม่ผูกบิล) : {Number(item.purchaseValue).toLocaleString()}
-                                    </p>
-                                    :null
-                                }
-                                {contactValue
-                                    ?<p style={{ margin: 0 }}>
-                                        มูลค่าที่คาด (เซลกรอก)
+                                        busket size
                                     <span
                                         style={{
                                         backgroundColor: '#7ff9cf',
@@ -893,7 +787,7 @@ function FacebookLeadScreen() {
                                         fontWeight: 500
                                         }}
                                     >
-                                        {contactValue}
+                                        {purchaseValue?purchaseValue:contactValue}
                                     </span>
                                     
                                     </p>
@@ -903,7 +797,7 @@ function FacebookLeadScreen() {
                             </td>
                             <td  >
                                 <div style={{ display:'flex', justifyContent:'space-between'}} >
-                                    <p onClick={()=>{updateTimeline(item)}} style={{ cursor: 'pointer', padding:0, margin:0 }} >{shown.label ? shown.label : `⚠️ ${status || 'ไม่มีสถานะ'}`}<i className="bi bi-pen"></i></p>
+                                    <p onClick={()=>{updateTimeline(item)}} style={{ cursor: 'pointer', padding:0, margin:0 }} >{status}<i class="bi bi-pen"></i></p>
                                     <p onClick={()=>{openTag(item)}} style={{ cursor: 'pointer', padding:0, margin:0 }} ><i class="bi bi-bookmark-heart"></i></p>
                                 </div>
                                 {tag.length > 0 && (

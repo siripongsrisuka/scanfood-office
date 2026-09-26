@@ -47,6 +47,7 @@ import {
   CommissionScreen,
   ExecutiveSalesLeaderboardScreen,
   CommissionHistoryScreen,
+  CrmLeadScreen,
   FacebookLeadScreen,
   ReportLinkCodeFalse
 } from './screens';
@@ -149,8 +150,7 @@ function App() {
           <Route path='executiveSalesLeaderboard' element={<ExecutiveSalesLeaderboardScreen/>} />
           <Route path='commissionHistory' element={<CommissionHistoryScreen/>} />
           <Route path='resetPassword' element={<MovedToScanofficeScreen from='resetPassword'/>} />
-          {/* DEV-1642: จอ CrmLeadScreen เดิมเป็น mock (services/crmService.js ไม่เขียนฐาน · ปุ่ม "บันทึกยอด" ไม่บันทึกจริง) ⇒ URL เดิมชี้จอ Leads ตัวจริง */}
-          <Route path='crmLead' element={<FacebookLeadScreen/>} />
+          <Route path='crmLead' element={<CrmLeadScreen/>} />
           <Route path='lead' element={<FacebookLeadScreen/>} />
           <Route path='reportLinkCodeFalse' element={<ReportLinkCodeFalse/>} />
           </Route>
