@@ -47,8 +47,6 @@ import {
   CommissionScreen,
   ExecutiveSalesLeaderboardScreen,
   CommissionHistoryScreen,
-  CrmLeadScreen,
-  FacebookLeadScreen,
   ReportLinkCodeFalse
 } from './screens';
 import { useSelector, useDispatch } from 'react-redux';
@@ -94,7 +92,7 @@ function App() {
           <Route path='/' element={<HomeScreen/>} />
 
           <Route path='/office' element={<OfficeScreen/>} >
-            <Route index  element={<FacebookLeadScreen/>} />
+            <Route index  element={<MovedToScanofficeScreen from='lead'/>} />
             {/* <Route index  element={<SaleScreen/>} /> */}
             <Route path='staff' element={<StaffScreen/>} />
             <Route path='clone' element={<MovedToScanofficeScreen from='clone'/>} />
@@ -150,8 +148,8 @@ function App() {
           <Route path='executiveSalesLeaderboard' element={<ExecutiveSalesLeaderboardScreen/>} />
           <Route path='commissionHistory' element={<CommissionHistoryScreen/>} />
           <Route path='resetPassword' element={<MovedToScanofficeScreen from='resetPassword'/>} />
-          <Route path='crmLead' element={<CrmLeadScreen/>} />
-          <Route path='lead' element={<FacebookLeadScreen/>} />
+          <Route path='crmLead' element={<MovedToScanofficeScreen from='crmLead'/>} />
+          <Route path='lead' element={<MovedToScanofficeScreen from='lead'/>} />
           <Route path='reportLinkCodeFalse' element={<ReportLinkCodeFalse/>} />
           </Route>
       </Routes>

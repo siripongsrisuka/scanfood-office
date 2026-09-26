@@ -27,6 +27,9 @@ export const MOVED_TO_SCANOFFICE = {
   kbank: { topic: "7.6 kbank", group: "CS", tab: "เคส KBank", url: "https://scanoffice.web.app/cs/kbank-cases" },
   source: { topic: "7.7 สื่อต่างๆ", group: "เมนูหลัก", tab: "สื่อต่างๆ", url: "https://scanoffice.web.app/media" },
   kbankReport: { topic: "6.99 kbankReport", group: "ทีม Tech", tab: "รายงาน KBank", url: "https://scanoffice.web.app/admin/configs/kbank-report" },
+  // 3.10 Leads + 6.13 CRM Lead (DEV-1642 · สัญญา v2 §6 · 2026-09-26) — CRM เซลย้ายไป scanoffice · lead เก่าไม่ย้าย (Pack A3)
+  lead: { topic: "3.10 Leads", group: "CRM", tab: "Lead", url: "https://scanoffice.web.app/crm/leads" },
+  crmLead: { topic: "6.13 CRM Lead", group: "CRM", tab: "Lead", url: "https://scanoffice.web.app/crm/leads" },
 };
 
 const SCANOFFICE = "https://scanoffice.web.app/admin/configs/";

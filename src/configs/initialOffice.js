@@ -124,6 +124,7 @@ export default [
     },
     {
       topic: '3.10 Leads',
+      movedTo: 'scanoffice', // ปิดเมนู (DEV-1642 · สัญญา v2 §6) — CRM เซลย้ายไป scanoffice › CRM › Lead · คง topic ไว้ให้ด่าน check-live-parity
       icon: 'bi-speedometer',
       to:'lead',
       id:'302'
