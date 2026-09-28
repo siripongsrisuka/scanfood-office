@@ -12,6 +12,9 @@ import {  stringReceiptNumber, stringYMDHMS3 } from "../Utility/dateTime";
 import { colors, initialLead, initialQuotation } from "../configs";
 import { PAYMENT_REQUEST_QR_PATH, POSXPAY_TOKEN } from "../configs/paymentApi";
 import { fetchCustomer, fetchHardware, fetchLicense, fetchMemo, fetchPayment, fetchSoftware, toastSuccess } from "../Utility/function";
+// 🚧 ด่าน "ห้ามออก QT ซ้ำให้ร้านที่มีใบแพ็กเกจค้าง" — อยู่ **ก่อนเงินเข้า** เท่านั้น (Pack เคาะเมนู 3 · 2026-09-28)
+//    เคสเฮงปังปั๊ว: ใบ request ค้าง → ออก QT ซ้ำ 2 ใบ → ร้านได้สิทธิ์ 2 รอบ · ตรรกะ+ข้อความ = Utility/pendingTicket.js (มีเทส)
+import { checkBeforeIssue, softwareIdsOf, PENDING_TICKET_STATUS, UNPAID_PROCESSES } from "../Utility/pendingTicket";
 
 const { greenSanta, blue } = colors;
 
@@ -181,8 +184,28 @@ function SaleScreen() {
             //     ?1 // payload.net
             //     :payload.net
             const amount = payload.net;
-  
-      
+
+            // 🚧 ก่อนขอ QR / สร้าง autoPayment: ร้านนี้มีใบแพ็กเกจค้าง (จ่ายแล้วรอเปิด) หรือ QT เดิมที่ยังไม่จ่าย
+            //    แพ็กเกจซ้อนกันไหม — มี = หยุดตรงนี้ ยังไม่แตะ provider/ฐานเลย · ให้ปิด/ยกเลิกใบเดิมก่อน
+            //    ❌ ห้ามย้ายด่านนี้ไปหลังเงินเข้า (webhook/cron/applyPackageOrderTxn) — ลูกค้าจ่ายแล้วต้องได้ของ
+            //    ✅ ฮาร์ดแวร์ล้วน / โหมด 1 เดือน (software ว่าง) / ร้านอื่น / แพ็กเกจคนละชุด = ไม่ถูกบล็อก
+            if(shopId && softwareIdsOf(currentQuotation).length > 0){
+                const [ticketSnap, unpaidSnap] = await Promise.all([
+                    db.collection('packageOrder').where('shopId','==',shopId).where('status','==',PENDING_TICKET_STATUS).get(),
+                    db.collection('autoPayment').where('shopId','==',shopId).where('process','in',UNPAID_PROCESSES).get(),
+                ]);
+                const verdict = checkBeforeIssue({
+                    quotation:currentQuotation,
+                    tickets:ticketSnap.docs.map(d=>({ ...d.data(), id:d.id })),
+                    quotations:unpaidSnap.docs.map(d=>({ ...d.data(), id:d.id })),
+                    licenses,
+                });
+                if(!verdict.ok){
+                    alert(verdict.message);
+                    return;
+                }
+            }
+
             const autoPaymentRef = db.collection('autoPayment').doc();
             const timestamp = new Date();
             let chargeId = '';
