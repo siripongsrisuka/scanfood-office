@@ -6,6 +6,7 @@ import { stringFullDate, stringYMDHMS3 } from "../Utility/dateTime";
 import { Modal_DatePicker, Modal_FlatListTwoColumn } from "../modal";
 import { scanfoodAPI } from "../Utility/api";
 import { db } from "../db/firestore";
+import { useSalesReadOnly, salesWriteBlocked } from "./SalesReadOnly";
 
 const { softWhite } = colors;
 
@@ -20,12 +21,14 @@ function LicenseCheck({
     setSoftwares,
     setLoading
 }) {
+    const salesReadOnly = useSalesReadOnly(); // DEV-1664 — หมวด 3 ดูได้อย่างเดียว (ใช้เฉพาะ SaleScreen)
     const [currentSoftware, setCurrentSoftware] = useState(initialSoftware);
     const [softwareAction_Modal, setSoftwareAction_Modal] = useState(false);
     const { requestDate } = currentSoftware;
      const [request_Modal, setRequest_Modal] = useState(false);
 
     function openSoftware(item){
+        if(salesReadOnly) return; // ทั้ง 2 ตัวเลือก (อนุมัติ/แก้วัน) = เขียน
         setCurrentSoftware(item);
         setSoftwareAction_Modal(true);
     };
@@ -47,6 +50,7 @@ function LicenseCheck({
     
     // 300%
     async function activateSoftware(docId){
+        if(salesWriteBlocked(salesReadOnly, 'อนุมัติแพ็กเกจ')) return;
         setLoading(true);
         try {
             const response = await scanfoodAPI.post(
@@ -67,6 +71,7 @@ function LicenseCheck({
     // 300%
     async function handleRequestDate(date){
         setRequest_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'แก้วันอนุมัติ')) return;
         setLoading(true);
         const { id } = currentSoftware;
         try {

@@ -2,6 +2,8 @@ import React, { useEffect, useState, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 // เมนู 6.1-6.7 · 6.9-6.12 ย้ายไป scanoffice ทีม Tech (2026-09-24 · Pack เคาะ 4a) — route เดิมเหลือหน้าแจ้งย้าย · 6.8 ไม่ย้าย (Pack 3b)
 import MovedToScanofficeScreen from './screens/MovedToScanofficeScreen';
+// หมวด 3. Sales = ดูได้อย่างเดียว (DEV-1664 · Pack เคาะ 2026-10-01) — ห่อทุก route 3.1-3.11 (+ index) · สวิตช์ = configs/legacySales.js
+import SalesReadOnly from './components/SalesReadOnly';
 import { 
   HomeScreen,
   SoftwareHistory,
@@ -94,7 +96,7 @@ function App() {
           <Route path='/' element={<HomeScreen/>} />
 
           <Route path='/office' element={<OfficeScreen/>} >
-            <Route index  element={<FacebookLeadScreen/>} />
+            <Route index  element={<SalesReadOnly><FacebookLeadScreen/></SalesReadOnly>} />
             {/* <Route index  element={<SaleScreen/>} /> */}
             <Route path='staff' element={<StaffScreen/>} />
             <Route path='clone' element={<MovedToScanofficeScreen from='clone'/>} />
@@ -103,36 +105,36 @@ function App() {
             <Route path='kbankReport' element={<MovedToScanofficeScreen from='kbankReport'/>} />
             <Route path='warehouse' element={<WarehouseScreen/>} />
             <Route path='approveSoftware' element={<ApproveSoftwareScreen/>} />
-            <Route path='sale' element={<SaleScreen/>} />
+            <Route path='sale' element={<SalesReadOnly><SaleScreen/></SalesReadOnly>} />
             <Route path='upgrade' element={<MovedToScanofficeScreen from='upgrade'/>} />
             <Route path='upgradeHistory' element={<MovedToScanofficeScreen from='upgradeHistory'/>} />
             <Route path='transferExpire' element={<MovedToScanofficeScreen from='transferExpire'/>} />
             <Route path='transform' element={<TransformTable/>} />
             <Route path='softwareHistory' element={<SoftwareHistory/>} />
-            <Route path='saleManager' element={<SaleManagerScreen/>} />
+            <Route path='saleManager' element={<SalesReadOnly><SaleManagerScreen/></SalesReadOnly>} />
             <Route path='marketingBoots' element={<MarketingBootsScreen/>} />
             <Route path='warehouseJob' element={<WarehouseJobScreen/>} />
             <Route path='warehouseSetting' element={<WarehouseSettingScreen/>} />
             <Route path='hardwareArrange' element={<WarehouseArrangeScreen/>} />
             <Route path='reportInbound' element={<ReportInbound/>} />
             <Route path='reportHardware' element={<ReportHardware/>} />
-            <Route path='newShop' element={<NewShopDashboard/>} />
+            <Route path='newShop' element={<SalesReadOnly><NewShopDashboard/></SalesReadOnly>} />
             <Route path='importItemFranchise' element={<MovedToScanofficeScreen from='importItemFranchise'/>} />
             <Route path='importBomFranchise' element={<MovedToScanofficeScreen from='importBomFranchise'/>} />
             <Route path='importMarketPlaceFranchise' element={<MovedToScanofficeScreen from='importMarketPlaceFranchise'/>} />
             <Route path='question' element={<QuestionScreen/>} />
             <Route path='diagnosis' element={<DiagnosisScreen/>} />
             <Route path='transferOwner' element={<MovedToScanofficeScreen from='transferOwner'/>} />
-            <Route path='extraDay' element={<ExtraDayScreen/>} />
-            <Route path='extraDayHistory' element={<ExtraDayHistory/>} />
+            <Route path='extraDay' element={<SalesReadOnly><ExtraDayScreen/></SalesReadOnly>} />
+            <Route path='extraDayHistory' element={<SalesReadOnly><ExtraDayHistory/></SalesReadOnly>} />
             <Route path='questionHistory' element={<QuestionHistoryScreen/>} />
             <Route path='customerProfile' element={<CustomerProfileScreen/>} />
-            <Route path='oneMonthShop' element={<OneMonthShopScreen/>} />
+            <Route path='oneMonthShop' element={<SalesReadOnly><OneMonthShopScreen/></SalesReadOnly>} />
             <Route path='emailKbank' element={<MovedToScanofficeScreen from='emailKbank'/>} />
             <Route path='emailTax' element={<MovedToScanofficeScreen from='emailTax'/>} />
-            <Route path='manualPaid' element={<ManualPaidScreen/>} />
-            <Route path='packageHistory' element={<PackageHistoryScreen/>} />
-            <Route path='hardwareHistory' element={<HardwareHistoryScreen/>} />
+            <Route path='manualPaid' element={<SalesReadOnly><ManualPaidScreen/></SalesReadOnly>} />
+            <Route path='packageHistory' element={<SalesReadOnly><PackageHistoryScreen/></SalesReadOnly>} />
+            <Route path='hardwareHistory' element={<SalesReadOnly><HardwareHistoryScreen/></SalesReadOnly>} />
             <Route path='emailPrinter' element={<MovedToScanofficeScreen from='emailPrinter'/>} />
             <Route path='eTax' element={<ETaxScreen/>} />
             <Route path='eTaxHistory' element={<ETaxHistoryScreen/>} />
@@ -146,13 +148,13 @@ function App() {
             <Route path='trainingSchedule' element={<MovedToScanofficeScreen from='trainingSchedule'/>} />
             <Route path='uploadStaff' element={<MovedToScanofficeScreen from='uploadStaff'/>} />
             <Route path='taxInvoice' element={<TaxInvoiceReceiptTemplate/>} />
-            <Route path='commission' element={<CommissionScreen/>} />
-          <Route path='executiveSalesLeaderboard' element={<ExecutiveSalesLeaderboardScreen/>} />
-          <Route path='commissionHistory' element={<CommissionHistoryScreen/>} />
+            <Route path='commission' element={<SalesReadOnly><CommissionScreen/></SalesReadOnly>} />
+          <Route path='executiveSalesLeaderboard' element={<SalesReadOnly><ExecutiveSalesLeaderboardScreen/></SalesReadOnly>} />
+          <Route path='commissionHistory' element={<SalesReadOnly><CommissionHistoryScreen/></SalesReadOnly>} />
           <Route path='resetPassword' element={<MovedToScanofficeScreen from='resetPassword'/>} />
           <Route path='crmLead' element={<CrmLeadScreen/>} />
-          <Route path='lead' element={<FacebookLeadScreen/>} />
-          <Route path='reportLinkCodeFalse' element={<ReportLinkCodeFalse/>} />
+          <Route path='lead' element={<SalesReadOnly><FacebookLeadScreen/></SalesReadOnly>} />
+          <Route path='reportLinkCodeFalse' element={<SalesReadOnly><ReportLinkCodeFalse/></SalesReadOnly>} />
           </Route>
       </Routes>
       </div>

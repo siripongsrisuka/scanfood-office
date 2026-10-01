@@ -4,6 +4,7 @@ import { db } from "../db/firestore";
 import { Modal_OneInput } from "../modal";
 import { Col, Row } from "react-bootstrap";
 import { colors } from "../configs";
+import { useSalesReadOnly, salesWriteBlocked } from "./SalesReadOnly";
 
 const { softWhite } = colors;
 
@@ -12,17 +13,20 @@ function HardwareCheck({
     setHardwares,
     setLoading
 }) {
+    const salesReadOnly = useSalesReadOnly(); // DEV-1664 — หมวด 3 ดูได้อย่างเดียว (ใช้เฉพาะ SaleScreen)
     const [note_Modal, setNote_Modal] = useState(false);
     const [currentHardware, setCurrentHardware] = useState({ id:'', note:''});
     const { note, id:hardwareId } = currentHardware;
 
     function openHardware(item){
+        if(salesReadOnly) return; // note แสดงในแถวอยู่แล้ว
         setCurrentHardware(item);
         setNote_Modal(true);
     };
 
     async function handleNote(){
         setNote_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'note ฮาร์ดแวร์')) return;
         setLoading(true);
         try {
             const hardwareRef = db.collection('hardwareOrder').doc(hardwareId);

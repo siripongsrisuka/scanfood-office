@@ -11,9 +11,11 @@ import { Modal_FlatListTwoColumn, Modal_Loading } from "../modal";
 import { initialQuotation } from "../configs";
 import { db } from "../db/firestore";
 import { updateNormalFieldPackage } from "../redux/packageSlice";
+import { useSalesReadOnly, salesWriteBlocked } from "../components/SalesReadOnly";
 
 
 function PackageHistoryScreen() {
+    const salesReadOnly = useSalesReadOnly(); // DEV-1664 — หมวด 3 ดูได้อย่างเดียว
     const dispatch = useDispatch();
     const { displayPackages } = useSelector((state)=> state.package);
     const { profile:{ id:profileId, admin } } = useSelector(state=>state.profile);
@@ -60,6 +62,7 @@ function PackageHistoryScreen() {
 
     async function addSaleToPackage({ id:saleId, name:saleName }){
         setSale_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'ตั้งเซล')) return;
         setLoading(true);
         const { id:orderId } = current;
         try {
@@ -74,6 +77,7 @@ function PackageHistoryScreen() {
     };
 
     function openSaleModal(item){
+        if(salesWriteBlocked(salesReadOnly, 'ตั้งเซล')) return;
         if(!admin)return alert('คุณไม่มีสิทธิ์ในการแก้ไขข้อมูลนี้');
 
         setSale_Modal(true);
@@ -81,6 +85,7 @@ function PackageHistoryScreen() {
     };
 
     async function handleCancelPackage(item){
+        if(salesWriteBlocked(salesReadOnly, 'ยกเลิกใบแพ็กเกจ')) return;
         if(!admin)return alert('คุณไม่มีสิทธิ์ในการยกเลิกคำสั่งซื้อแพ็คเกจนี้');
         const ok = window.confirm('คุณแน่ใจหรือไม่ที่จะยกเลิกคำสั่งซื้อแพ็คเกจนี้?');
         if(!ok)return;
@@ -130,9 +135,9 @@ function PackageHistoryScreen() {
                 return <tr  key={index} >
                             <td style={styles.container4}>{index+1}.</td>
                             <td style={styles.container4}>{stringDateTimeReceipt(timestamp)}</td>
-                            <td onClick={()=>{handleCancelPackage(item)}} >{shopName}<i class="bi bi-trash" ></i></td>
+                            <td onClick={()=>{handleCancelPackage(item)}} >{shopName}{salesReadOnly ? null : <i class="bi bi-trash" ></i>}</td>
                             <td style={styles.container4}>{net}</td>
-                            <td onClick={()=>{openSaleModal(item)}} style={styles.container4}>{saleName}{isApproverPen(profileId)}</td>
+                            <td onClick={()=>{openSaleModal(item)}} style={styles.container4}>{saleName}{salesReadOnly ? null : isApproverPen(profileId)}</td>
                         </tr>
             })}
             </tbody>

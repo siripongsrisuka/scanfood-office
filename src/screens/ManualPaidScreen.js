@@ -11,11 +11,13 @@ import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { OneButton } from "../components";
 import { initialQuotation } from "../configs";
 import { scanfoodAPI } from "../Utility/api";
+import { useSalesReadOnly, salesWriteBlocked } from "../components/SalesReadOnly";
 import { deleteMessage, sendMessage, telegramDeleteQueue } from "../Utility/telegram";
 import { v4 as uuidv4 } from 'uuid';
 
 
 function ManualPaidScreen() {
+    const salesReadOnly = useSalesReadOnly(); // DEV-1664 — หมวด 3 ดูได้อย่างเดียว
     const { profile:{ admin  }  } = useSelector( state => state.profile );
     const { warehouse } = useSelector(state=>state.warehouse);
     const [masterData, setMasterData] = useState([]);
@@ -59,6 +61,7 @@ function ManualPaidScreen() {
 
     async function handleSo(payload){
         setSo_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'อนุมัติ/คืนค่า/ปฏิเสธแพ็กเกจ')) return;
         setLoading(true);
         const { message_id, message_id_saleManager, chat_id, chat_id_saleManager, manualApproveMessage = null } = currentSo;
         let name = '';
@@ -147,7 +150,7 @@ function ManualPaidScreen() {
     };
 
     function openSoModal(item){
-        if(!admin){
+        if(!admin && !salesReadOnly){ // ล็อกอยู่ = ใครก็เปิดดูได้ (ไม่มีปุ่มเขียนเหลือ)
             alert('คุณไม่มีสิทธิ์อนุมัติแพ็กเกจ');
             return;
         }
@@ -168,7 +171,7 @@ function ManualPaidScreen() {
             hardwares={warehouse}
             submit={handleSo}
             disabled={true} // ป้องกันหน้าอื่นแก้ข้อมูล so
-            manualChecked={true}
+            manualChecked={!salesReadOnly} // DEV-1664 — ล็อก = ซ่อนปุ่ม อนุมัติ/คืนค่า/ปฏิเสธ เหลือ "ปิด"
         />
         <Modal_Loading show={loading} />
         <h4>ค้นพบ {masterData.length} รายการ</h4> 
@@ -192,7 +195,7 @@ function ManualPaidScreen() {
                             <td style={styles.container4}>{profileName}</td>
                             <td style={styles.container4}>{shopName}</td>
                             <td style={styles.container4}>
-                                <OneButton {...{ text: "จัดการ", submit: () => {openSoModal(item)} }} />
+                                <OneButton {...{ text: salesReadOnly ? "ดูใบ" : "จัดการ", submit: () => {openSoModal(item)} }} />
                             </td>
                         </tr>
             })}

@@ -8,11 +8,13 @@ import { db } from "../db/firestore";
 import { colors } from "../configs";
 import { SearchControl } from "../components";
 import { scanfoodAPI } from "../Utility/api";
+import { useSalesReadOnly, salesWriteBlocked } from "../components/SalesReadOnly";
 
 const initialInfo = { name:'', tel:'', note:'',shopId:'',packageArray:[]};
 const { white, one } = colors;
 
 function NewShopDashboard() {
+    const salesReadOnly = useSalesReadOnly(); // DEV-1664 — หมวด 3 ดูได้อย่างเดียว
 
     const [loading, setLoading] = useState(false);
     const [currentDisplay, setCurrentDisplay] = useState([]) // จำนวนที่แสดงในหนึ่งหน้า
@@ -119,6 +121,7 @@ function NewShopDashboard() {
   },[page,rowsPerPage,masterData,search]);
 
   async function manageInfo(item){
+    if(salesReadOnly) return; // ข้อมูล info แสดงในตารางอยู่แล้ว · modal มีแต่ปุ่มบันทึก
     setLoading(true)
     try {
         const profileRef = db.collection('profile').doc(item.humanResource[0].id);
@@ -138,6 +141,7 @@ function NewShopDashboard() {
   // 200%
   async function submit(){
     setInfo_Modal(false)
+    if(salesWriteBlocked(salesReadOnly, 'แก้ข้อมูลร้าน')) return;
     setLoading(true)
     try {
         const shopRef = db.collection('shop').doc(shopId);
@@ -188,7 +192,7 @@ function NewShopDashboard() {
                   <tbody  >
                     {currentDisplay.map((item, index) => {
                       const { no, createdDate, name, info, qrcodeColor, qrcodeRemain, tel } = item;
-                      return <tr  style={{cursor: 'pointer'}} key={index}  >
+                      return <tr  style={{cursor: salesReadOnly ? 'default' : 'pointer'}} key={index}  >
                                 <td onClick={()=>{manageInfo(item)}} style={styles.text3}>{no}.</td>
                                 <td onClick={()=>{manageInfo(item)}} style={styles.text3} >{stringFullDate(createdDate)}</td>
                                 <td onClick={()=>{manageInfo(item)}} >

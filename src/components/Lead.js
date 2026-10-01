@@ -6,6 +6,7 @@ import { toastSuccess, wait } from "../Utility/function";
 import { yearMonth } from "../Utility/dateTime";
 import { db } from "../db/firestore";
 import OneButton from "./OneButton";
+import { useSalesReadOnly, salesWriteBlocked } from "./SalesReadOnly";
 
 const { softWhite, softGray } = colors;
 
@@ -31,6 +32,7 @@ function Lead({
     setLead_Modal
 }) {
     
+    const salesReadOnly = useSalesReadOnly(); // DEV-1664 — หมวด 3 ดูได้อย่างเดียว
     const { tel, storeSize, id:leadId } = currentLead;
     const [leadOption_Modal, setLeadOption_Modal] = useState(false);
     const [cancel_Modal, setCancel_Modal] = useState(false);
@@ -82,6 +84,7 @@ function Lead({
     async function handleCancel(){
         const { cancelId, reason } = currentCancel;
         setCancel_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'ย้าย lead ไปถังขยะ')) return;
         setLoading(true);
         try {
             const customerRef = db.collection('customer').doc(leadId);
@@ -114,10 +117,10 @@ function Lead({
                 header={'Lead Options'}
                 show={leadOption_Modal}
                 onHide={()=>{setLeadOption_Modal(false)}}
-                value={leadOptions}
+                value={salesReadOnly ? leadOptions.filter(a=>a.id==='2') : leadOptions}
                 onClick={handleLeadAction}
             />
-            <OneButton {...{ text: '+ เพิ่ม Lead', submit: ()=>{setLead_Modal(true);setCurrentLead(initialLead)}, variant:'dark' }} />
+            {salesReadOnly ? null : <OneButton {...{ text: '+ เพิ่ม Lead', submit: ()=>{setLead_Modal(true);setCurrentLead(initialLead)}, variant:'dark' }} />}
             <h4>ทั้งหมด : {leads.length} lead</h4>
             {leads.map((item)=>{
                 const { name, storeSize, shopType, note, process, day, shopId } = item;

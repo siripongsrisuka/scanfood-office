@@ -7,6 +7,7 @@ import { toastSuccess } from "../Utility/function";
 import { db } from "../db/firestore";
 import { useSelector } from "react-redux";
 import OneButton from "./OneButton";
+import { useSalesReadOnly, salesWriteBlocked } from "./SalesReadOnly";
 
 function Memo({
     memo,
@@ -14,11 +15,13 @@ function Memo({
     setLoading
 }) {
     const { profile:{ id:profileId, name:profileName, team } } = useSelector(state=>state.profile);
+    const salesReadOnly = useSalesReadOnly(); // DEV-1664 — หมวด 3 ดูได้อย่างเดียว (Memo ใช้เฉพาะ SaleScreen)
     const [memo_Modal, setMemo_Modal] = useState(false);
     const [currentMemo, setCurrentMemo] = useState(initialMemo);
     const { content } = currentMemo;
 
     function openMemo(item){
+        if(salesReadOnly) return; // เนื้อ memo แสดงบนการ์ดอยู่แล้ว
         setCurrentMemo(item);
         setMemo_Modal(true);
     };
@@ -26,6 +29,7 @@ function Memo({
     //300%
     async function handleMemo(){
         setMemo_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'memo')) return;
         const { id, content } = currentMemo;
         setLoading(true);
         try {
@@ -74,7 +78,7 @@ function Memo({
             onChange={(value)=>{setCurrentMemo(prev=>({...prev, content:value }))}}
             area={true}
         />
-        <OneButton {...{ text: '+ เพิ่ม Memo', submit: ()=>setMemo_Modal(true), variant:'dark' }} />
+        {salesReadOnly ? null : <OneButton {...{ text: '+ เพิ่ม Memo', submit: ()=>setMemo_Modal(true), variant:'dark' }} />}
         <h6>ทั้งหมด {memo.length} รายการ</h6>
         <Row>
             {memo.map((item,index)=>{

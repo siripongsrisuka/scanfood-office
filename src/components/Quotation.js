@@ -12,6 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { stringDateTimeReceipt } from "../Utility/dateTime";
 import { sendMessage } from "../Utility/telegram";
 import { useDispatch } from "react-redux";
+import { useSalesReadOnly, salesWriteBlocked } from "./SalesReadOnly";
 
 const { softWhite } = colors;
 
@@ -51,6 +52,7 @@ function Quotation({
     setFull_Modal
 }) {
     const dispatch = useDispatch();
+    const salesReadOnly = useSalesReadOnly(); // DEV-1664 — หมวด 3 ดูได้อย่างเดียว (ใช้เฉพาะ SaleScreen)
     const {  id:customerId,   } = currentLead;
     const { id:quotationId, withholdingTax = 0, hardware = []  } = currentQuotation;
     const [paymentAction_Modal, setPaymentAction_Modal] = useState(false);
@@ -76,6 +78,7 @@ function Quotation({
     };
 
     const handleButtonClick = () => {
+        if(salesWriteBlocked(salesReadOnly, 'แนบหลักฐานชำระเงิน')) return;
         fileInputRef.current.click();
     };
 
@@ -111,6 +114,7 @@ function Quotation({
                 // options = quotationOptions.filter(a=>['2','2.1','3','4','5'].includes(a.id))
                 break;
         };
+        if(salesReadOnly) options = options.filter(a=>['2','2.1','3'].includes(a.id)); // DEV-1664 — ตัด ผูกร้าน/ยกเลิก/แนบหลักฐาน
         setOptions(options)
     
     };
@@ -155,6 +159,7 @@ function Quotation({
 
     async function handleConnect(item){
         setConnect_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'ผูกร้าน')) return;
         const { id, name, storeSize } = item;
 
         // ป้องกันให้แพ็กเกจผิดขนาดร้าน
@@ -206,6 +211,7 @@ function Quotation({
 
     // 300%
     async function handleCancelPayment(){
+        if(salesWriteBlocked(salesReadOnly, 'ยกเลิกใบเสนอราคา')) return;
         setLoading(true);
         try {
             await db.runTransaction( async (transaction)=>{
@@ -231,6 +237,7 @@ function Quotation({
 
     // 300%
     async function  handleAddEvident(imageId){
+        if(salesWriteBlocked(salesReadOnly, 'แนบหลักฐานชำระเงิน')) return;
         const { id } = currentQuotation;
         setLoading(true);
         try {
@@ -309,6 +316,7 @@ function Quotation({
         // 2. ถ้าออเดอร์ยังคงสถานะ failed ให้แจ้งเตือนผู้ใช้ว่าออเดอร์นี้ไม่สำเร็จและไม่สามารถอนุมัติได้
         // 3. ถ้าออเดอร์เปลี่ยนเป็น success ให้แจ้งเตือนผู้ใช้ว่าออเดอร์นี้สำเร็จแล้วและจะถูกอนุมัติทันที และอัพเดตสถานะในระบบเป็น success
       async function checkFailedOrder(currentQuotation){
+        if(salesWriteBlocked(salesReadOnly, 'ตรวจซ้ำ/อนุมัติออเดอร์')) return;
         
         const ok = window.confirm("ต้องการตรวจสอบสถานะออเดอร์นี้อีกครั้งหรือไม่?");
         if (!ok) return;
@@ -378,7 +386,7 @@ function Quotation({
             return <Row  key={item.id} style={{ borderBottom:`1px solid ${softWhite}`, marginBottom:'5px', position:'relative' }} >
                         <Col xs='12' sm='6' onClick={()=>{openOptions(item)}}  >{name}[{shopName}]</Col>
                         <Col xs='6' sm='3' onClick={()=>{openOptions(item)}}  >{formatCurrency(net)}</Col>
-                        {process==='failed'
+                        {process==='failed' && !salesReadOnly
                             ?<Col xs='6' sm='3' onClick={()=>{checkFailedOrder(item)}}  ><button style={{backgroundColor:color, padding:5, minWidth:'150px', borderRadius:20}} >{processName}(กดเพื่อตรวจซ้ำ)</button></Col>
                             :<Col xs='6' sm='3' onClick={()=>{openOptions(item)}}  ><button style={{backgroundColor:color, padding:5, minWidth:'150px', borderRadius:20}} >{processName}</button></Col>
                         }

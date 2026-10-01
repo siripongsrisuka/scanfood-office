@@ -10,11 +10,13 @@ import { Modal_ExtraDay, Modal_FlatListTwoColumn, Modal_Loading } from "../modal
 import { db } from "../db/firestore";
 import { reverseSort } from "../Utility/sort";
 import { scanfoodAPI } from "../Utility/api";
+import { useSalesReadOnly, salesWriteBlocked } from "../components/SalesReadOnly";
 import { initialExtraDay } from "../configs";
 import { deleteMessage, sendMessage, telegramDeleteQueue } from "../Utility/telegram";
 import { v4 as uuidv4 } from 'uuid';
 
 function ExtraDayScreen() {
+    const salesReadOnly = useSalesReadOnly(); // DEV-1664 — หมวด 3 ดูได้อย่างเดียว
     const [extraDay_Modal, setExtraDay_Modal] = useState(false);
     const { profile:{ id:profileId, name:profileName, saleManagerTeam, chat_id } } = useSelector(state=>state.profile);
     const [masterData, setMasterData] = useState([]);
@@ -57,6 +59,7 @@ function ExtraDayScreen() {
 
     async function handleExtraDaySubmit(data){
         setExtraDay_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'ยื่นคำขอวันใช้งาน')) return;
         setLoading(true);
         try {
             const extraDayRef = db.collection('extraDay').doc();    
@@ -107,6 +110,7 @@ days : ${payload.days}
     };
 
     async function approvedExtraDay(item){
+        if(salesWriteBlocked(salesReadOnly, 'อนุมัติวันใช้งาน')) return;
         const { shopId, days, id } = item;
         const { chat_id, chat_id_saleManager, message_id_saleManager, message_id, extraDayMessage = null } = current;
         setLoading(true);
@@ -147,6 +151,7 @@ days : ${payload.days}
     };
 
     async function handleRejectExtraDay(item){
+        if(salesWriteBlocked(salesReadOnly, 'ปฏิเสธคำขอวันใช้งาน')) return;
         setLoading(true);
         try {
             const { chat_id, chat_id_saleManager, message_id_saleManager, message_id, extraDayMessage = null } = current;
@@ -211,6 +216,7 @@ days : ${payload.days}
     }
 
     function handleCurrent(item){
+        if(salesReadOnly) return; // อนุมัติ/ปฏิเสธ = เขียนทั้งคู่
         if(!saleManagerTeam) return;
         setCurrent(item);
         setAction_Modal(true);
@@ -236,7 +242,7 @@ days : ${payload.days}
         <h5>เงื่อนไขการขอวันใช้งาน</h5>
         <h6>- Prepaid ขอได้ 2 ครั้ง ครั้งละ 3 วัน</h6>
         <h6>- Postpaid ขอได้ 1 ครั้ง (7,14,30 วัน)</h6>
-        <SearchAndBottom {...{ placeholder:'ค้นหาด้วยชื่อร้านหรือชื่อเซล', search, setSearch, text:'ยื่นคำขอ', exportToXlsx:()=>{setExtraDay_Modal(true)} }} />
+        <SearchAndBottom {...{ placeholder:'ค้นหาด้วยชื่อร้านหรือชื่อเซล', search, setSearch, text:salesReadOnly?'ดูได้อย่างเดียว':'ยื่นคำขอ', variant:salesReadOnly?'secondary':'dark', exportToXlsx:()=>{ if(salesWriteBlocked(salesReadOnly, 'ยื่นคำขอวันใช้งาน')) return; setExtraDay_Modal(true) } }} />
         <br/>
         <h4>ค้นพบ {resultLength} รายการ</h4> 
         <Table striped bordered hover responsive  variant="light"   >

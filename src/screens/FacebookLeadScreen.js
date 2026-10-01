@@ -30,6 +30,7 @@ import {
 } from "rsuite";
 import SearchIcon from "@rsuite/icons/Search";
 import { scanfoodAPI } from "../Utility/api";
+import { useSalesReadOnly, salesWriteBlocked } from "../components/SalesReadOnly";
 import { initialLead } from "../configs";
 import { MdLteMobiledata } from "react-icons/md";
 import { id, ta } from "date-fns/locale";
@@ -74,6 +75,7 @@ const leadStatusOptions = [
 
 const imageId = 'https://firebasestorage.googleapis.com/v0/b/shopchamp-restaurant.appspot.com/o/bank%2F6224286624665767378.jpg?alt=media&token=641c6da4-dce9-4faf-8a52-3550012be1ee'
 function FacebookLeadScreen() {
+    const salesReadOnly = useSalesReadOnly(); // DEV-1664 — หมวด 3 ดูได้อย่างเดียว
     const { office:{ humanRight } } = useSelector(state=>state.office);
     const { profile:{ name:profileName, id:profileId, saleManagerTeam } } = useSelector(state=>state.profile);
     const { sales, saleMap, salemanager } = useMemo(()=>{
@@ -236,6 +238,7 @@ function FacebookLeadScreen() {
 
 
     async function handleConfirm({ id, value }){
+        if(salesWriteBlocked(salesReadOnly, 'ติดต่อแล้ว')) return;
         setContact_Modal(false)
         setLoading(true);
         try {
@@ -288,6 +291,7 @@ function FacebookLeadScreen() {
     }
 
     async function updateTimeline(lead){
+        if(salesWriteBlocked(salesReadOnly, 'เปลี่ยนสถานะ lead')) return;
         if(!lead.saleId) return alert('ยังไม่มีเซลล์ assigned กรุณาเลือกเซลล์ก่อน')
         if(lead.status==='contacted') return alert('ไม่สามารถแก้ไขสถานะได้ เนื่องจากติดต่อแล้ว')
         setLead(lead);
@@ -297,6 +301,7 @@ function FacebookLeadScreen() {
 
     async function handleTimelineAction(value){
         setTimeline_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'เปลี่ยนสถานะ lead')) return;
         const ok = window.confirm(`ยืนยันสถานะ : ${value.name} หรือไม่?`)
         if(!ok) return;
         if(value.id === 'contacted'){
@@ -346,6 +351,7 @@ function FacebookLeadScreen() {
     };
     const [sale_Modal, setSale_Modal] = useState(false);
     function openSale(item){
+        if(salesWriteBlocked(salesReadOnly, 'จ่าย lead ให้เซล')) return;
         if(item.saleId && !(saleManagerTeam && ['registered','in_progress'].includes(item.status)))return alert('ไม่สามารถแก้ไขเซลล์ได้ เนื่องจากมีเซลล์อยู่แล้ว')
         setLead(item);
         setSale_Modal(true);
@@ -354,6 +360,7 @@ function FacebookLeadScreen() {
 
     async function handleAssignSale({ id:saleId }){
         setSale_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'จ่าย lead ให้เซล')) return;
         setLoading(true);
         try {
 
@@ -396,6 +403,7 @@ function FacebookLeadScreen() {
 
     async function handleLead(){
         setLead_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'สร้าง lead')) return;
         setLoading(true);
         const timestamp = new Date();
         try {
@@ -423,6 +431,7 @@ function FacebookLeadScreen() {
     };
 
     function openMemo(item){
+        if(salesWriteBlocked(salesReadOnly, 'memo')) return;
         if(!item.saleId) return alert('ยังไม่มีเซลล์ assigned กรุณาเลือกเซลล์ก่อน')
         if(profileId !== item.saleId && !isGodIt(profileId)) return alert('ไม่สามารถแก้ไข memo ได้ เนื่องจากไม่ใช่เซลล์ที่รับผิดชอบ')
         setLead(item);
@@ -433,6 +442,7 @@ function FacebookLeadScreen() {
 
     async function handleMemo(){
         setMemo_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'memo')) return;
         const { id:leadId } = lead;
         setLoading(true);
         try {
@@ -465,6 +475,7 @@ function FacebookLeadScreen() {
 
 
     function openLeadStatus(item){
+        if(salesWriteBlocked(salesReadOnly, 'lead status')) return;
         if(item.status !== 'contacted') return alert('สามารถแก้ไขสถานะได้เฉพาะ lead ที่ติดต่อแล้วเท่านั้น')
         if(profileId !== 'ebhtbWII6TUanBMqS7bBHIQ1aws2') return alert('คุณไม่ใช่คุณหลุยส์ ไม่สามารถแก้ไขสถานะได้')
         setLead(item);
@@ -473,6 +484,7 @@ function FacebookLeadScreen() {
 
     async function handleLeadStatus({ id:leadStatus }){
         setLeadStatus_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'lead status')) return;
         const { id:leadId } = lead;
         setLoading(true);
         try {
@@ -505,6 +517,7 @@ function FacebookLeadScreen() {
     const [tag_Modal, setTag_Modal] = useState(false);
     const [selected, setSelected] = useState([]);
     function openTag(item){
+        if(salesWriteBlocked(salesReadOnly, 'tag')) return;
         if(item.status !== 'contacted') return alert('สามารถแก้ไขสถานะได้เฉพาะ lead ที่ติดต่อแล้วเท่านั้น')
         if(profileId !== 'ebhtbWII6TUanBMqS7bBHIQ1aws2') return alert('คุณไม่ใช่คุณหลุยส์ ไม่สามารถแก้ไขสถานะได้อีกเหมือนกัน')
         setLead(item);
@@ -514,6 +527,7 @@ function FacebookLeadScreen() {
 
      async function submitSelected(){
         setTag_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'tag')) return;
         const { id:leadId } = lead;
         setLoading(true);
         try {
@@ -584,7 +598,7 @@ function FacebookLeadScreen() {
         />
         <div style={{ display:'flex' }} >
                  <h1>Leads</h1>
-        <OneButton {...{ text:'เพิ่ม Lead', submit:()=>{setLead_Modal(true)} }} />
+        {salesReadOnly ? null : <OneButton {...{ text:'เพิ่ม Lead', submit:()=>{setLead_Modal(true)} }} />}
 
         </div>
            <FacebookSearchBar

@@ -10,10 +10,12 @@ import { goToTop, isApproverPen, searchMultiFunction } from "../Utility/function
 import { Modal_FlatListTwoColumn, Modal_Loading } from "../modal";
 import { initialQuotation } from "../configs";
 import { db } from "../db/firestore";
+import { useSalesReadOnly, salesWriteBlocked } from "../components/SalesReadOnly";
 import { updateNormalFieldHardware } from "../redux/hardwareSlice";
 
 
 function HardwareHistoryScreen() {
+    const salesReadOnly = useSalesReadOnly(); // DEV-1664 — หมวด 3 ดูได้อย่างเดียว
     const dispatch = useDispatch();
     const { displayHardware, hardware } = useSelector((state)=> state.hardware);
     const { profile:{ id:profileId, admin } } = useSelector(state=>state.profile);
@@ -61,6 +63,7 @@ function HardwareHistoryScreen() {
 
     async function addSaleToHardware({ id:saleId, name:saleName }){
         setSale_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'ตั้งเซล')) return;
         setLoading(true);
         const { id:orderId } = current;
         try {
@@ -75,6 +78,7 @@ function HardwareHistoryScreen() {
     };
 
     function openSaleModal(item){
+        if(salesWriteBlocked(salesReadOnly, 'ตั้งเซล')) return;
         if(!admin)return;
 
         setSale_Modal(true);
@@ -82,6 +86,7 @@ function HardwareHistoryScreen() {
     };
 
     async function handleCancelHardware(item){
+        if(salesWriteBlocked(salesReadOnly, 'ยกเลิกใบฮาร์ดแวร์')) return;
         if(!admin)return;
         const ok = window.confirm('คุณแน่ใจหรือไม่ที่จะยกเลิกคำสั่งซื้อฮาร์ดแวร์นี้?');
         if(!ok)return;
@@ -131,9 +136,9 @@ function HardwareHistoryScreen() {
                 return <tr  key={index} >
                             <td style={styles.container4}>{index+1}.</td>
                             <td style={styles.container4}>{stringDateTimeReceipt(timestamp)}</td>
-                            <td onClick={()=>{handleCancelHardware(item)}} >{shopName}<i class="bi bi-trash" ></i></td>
+                            <td onClick={()=>{handleCancelHardware(item)}} >{shopName}{salesReadOnly ? null : <i class="bi bi-trash" ></i>}</td>
                             <td style={styles.container4}>{net}</td>
-                            <td onClick={()=>{openSaleModal(item)}} style={styles.container4}>{saleName}{isApproverPen(profileId)}</td>
+                            <td onClick={()=>{openSaleModal(item)}} style={styles.container4}>{saleName}{salesReadOnly ? null : isApproverPen(profileId)}</td>
                         </tr>
             })}
             </tbody>

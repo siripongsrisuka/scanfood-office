@@ -8,6 +8,7 @@ import { Modal_Lead, Modal_FlatlistSearchShop, Modal_Loading, Modal_Quotation, M
 import { db } from "../db/firestore";
 import { HardwareCheck, Lead, LicenseCheck, Memo, Quotation, SlideOptions } from "../components";
 import { scanfoodAPI } from "../Utility/api";
+import { useSalesReadOnly, salesWriteBlocked } from "../components/SalesReadOnly";
 import {  stringReceiptNumber, stringYMDHMS3 } from "../Utility/dateTime";
 import { colors, initialLead, initialQuotation } from "../configs";
 import { PAYMENT_REQUEST_QR_PATH, POSXPAY_TOKEN } from "../configs/paymentApi";
@@ -27,6 +28,7 @@ const thisOptions = [
 ];
 
 function SaleScreen() {
+    const salesReadOnly = useSalesReadOnly(); // DEV-1664 — หมวด 3 ดูได้อย่างเดียว
     const { profile } = useSelector(state=>state.profile);
     const { id:profileId, name:profileName, team = "A", chat_id = '', admin = false, saleManagerTeam = '' }  = profile;
     const { office:{ humanRight } } = useSelector(state=>state.office);
@@ -110,6 +112,7 @@ function SaleScreen() {
         // 200%
     async function handleLead(){
         setLead_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'สร้าง/แก้ลูกค้า')) return;
         if(leadStatus !=='waiting') return alert('แก้ไขไม่ได้')
         setLoading(true);
         try {
@@ -166,6 +169,7 @@ function SaleScreen() {
             card, taxStep, installments
          } = currentQuotation;
         setQuotation_Modal(false)
+        if(salesWriteBlocked(salesReadOnly, 'ออกใบเสนอราคา')) return;
 
         if(!shopId && oneMonth) return alert('ยังไม่มี shopId');
 
@@ -357,6 +361,7 @@ function SaleScreen() {
 
     async function handleConnect(item){
         setConnect_Modal(false);
+        if(salesWriteBlocked(salesReadOnly, 'ผูกร้าน')) return;
         const { id, name, storeSize } = item;
 
         // ป้องกันให้แพ็กเกจผิดขนาดร้าน
@@ -453,7 +458,7 @@ function SaleScreen() {
             licenses={licenses}
             hardwares={warehouse}
             submit={handleQuotation}
-            disabled={optionId!=='1'} // ป้องกันหน้าอื่นแก้ข้อมูล so
+            disabled={salesReadOnly || optionId!=='1'} // ป้องกันหน้าอื่นแก้ข้อมูล so · DEV-1664 ล็อกหมวด 3
         />
         <Modal_FlatlistSearchShop
             show={connect_Modal}
@@ -466,7 +471,7 @@ function SaleScreen() {
             current={currentLead}
             setCurrent={setCurrentLead}
             submit={handleLead}
-            disabled={currentLead.status !=='waiting'}
+            disabled={salesReadOnly || currentLead.status !=='waiting'}
         />
         <Modal_Loading show={loading} />
         {optionId==='1'
