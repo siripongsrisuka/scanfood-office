@@ -116,7 +116,11 @@ async function loadLiveStaticFiles() {
   } catch (e) {
     die(`ยืนยันตัวตนกับ Firebase ไม่ผ่าน (${e.message})`);
   }
-  const versions = await hostingApi.listVersions(SITE);
+  // firebase-tools 15.34+ เปลี่ยนเป็น listVersions(project, site) — รุ่นเก่ารับ (site) ตัวเดียว
+  //   ส่ง site ตัวเดียวให้รุ่นใหม่ = มันเอาชื่อ site ไปเป็น project → 400 ทั้ง build (2026-10-25)
+  const versions = hostingApi.listVersions.length >= 2
+    ? await hostingApi.listVersions(PROJECT, SITE)
+    : await hostingApi.listVersions(SITE);
   const latest = versions
     .map((v) => ({ id: v.name.split('/').pop(), created: v.createTime }))
     .sort((a, b) => String(b.created).localeCompare(String(a.created)))[0];
