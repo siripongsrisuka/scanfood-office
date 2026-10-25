@@ -91,8 +91,4 @@ const firebaseConfig = {
   
   };
 
-  export function addMail({content,scanfood,timestamp,shopId}){
-      db.collection('mailbox').add({content,scanfood,timestamp,shopId})
-  }
-
   export { db, firebaseAuth, firebaseStorage, firebase }

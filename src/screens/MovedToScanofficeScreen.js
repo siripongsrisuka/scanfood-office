@@ -29,6 +29,9 @@ export const MOVED_TO_SCANOFFICE = {
   kbankReport: { topic: "6.99 kbankReport", group: "ทีม Tech", tab: "รายงาน KBank", url: "https://scanoffice.web.app/admin/configs/kbank-report" },
   // 7.8 (2026-09-26 · Pack: ลบข้อ 7-8 ออก)
   trainingSchedule: { topic: "7.8 จองคิวทอง", group: "CRM", tab: "จองคิว training", url: "https://scanoffice.web.app/training/queue" },
+  // อนุมัติแพ็กเกจ (DEV-1805 ก้อน C · 2026-10-25) — จอเก่าเขียน packageOrder/shop/mailbox ตรงจากเบราว์เซอร์ (ไม่มีด่าน)
+  //   ของใหม่ = scanoffice "อนุมัติแพ็กเกจ" → hub `/admin-package/approve` (ด่าน 3 ชั้น · แจ้งร้านเป็นข่าวระบบแทน mailbox) · เมนูถูกปิดไปก่อนแล้ว เหลือแค่ลิงก์เก่า
+  approveSoftware: { topic: "อนุมัติแพ็กเกจ", group: "Scanfood control", tab: "อนุมัติแพ็กเกจ", url: "https://office.scanfood.co/scanfood-control/package-orders" },
 };
 
 const SCANOFFICE = "https://scanoffice.web.app/admin/configs/";

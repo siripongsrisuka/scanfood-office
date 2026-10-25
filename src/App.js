@@ -58,7 +58,6 @@ import { login } from './redux/authSlice';
 import { firebaseAuth } from './db/firestore'
 import 'rsuite/dist/rsuite.min.css';
 import { ToastContainer } from 'react-toastify';
-import ApproveSoftwareScreen from "./screens/ApproveSoftwareScreen";
 
 
 function App() {
@@ -104,7 +103,7 @@ function App() {
             <Route path='importBomShop' element={<MovedToScanofficeScreen from='importBomShop'/>} />
             <Route path='kbankReport' element={<MovedToScanofficeScreen from='kbankReport'/>} />
             <Route path='warehouse' element={<WarehouseScreen/>} />
-            <Route path='approveSoftware' element={<ApproveSoftwareScreen/>} />
+            <Route path='approveSoftware' element={<MovedToScanofficeScreen from='approveSoftware'/>} />
             <Route path='sale' element={<SalesReadOnly><SaleScreen/></SalesReadOnly>} />
             <Route path='upgrade' element={<MovedToScanofficeScreen from='upgrade'/>} />
             <Route path='upgradeHistory' element={<MovedToScanofficeScreen from='upgradeHistory'/>} />
